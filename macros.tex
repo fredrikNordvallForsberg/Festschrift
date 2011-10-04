@@ -1,0 +1,181 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SPA and SPB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\SPA}{\ensuremath{\text{SP}_{\mathrm{A}}}}
+\newcommand{\SPB}{\ensuremath{\text{SP}_{\mathrm{B}}}}
+
+\newcommand{\nilA}{\ensuremath{\text{nil}}}
+\newcommand{\nilB}{\nilA}
+
+\newcommand{\nonindA}{\ensuremath{\text{non-ind}}}
+\newcommand{\nonindB}{\nonindA}
+
+\newcommand{\AindA}{\ensuremath{\text{A-ind}}}
+\newcommand{\AindB}{\AindA}
+
+\newcommand{\BindA}{\ensuremath{\text{B-ind}}}
+\newcommand{\BindB}{\BindA}
+
+\newcommand{\hindex}{\ensuremath{h_{\mathrm{index}}}}
+
+\newcommand{\Aref}{\ensuremath{A_{\mathrm{ref}}}}
+\newcommand{\Bref}{\ensuremath{B_{\mathrm{ref}}}}
+
+\newcommand{\ArgA}{\ensuremath{\text{Arg}_{\mathrm{A}}}}
+\newcommand{\ArgB}{\ensuremath{\text{Arg}_{\mathrm{B}}}}
+\newcommand{\IndexB}{\ensuremath{\text{Index}_{\mathrm{B}}}}
+
+\newcommand{\repA}{\ensuremath{\text{rep}_{\mathrm{A}}}}
+\newcommand{\repIndex}{\ensuremath{\text{rep}_{\mathrm{index}}}}
+\newcommand{\repB}{\ensuremath{\text{rep}_{\mathrm{B}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Towards SPB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\repn}[1]{\ensuremath{\text{rep}_{#1}}}
+
+\newcommand{\argn}[1]{\ensuremath{\text{arg}^{#1}}}
+
+\newcommand{\Aterm}{\ensuremath{\text{Term}}}
+
+\newcommand{\repbar}{\ensuremath{\overline{\text{rep}_{\mathrm{A}}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abbreviations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\gammaA}{\ensuremath{\gamma_{\mathrm{A}}}}
+\newcommand{\gammaB}{\ensuremath{\gamma_{\mathrm{B}}}}
+\newcommand{\gammaAB}{\gammaA, \gammaB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% intro and elim
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\introA}{\ensuremath{\text{intro}_{\mathrm{A}}}}
+\newcommand{\introB}{\ensuremath{\text{intro}_{\mathrm{B}}}}
+
+\newcommand{\intro}[1]{\ensuremath{\text{intro}_{#1}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The logical framework
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Set}{\ensuremath{\text{Set}}}
+\newcommand{\TYPE}{\ensuremath{\text{Type}}}
+
+\newcommand{\zero}{\ensuremath{\mathbf{0}}}
+\newcommand{\one}{\ensuremath{\mathbf{1}}}
+\newcommand{\oneelt}{\ensuremath{\star}}
+
+\newcommand{\two}{\ensuremath{\mathbf{2}}}
+\newcommand{\twott}{\ensuremath{\text{tt}}}
+\newcommand{\twoff}{\ensuremath{\text{ff}}}
+
+\newcommand{\magic}[1]{\ensuremath{!_{#1}}}
+
+\newcommand{\inl}{\ensuremath{\text{inl}}}
+\newcommand{\inr}{\ensuremath{\text{inr}}}
+
+\newcommand{\pair}[2]{\ensuremath{\langle #1 , #2\rangle}}
+
+\newcommand{\id}{\ensuremath{\text{id}}}
+
+\newcommand{\Nat}{\ensuremath{\mathbb{N}}}
+
+
+%%%%%%%%%%
+
+\newcommand{\IF}{\ensuremath{\textbf{if}}}
+\newcommand{\THEN}{\ensuremath{\textbf{then}}}
+\newcommand{\ELSE}{\ensuremath{\textbf{else}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Contexts and types
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Ctxt}{\ensuremath{\text{Ctxt}}}
+\newcommand{\Ty}{\ensuremath{\text{Ty}}}
+
+\newcommand{\emptyCtxt}{\ensuremath{\varepsilon}}
+\newcommand{\consCtxtbare}{\ensuremath{\triangleright}}
+\newcommand{\consCtxt}[2]{\ensuremath{#1 \consCtxtbare #2}}
+
+\newcommand{\baseTybare}{\ensuremath{\iota}}
+\newcommand{\baseTy}[1]{\ensuremath{\baseTybare_{#1}}}
+\newcommand{\piTybare}{\ensuremath{\Pi}}
+\newcommand{\piTy}[3]{\ensuremath{\piTybare_{#1}(#2, #3)}}
+
+\newcommand{\ArgCtxt}{\ensuremath{\text{Arg}_{\Ctxt}}}
+\newcommand{\ArgType}{\ensuremath{\text{Arg}_{\Ty}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Sorted lists
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\SortedList}{\ensuremath{\text{SortedList}}}
+\newcommand{\lessList}{\ensuremath{\leq_{\text{L}}}}
+
+\newcommand{\nilList}{\ensuremath{\text{nil}}}
+\newcommand{\consListbare}{\ensuremath{\text{cons}}}
+\newcommand{\consList}[3]{\ensuremath{\consListbare(#1, #2, #3)}}
+
+\newcommand{\nilLess}[1]{\ensuremath{\text{triv}_{#1}}}
+\newcommand{\consLess}[6]{\ensuremath{\ll #5, #6\gg_{#4, #1, #2, #3}}}
+\newcommand{\consLessbare}{\ensuremath{\ll \cdot \gg}}
+
+\newcommand{\ArgSList}{\ensuremath{\text{Arg}_{\text{SList}}}}
+\newcommand{\ArglessList}{\ensuremath{\text{Arg}_{\lessList}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set theoretic model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\sem}[1]{\ensuremath{\llbracket #1 \rrbracket}}
+
+\newcommand{\cardz}{\ensuremath{\mathfrak{i}_0}}
+\newcommand{\cardi}{\ensuremath{\mathfrak{i}_1}}
+
+\newcommand{\rhoextend}[2]{\ensuremath{\rho_{[#1 \mapsto #2]}}}
+
+\newcommand{\colonsimeq}{\ensuremath{\mathrel{\mathop:}\simeq}}
+
+\newcommand{\tstile}{{\ensuremath{\vdash}}} %\sststile{}{}}}
+\newcommand{\rst}[1]{\ensuremath{{\mathbin\upharpoonright}%
+\raise-.5ex\hbox{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorem environments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\blackqed}{\hfill\ensuremath{\blacksquare}}
+\renewcommand{\qedsymbol}{\ensuremath{\square}}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{fact}[theorem]{Fact}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{definition}[theorem]{Example}
+
+
+
+\newcommand{\notIncludedProof}[1]{} %for proofs that shouldn't be included in article
+\newcommand{\IncludedProof}[1]{ %for proofs that should be temporarily included in article
+%\framebox{%
+%\begin{minipage}{\textwidth}
+  #1
+%\end{minipage}}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "indInd_model"
+%%% End: 

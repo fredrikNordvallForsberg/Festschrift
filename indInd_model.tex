@@ -1,0 +1,1162 @@
+\documentclass{article}
+
+\usepackage{proof}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+\usepackage{enumerate}
+\usepackage{microtype}
+
+\usepackage{hyperref}
+
+%\title{A set-theoretic model of induction-induction}
+\title{A finite axiomatisation of inductive-inductive definitions}
+
+\usepackage{authblk}
+\author{Fredrik Nordvall Forsberg}
+\author{Anton Setzer}
+\affil{Swansea University \\
+Singleton  Park \\
+Swansea SA2 8PP, UK}
+
+%\thanks{Supported by EPSRC grant EP/G033374/1, Theory and applications of induction-recursion.}}
+
+\input macros.tex
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}  \noindent %todo: rewrite abstract to reflect new focus of article
+  Induction-induction is a principle for mutually defining data types
+  $A : \Set$, $B : A \to \Set$. Both $A$ and $B$ are defined
+  inductively, and the constructors for $A$ can refer to $B$ and vice
+  versa. In addition, the constructor for $B$ can refer to \emph{the
+    constructor} for $A$. Induction induction occurs in a natural way
+  when formalising dependent type theory in type theory.  We give some
+  examples of inductive-inductive definitions, such as the set of
+  surreal numbers. We then formulate the principle of
+  induction-induction, and prove its consistency by constructing a
+  model.
+%Finally we analyse the relationship between induction-induction and indexed 
+%inductive definitions.
+\end{abstract}
+
+\section{Introduction} %todo: rewrite introduction
+\label{sec:introduction}
+
+%Martin-L\"of Type Theory \cite{martinlof1984bibliopolis} is a
+%foundational framework for constructive mathematics, where induction
+%plays a major part in the construction of sets.
+
+Induction is an important principle of definition and reasoning,
+especially so in constructive mathematics.  Martin-L\"of's
+formulation~\cite{martinlof1984bibliopolis} of type theory, for
+instance, includes inductive definitions of among others Cartesian
+products, disjoint unions, the natural numbers, well-orderings and
+lists. Martin-L\"of also includes the identity set and the family of
+finite sets, but these are examples not of ordinary inductive
+definitions, but of inductive families~\cite{dybjer1994indfam}, where
+a family $X : I \to \Set$ for some fixed index set $I$ is defined
+inductively simultaneously.
+
+One of the most important contributions of
+Martin-L\"of~\cite{martinlof1984bibliopolis} is the definition of the
+universe \`a la Tarski~\cite{palmgren1998twentyfiveyears}, where a set
+$U$ (thought of as containing codes for sets) is defined inductively
+together with a function $T : U \to \Set$ (thought of as mapping a
+code $u : U$ to the set $T(u)$ it represents) which is defined
+recursively. This is an instance of the principle of
+inductive-recursive definitions~\cite{dybjer2000IR}. The constructors
+for $U$ may depend negatively on $T$ applied to elements of $U$, as is
+the case if $U$ for example is closed under dependent function spaces:
+\[
+\infer{\pi(a, b) : U}{a : U & \quad b : T(a) \to U}
+\]
+with $T(\pi(a, b)) = (x : T(x)) \to T(b(x))$.
+
+Here, $T : U \to \Set$ is defined recursively. Sometimes, however, one
+might not want to give $T(u)$ completely as soon as $u : U$ is
+introduced, but instead define $T$ inductively as well.
+
+In this article, we present another induction principle, which we, in
+reference to induction-recursion, call \emph{induction-induction}. A set $A$ is
+inductively defined simultaneously with an $A$-indexed set $B$, which is also
+inductively defined, and the introduction rules for $A$ may also refer to
+$B$. So we have formation rules $A : \Set$, $B : A \to \Set$ and typical
+introduction rules might take the form
+\[ \infer{\text{intro}_A(a, b, \ldots) : A}{a : A &b : B(a) & \ldots} \quad
+\infer{\text{intro}_B(a_0, b, a_1, \ldots) : B(a_1)}{a_0 : A &
+&b : B(a_0) & a_1 : A & \ldots} \]
+
+This is not a simple mutual inductive definition of two sets, as $B$
+is indexed by $A$. It is not an ordinary inductive family, as $A$ may
+refer to $B$. Finally, it is not an instance of induction-recursion,
+as $B$ is constructed inductively, not recursively.
+
+$<$Schemas and universes of descriptions$>$.
+
+%External schemas for general inductive sets and inductive families
+%have been given by Backhouse et.\ al.\ \cite{backhouse1989diytt} %backhouse1988meaning
+%and Dybjer \cite{dybjer1994indfam} respectively.
+
+%this has been internalised by Dybjer and Setzer
+%\cite{dybjersetzer1999finax,dybjersetzer2003inalg,dybjersetzer2006IIR}.
+
+%Inductive-recursive
+%definitions have also been used for generic programming in dependent
+%type theory \cite{benke2003universes}.
+
+
+
+\subsection{Examples of inductive-inductive definitions}
+\label{sec:examples}
+
+\begin{example}[Contexts and types]
+\label{ex:ctxt-type}
+
+
+Danielsson \cite{danielsson2007formalisation} and Chapman
+\cite{chapman2009eatitself} define the syntax of dependent type theory
+in the theory itself by inductively defining contexts, types in a
+given context and terms of a given type. Let us concentrate on
+contexts and types for simplicity. There should be an empty
+context $\emptyCtxt$, and if we have any context $\Gamma$ and a valid
+type $\sigma$ in that context, then we should be able to extend the
+context with a fresh variable of that type. We end up with the
+following inductive definition of the set of contexts:
+\[
+\infer{\emptyCtxt : \Ctxt}{} \qquad
+\infer{\consCtxt{\Gamma}{\sigma} : \Ctxt}{\Gamma : \Ctxt & \sigma : \Ty(\Gamma)}
+\]
+
+For types, let us have a base type $\baseTy{}$ (valid in any context)
+and a dependent function type: if $\sigma$ is a type in context $\Gamma$,
+and $\tau$ is a type in $\Gamma$ extended with a fresh variable of type
+$\sigma$ (the variable from the domain), then $\Pi(\sigma, \tau)$ is a
+type in the original context. This leads us to the following inductive
+definition of $\Ty : \Ctxt \to \Set$:
+\[
+\infer{\baseTy{\Gamma} : \Ty(\Gamma)}{\Gamma : \Ctxt} \qquad
+\infer{\piTy{\Gamma}{\sigma}{\tau} : \Ty(\Gamma)}{\Gamma : \Ctxt
+                    & \sigma : \Ty(\Gamma)
+                    & \tau : \Ty(\consCtxt{\Gamma}{\sigma})}
+\]
+
+Note that the definition of $\Ctxt$ refers to $\Ty$, so both sets
+have to be defined simultaneously. Another peculiarity is how the
+introduction rule for $\Pi$ explicitly focuses on a specific
+constructor in the index of the type of $\tau$.
+\blackqed
+
+% Inductive-inductive definitions have been used by Dybjer~\cite{dybjer1996internalTT}, Danielsson~\cite{danielsson2007formalisation} and
+% Chapman~\cite{chapman2009eatitself} to internalise the syntax and semantics of
+% type theory. \label{ctxtsandtypes} 
+% Slightly simplified, they define a set $\Ctxt$ of contexts, a
+% family $\Ty : \Ctxt \to \Set$ of types in a given context, and a family
+% $\Term : (\Gamma : \Ctxt) \to \Ty(\Gamma) \to \Set$ of terms of a
+% given type. Let us for simplicity only consider contexts and
+% types. The set $\Ctxt$ of contexts has two constructors
+% \begin{align*}
+%   \nil &: \Ctxt \enspace ,\\
+%   \cons &: (\Gamma : \Ctxt) \times \Ty(\Gamma) \to \Ctxt\enspace ,
+% \end{align*}
+% corresponding to the empty context and extending a context $\Gamma$
+% with a new type. In our simplified setting, $\Ty : \Ctxt \to \Set$ has the following constructors
+% \begin{align*}
+%   \setz &: (\Gamma : \Ctxt) \to \Ty(\Gamma) \enspace ,\\
+%   \Pi &:  (\Gamma : \Ctxt) \times (A : \Ty(\Gamma)) \times \Ty(\cons(\Gamma, A)) \to \Ty(\Gamma)\enspace . %\\
+% %  \El &:  (\Gamma : \Ctxt) \to \Term (\Gamma, \setz) \to \Ty(\Gamma).
+% \end{align*}
+% The first constructor states that $\setz$ is a type in any
+% context. The second constructor $\Pi$ is the constructor for the $\Pi$-type: If we have a
+% type $A$ in a context $\Gamma$, and another type $B$ in $\Gamma$
+% extended by $A$ (corresponding to abstracting a variable of type $A$), then
+% $\Pi(A, B)$ is also a type in $\Gamma$. 
+% %Finally, $\El$ states that every term of type $\Set$ is also a type.
+
+% Note how the constructor $\cons$ for $\Ctxt$ has an argument of type
+% $\Ty(\Gamma)$, even though $\Ty$ is indexed by $\Ctxt$. It is also worth
+% noting that $\Pi$ has an argument of type $\Ty(\cons(\Gamma, A))$, i.e.\ we are
+% using the constructor for $\Ctxt$ in the index of $\Ty$. In general, we could
+% of course imagine an argument of type $\Ty(\cons(\cons(\Gamma, A), A'))$ etc.
+\end{example}
+
+\begin{example}[Sorted lists]
+\label{ex:sorted-list}
+
+Let us define a data type consisting of sorted lists (of natural
+numbers, say). With induction-induction, we can simultaneously define
+the set $\SortedList$ of sorted lists and the predicate $\lessList :
+(\Nat \times \SortedList) \to \Set$ with $n \lessList \ell$ true if
+$n$ is less than or equal to every element of $\ell$.
+
+The empty list is certainly sorted, and if we have a proof $p$ that
+$n$ is less than or equal to every element of the list $\ell$, we can
+put $n$ in front of $\ell$ to get a new sorted list
+$\consList{n}{\ell}{p}$. Translated into introduction rules, this becomes:
+\[
+\infer{\nilList : \SortedList}{} \qquad
+\infer{\consList{n}{\ell}{p} : \SortedList}{n : \Nat \quad & \ell : \SortedList \quad & p : n \lessList \ell}
+\]
+For $\lessList$, we have that every $m : \Nat$ is trivially smaller
+than every element of the empty list, and if $m \leq n$ and
+inductively $m \lessList \ell$, then $m \lessList \consList{n}{\ell}{p}$:
+\[
+\infer{\nilLess{m} : m \lessList \nilList}
+%{m : \Nat}
+{} \qquad
+\infer{\consLess{n}{\ell}{p}{m}{q}{p_{m, \ell}}\ : m \lessList \consList{n}{\ell}{p}}
+%      {m, n : \Nat \quad & \ell : \SortedList \quad & p : n \lessList \ell \quad &
+       {q : m \leq n \quad & p_{m, \ell} : m \lessList \ell}
+\]
+%
+% For an example with more of a programming flavour, consider defining a
+% data type consisting of sorted lists (of natural numbers, say). With
+% induction-induction, we can simultaneously define the set
+% $\SortedList$ of sorted lists and the predicate $\lessList : (\Nat
+% \times \SortedList) \to \Set$ with $n \lessList \ell$ true if $n$ is
+% less than or equal to every element of $\ell$.
+
+% The empty list is certainly sorted, and if we have a proof $p$ that
+% $n$ is less than or equal to every element of the list $\ell$, we can
+% put $n$ in front of $\ell$ to get a new sorted list
+% $\consList{n}{\ell}{p}$. Translated into introduction rules, this becomes:
+% \[
+% \infer{\nilList : \SortedList}{} \qquad
+% \infer{\consList{n}{\ell}{p} : \SortedList}{n : \Nat \quad & \ell : \SortedList \quad & p : n \lessList \ell}
+% \]
+% For $\lessList$, we have that every $m : \Nat$ is trivially smaller
+% than every element of the empty list, and if $m \leq n$ and
+% inductively $m \lessList \ell$, then $m \lessList \consList{n}{\ell}{p}$:
+% \[
+% \infer{\nilLess{m} : m \lessList \nilList}
+% %{m : \Nat}
+% {} \qquad
+% \infer{\consLess{n}{\ell}{p}{m}{q}{p_{m, \ell}}\ : m \lessList \consList{n}{\ell}{p}}
+% %      {m, n : \Nat \quad & \ell : \SortedList \quad & p : n \lessList \ell \quad &
+%        {q : m \leq n \quad & p_{m, \ell} : m \lessList \ell}
+% \]
+
+% Of course, there are many alternative ways to define such a data type
+% using ordinary induction, but the inductive-inductive one seems
+% natural and might be more convenient for some purposes.
+\blackqed
+\end{example}
+
+\begin{example}[Conway's surreal numbers]
+\label{ex:surreal}
+
+Conway \cite{conway2001ONAG} informally uses induction-induction (but
+couched in ZF set theory, not type theory) in order to define his
+\emph{surreal numbers}. The ``set''\footnote{There are some size
+  issues, since the surreal numbers contain the class of ordinals.} of
+surreal numbers is defined inductively, together with an order
+relation on surreal numbers which is also defined inductively:
+
+\begin{itemize}
+\item A surreal number $X = (X_\mathrm{L}, X_\mathrm{R})$ consists of
+  two sets $X_\mathrm{L}$ and $X_\mathrm{L}$ of surreal numbers, such
+  that no element from $X_\mathrm{L}$ is greater than any element from
+  $X_\mathrm{R}$.
+\item A surreal number $Y = (Y_\mathrm{L}, Y_\mathrm{R})$ is greater
+  than another surreal number $X = (X_\mathrm{L}, X_\mathrm{R})$, $X \leq Y$, if and
+  only if
+  \begin{itemize}
+  \item there is no $x \in X_\mathrm{L}$ such that $Y \leq x$, and
+  \item there is no $y \in Y_\mathrm{R}$ such that $y \leq X$.
+  \end{itemize}
+\end{itemize}
+
+Both rules can be understood as inductive definitions. However, they
+are not formulated with a constructive reading in mind (too many
+negations!). Mamane~\cite{mamane2004surrealCoq} develops the theory of
+surreal nubmers in the proof assistant Coq~\cite{coq}. %todo: expand
+\blackqed
+\end{example}
+
+
+\subsection{Inductive-inductive definitions versus inductive-recursive definitions}
+\label{sec:indind-vs-IR}
+
+\section{Type-theoretical preliminaries}
+\label{sec:preliminaries}
+
+We work in a type theory with at least two universes $\Set$ and
+$\TYPE$, with $\Set : \TYPE$ and $\Set$ a subuniverse of $\TYPE$,
+i.e.\ if $A : \Set$ then $A : \TYPE$. Both $\Set$ and $\TYPE$ are
+closed under dependent function types, written $(x : A) \to B$, where
+$B$ is a set or type depending on $x: A$. Abstraction is written as
+$\lambda x : A . e$, where $e : B$ depending on $x : A$, and
+application as $f(x)$. Repeated abstraction and application are
+written as $\lambda x_1 : A_1 \ldots x_k : A_k . e$ and $f(x_1,
+\ldots, x_k)$. If the type of $x$ can be inferred, we simply write
+$\lambda x.e$ as an abbreviation.  Furthermore, both $\Set$ and
+$\TYPE$ are closed under dependent products, written $(x : A) \times
+B$, where $B$ is a set or type depending on $x: A$, with pairs
+$\langle a , b \rangle$, where $a : A$ and $b : B[x \coloneqq a]$.
+% and projections $\pi_1$, $\pi_2$
+We also have $\beta$- and $\eta$-rules for both dependent function types
+and products.
+
+We need an empty type $\zero : \Set$, with elimination ${!_A : \zero
+  \to A}$ for every $A : \Set$. We need a unit type $\one : \Set$,
+with unique element $\oneelt : \one$ and an $\eta$-rule stating that
+if $x : \one$, then $x = \oneelt : \one$. Moreover, we include a two
+element set $\two : \Set$, with elements $\twott : \two$, $\twoff :
+\two$ and elimination constant $\IF~\cdot~\THEN~\cdot~\ELSE~\cdot :$
+$(a : \two) \to A(\twott) \to A(\twoff) \to A(a)$ where $i : \two
+\Rightarrow A(i) : \TYPE$. I should satisfy the obvious computation
+rules, i.e.\ $\IF~\twott~\THEN~a~\ELSE~b = a$ and
+$\IF~\twoff~\THEN~a~\ELSE~b = b$. Finally, we require the type $\Nat$
+of natural numbers.
+
+With $\IF~\cdot~\THEN~\cdot~\ELSE~\cdot$ and dependent products, we can now
+% as in \cite[A.2]{dybjersetzer2006IIR}
+define the disjoint union of two sets $A + B \coloneqq$ ${(x : \two)}
+\times (\IF~x~\THEN~A~\ELSE~B)$ with constructors $\inl = \lambda {a :
+  A} . \langle \twott , a \rangle$ and $\inr = \lambda {b : B}
+. \langle \twoff , b \rangle$, and prove the usual formation,
+introduction, elimination and equality rules. Importantly, we get
+large elimination for sums, since we have large elimination for
+$\two$. We write the eliminator $[f, g] : {(c : A + B)} \to C(c)$, where
+$i : A + B \Rightarrow A(i) : \TYPE$ and $f : (a : A) \to C(\inl(a))$,
+$g : (b : B) \to C(\inr(b))$. The equality rules are
+\begin{align*}
+[f, g](\inl(a)) &= f(a) \enspace , \\
+[f, g](\inr(b)) &= g(b) \enspace .
+\end{align*}
+We write $\bigplus_{k = 0}^n A_k$ for the iterated sum $A_0 + (A_1 +
+(\ldots + A_n)\cdots)$ and $[f_0, f_1, \ldots, f_n]$ for the iterated
+case distinction $[f_0, [f_1, [\ldots , f_n]]\cdots]$.
+% We write $A_0 + A_1 + \ldots + A_n$ for $A_0 + (A_1 + (\ldots +
+% A_n)\cdots)$ and $\inn_k(a)$ for the $k$th injection
+% $\inl(\inr^k(a))$ (with special case $\inn_n(a)$ = $\inr^{n}(a)$).
+
+Intensional type theory in Martin-L\"of's logical framework extended with
+dependent products and $\zero$, $\one$, $\two$ and $\Nat$ has all the features we
+need. Thus, our development can be seen as an extension of
+the logical framework.
+
+\section{A finite axiomatisation}
+\label{sec:axiomatisation}
+ 
+%TODO: rewrite
+
+In this section, we give a finite axiomatisation of a type theory with
+inductive-inductive definitions. This axiomatisation differs slightly
+from our previous
+axiomatisation~\cite{nordvallforsbergSetzer2010indind}, in that it
+hopefully is easier to understand. However, the definable sets should
+be the same for both axiomatisations.
+
+%TODO: rewrite
+
+We take inspiration from Dybjer and Setzer's axiomatisation of
+inductive-recursive definitions~\cite{dybjersetzer1999finax}. The main
+idea is to construct a universe consisting of codes for
+inductive-inductive definitions, together with a decoding function,
+which maps a code $\varphi$ to the domain of the constructor for the
+inductively defined set represented by $\varphi$.  Just as the second
+component $B : A \to \Set$ depends on the first set $A$, the universe $\SPB : \SPA \to \TYPE$
+of codes for the second component will depend on the universe $\SPA$ of codes
+for the first set.
+
+\subsection{Dissecting an inductive-inductive definition}
+\label{sec:dissect-ind}
+
+We wish to formalise and internalise an inductive-inductive definition
+given by constructors
+\[
+\introA : \Phi_{\mathrm{A}}(A, B) \to A
+\]
+and
+\[
+\introB : (x : \Phi_{\mathrm{B}}(A, B, \introA)) \to B(\theta(x))
+\]
+for some $\Phi_{\mathrm{A}}(A, B) : \Set$, $\Phi_{\mathrm{B}}(A, B,
+\introA) : \Set$ and $\theta : \Phi_{\mathrm{B}}(A, B, \introA) \to
+A$.
+Here, $\theta(x)$ is the \emph{index} of $\introB(x)$, i.e.\ the element $a :
+A$ such that $\introB(x) : B(a)$.
+
+Not all expressions $\Phi_{\mathrm{A}}$ and $\Phi_{\mathrm{B}}$ give
+rise to acceptable inductive-inductive definitions. It is well known,
+for example, that the theory becomes inconsistent if $A$ or $B$ occur
+in negative positions in $\Phi_{\mathrm{A}}$ or $\Phi_{\mathrm{B}}$
+respectively. Thus, we restrict our attention to a class of strictly
+positive functors.
+
+%todo: non-ind, A-ind, B-ind
+
+\subsection{The axiomatisation}
+\label{sec:formal-axiomatisation}
+
+We now give the formal rules for an inductive-inductive definition of
+$A : \Set$, $B : A \to \Set$. These consists of a set of rules for the
+universe $\SPA$ of descriptions of the set $A$ and its decoding
+function $\ArgA$, a set of rules for the universe $\SPB$ and its
+decoding function $\ArgB$, and formation and introduction rules for
+each pair of codes $\gammaA : \SPA$, $\gammaB : \SPB(\gammaA)$.
+
+%elimination rules (with only the type of \BOX_F)
+
+\subsubsection{The universe $\SPA$ of descriptions of $A$}
+\label{sec:SPA}
+  
+We introduce the universe of codes for the index set with the
+formation rule
+\[
+\infer{\SPA(\Aref) : \TYPE}{\Aref : \Set}
+\]
+and define (by abuse of notation) $\SPA \coloneqq \SPA(\zero)$. Thus
+codes in $\SPA$ do not refer to any elements to start with.
+
+The introduction rules for $\SPA$ reflects the informal discussion in
+Section~\ref{sec:dissect-ind}. The rules are as follows (we suppress
+the global premise $\Aref : \Set$):
+\[
+\infer{\nilA : \SPA(\Aref)}{}
+\]
+%
+The code $\nilA$ represents a trivial constructor $c : \one \to A$ (a base case).
+%
+\[
+\infer{\nonindA(K, \gamma) : \SPA(\Aref)}{K : \Set & \quad \gamma : K \to \SPA(\Aref)}
+\]
+%
+The code $\nonindA(K, \gamma)$ represents a non-inductive argument $x
+: K$, with the rest of the arguments given by $\gamma(x)$.
+%
+\[
+\infer{\AindA(K, \gamma) : \SPA(\Aref)}{K : \Set & \quad \gamma : \SPA(\Aref + K)}
+\]
+%
+The code $\AindA(K, \gamma)$ represents an inductive argument with
+type $K \to A$, with the rest of the arguments given by
+$\gamma$. Notice that $\gamma : \SPA(\Aref + K)$, so that the
+remaining arguments can refer to more elements in $A$ (namely those
+introduced by the inductive argument).
+%
+\[
+\infer{\BindA(K, \hindex, \gamma) : \SPA(\Aref)}{K : \Set & \quad \hindex : K \to \Aref & \quad \gamma : \SPA(\Aref)}
+\]
+%
+Finally, the code $\BindA(K, \hindex, \gamma)$ represents an inductive
+argument with type $(x : K) \to B(i(x))$, where the index $i(x)$ is
+determined by $\hindex$, and the rest of the arguments are given by
+$\gamma$.
+%
+
+\begin{example}
+  The constructor $\consCtxtbare : ((\Gamma : \Ctxt) \times \Ty(\Gamma))
+  \to \Ctxt$ is represented by the code
+\[
+\gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one, \widehat{\Gamma}, \nilA)) \enspace ,
+\]
+where $\widehat{\Gamma} = \lambda (\oneelt : \one)\,.\,\inr(\oneelt)$ is the representation of $\Gamma$ in $\Aref = \zero + \one$.
+\blackqed
+\end{example}
+
+We now define the decoding function $\ArgA$, which maps a code to the
+domain of the constructor it represents. In addition to a set $\Aref$
+and a code $\gamma : \SPA(\Aref)$, $\ArgA$ will take a set $X$ and a
+family $Y : X \to \Set$ as arguments to use as $A$ and $B$ in the
+inductive arguments. These will later be instantiated recursively. We
+also require a function $\repA : \Aref \to X$ which we think of as
+mapping a ``referable'' element to the element it represents in
+$X$. All in all, $\ArgA$ has the following formation rule:
+%
+\[
+\infer{\ArgA(\Aref, \gamma. X, Y, \repA) : \Set}{\Aref : \Set
+                                         & \quad \gamma : \SPA(\Aref)
+                                         & \quad X : \Set
+                                         & \quad Y : X \to \Set
+                                         & \quad \repA : \Aref \to X}
+\]
+%
+Notice that if $\gamma : \SPA$, i.e.\ if $\Aref = \zero$, then we can
+choose $\repA = {} \magic{X} : \zero \to X$ (indeed, extensionally,
+this is the only choice), so that we can define
+\[
+\ArgA : \SPA \to (X : \Set) \to (Y : X \to \Set) \Set
+\]
+by $\ArgA(\gamma, X, Y) = \ArgA(\zero, \gamma, X, Y, \magic{X})$.
+
+The definition of $\ArgA$ follows the informal description of what the
+different codes represent above:
+
+%todo: formatting %todo mark changing arguments
+\begin{align*} 
+  \ArgA(\Aref, \nilA, X, Y, \repA) &= \one \\
+  \ArgA(\Aref, \nonindA(K, \gamma), X, Y, \repA) &= (x : K) \times \ArgA(\Aref, \gamma(x), X, Y, \repA) \\
+  \ArgA(\Aref, \AindA(K, \gamma), X, Y, \repA) &=  (j : K \to X) \times \ArgA(\Aref + K, \gamma, X, Y, [\repA, j]) \\
+  \ArgA(\Aref, \BindA(K, \hindex, \gamma), X, Y, \repA) &=  ((x : K) \to Y((\repA \circ \hindex)(x))) \times \ArgA(\Aref, \gamma, X, Y, \repA) \\
+\end{align*}
+
+%todo: discuss Aind and Bind
+
+\begin{example}
+  Recall the code $\gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one,
+  \lambda (\oneelt : \one)\,.\,\inr(\oneelt), \nilA))$ for the
+  constructor $\consCtxtbare : ((\Gamma : \Ctxt) \times \Ty(\Gamma)) \to
+  \Ctxt$. We have 
+\[
+\ArgA(\gamma_{\consCtxtbare}, \Ctxt, \Ty) = (\Gamma : \one \to \Ctxt)
+\times (\one \to \Ty(\Gamma(\oneelt))) \times \one
+\]
+which, thanks to the $\eta$-rules for $\one$, is isomorphic to the
+domain of $\consCtxtbare$. 
+\blackqed
+\end{example}
+
+\subsubsection{Towards descriptions of $B$} %todo: rename
+\label{sec:towards-SPB}
+
+As we have seen in Example \ref{ex:ctxt-type}, it is important that
+the constructor $\introB$ for the second set $B : A \to \Set$ can
+refer to the constructor $\introA$ for the first set $A$. This means
+that inductive arguments might be of type $B(\introA(\overline{a}))$
+for some $\overline{a} : \ArgA(\gammaA, A, B)$ or even
+$B(\introA(\ldots\introA\ldots(\overline{a})))$ for some $\overline{a}
+: \ArgA(\gammaA, \ldots \ArgA(\gammaA, A, B)\ldots, B')$. Thus, we
+need to be able to represent such indices in the descriptions of the
+constructor $\introB$.
+
+First, it is no longer enough to only keep track of the referable
+elements $\Aref$ of $A$ -- we need to be able to refer to elements of
+$B$ as well, since they could be used as arguments to $\introA$. We
+will represent the elements of $B$ we can refer to by a set $\Bref$,
+together with functions $\repIndex : \Bref \to A$ and $\repB : (x :
+\Bref) \to B(\repIndex(x))$ ; the function $\repIndex$ gives the index
+of the represented element, and $\repB$ the actual element.
+
+%todo: consistent use of X, Y / A , B
+
+We want to represent elements in $\ArgA(\gammaA, A, B)$. We claim that
+the elements in $\ArgA(\gammaA, \Aref + \Bref, [\lambda x\,.\,\zero,
+\lambda x\,.\,\one])$ are suitable for this purpose. To see this,
+first observe that we can define a functions
+\[
+f : \Aref + \Bref \to A
+\]
+%
+%and
+%
+\[
+g : (x : \Aref + \Bref) \to
+    [\lambda x\,.\,\zero, \lambda x\,.\,\one](x)
+      \to B(f(x))
+\]
+%
+by $f = [\repA, \repIndex]$ and $g = [\lambda x\,.\,\magic{B \circ
+  \repA}, \lambda x \oneelt\,.\, \repB(x)]$. Then, we can lift these
+functions to a function
+%
+\[
+\ArgA(\gammaA, f, g) : \ArgA(\gammaA, \Aref +\Bref, [\lambda x\,.\,\zero, \lambda x\,.\,\one]) \to
+                       \ArgA(\gammaA, A, B)
+\]
+%
+by observing that $\ArgA(\gammaA)$ is functorial:
+
+\begin{lemma} %todo: reword. Do we want to avoid cat. theory?
+  For each $\gamma : \SPA$, $\ArgA(\gamma)$ extends to a functor from
+  families of sets to sets, i.e.\ given $f : A \to A'$ and $g : (x :
+  A) \to B(x) \to B'(f(x))$, one can define $\ArgA(\gamma, f, g) :
+  \ArgA(\gamma, A, B) \to \ArgA(\gamma, A', B')$ such that identities
+  and compositions are preserved.
+\end{lemma}
+\begin{proof} %todo
+
+  This is straightforward in extensional type theory. In intensional
+  type theory, we have to be more careful. The function $\ArgA(\gamma,
+  f, g)$ is defined by induction over $\gamma$ and $\Aref$: let $A$,
+  $B$, $\repA : \Aref \to A$, $A'$, $B'$, $\repA' : \Aref \to A'$ and
+  $f : A \to A'$, $g : (x : A) \to B(x) \to B'(f(x))$ be given. In
+  addition, assume that $f(\repA(x)) = \repA'(x)$ for all $x :
+  \Aref$. It is enough for our purposes to state this in a
+  ``specialised Leibniz form''; we require a term
+  \[
+  p : (x : \Aref) \to B'(f(\repA(x))) \to B'(\repA'(x)) \enspace .
+  \]
+  % 
+  Thus we define
+  % 
+  \[
+  \ArgA(\gamma, f, g, p) : %(p : (x : \Aref) \to B'(f(\repA(x))) \to B'(\repA'(x))) \to
+  \ArgA(\Aref, \gamma, A, B, \repA)
+  \to \ArgA(\Aref, \gamma, A', B', \repA')
+  \]
+  % 
+  by induction over $\gamma$:
+  \begin{align*}
+    \ArgA(\nilA, f, g, p, \oneelt) &= \oneelt\\
+    \ArgA(\nonindA(K, \gamma), f, g, p, \pair{k}{y}) &= \pair{k}{\ArgA(\gamma(k), f, g, p, y)}\\
+    \ArgA(\AindA(K, \gamma), f, g, p, \pair{j}{y}) &= \pair{f \circ j}{\ArgA(\gamma, f, g, [p, \lambda x\,.\,\id], y)}\\
+    \ArgA(\BindA(K, \hindex, \gamma), f, g, p, \pair{j}{y}) &= \pair{\lambda k\,.\,p(h(k), g(\repA(h(k)), j(k)))}{\ArgA(\gamma, f, g, p, y)}
+  \end{align*}
+  
+  Finally, we can define $\ArgA(\gamma, f, g) : \ArgA(\gamma, A, B) \to
+  \ArgA(\gamma, A', B')$ by
+  \[
+  \ArgA(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magic{B'(f(\repA(x))) \to B'(\repA'(x))} \enspace .
+  \]
+  % 
+  (Pointwise) preservation of identities and composition is easily checked.
+\end{proof}
+
+Recall that we want to use the lemma to represent elements in
+$\ArgA(\gammaA. A, B)$ by elements in $\ArgA(\gammaA, \Aref +\Bref,
+[\lambda x\,.\,\zero, \lambda x\,.\,\one])$. We can actually do one
+better, and represent arbitrarily terms built from elements in $A$ and
+$B$ with the use of a constructor $\introA : \ArgA(\gammaA, A, B) \to
+A$. For this, define $\argn{n}$ with formation rule
+%
+\[
+\infer{\argn{n}(\gammaA, \Aref, \Bref) : \Set}{n \in \Nat & \quad \gammaA : \SPA & \quad \Aref, \Bref : \Set}
+\]
+%
+by letting
+\begin{align*}
+\argn{0}(\gammaA, \Aref, \Bref) &= \Aref \\
+\argn{n + 1}(\gammaA, \Aref, \Bref) &= \ArgA(\gammaA, \bigplus_{k = 0}^n \argn{k}(\gammaA, \Aref, \Bref) + \Bref,  [\lambda x\,.\,\zero, \lambda x\,.\,\one])
+\end{align*}
+
+%todo: motivate \bigplus
+
+Given a constructor $\introA : \ArgA(\gammaA, A, B) \to A$, all
+elements in $\argn{n}(\gammaA,\Aref, \Bref)$ represents elements in
+$A$, given that the elements of $\Aref$ and $\Bref$ represents elements
+of $A$ and $B$ respectively (i.e.\ we have $\repA : \Aref \to A$,
+$\repIndex : \Bref \to A$ and $\repB : (x : \Bref) \to
+B(\repIndex(x))$):
+%
+\[
+\infer{\repn{n}(\gammaA, \introA, \repA, \repIndex, \repB) : \argn{n}(\gammaA, \Aref, \Bref) \to A}
+      {n : \Nat & \quad
+       \gammaA : \SPA & \quad
+       \introA : \ArgA(\gammaA, A, B) \to A & \quad
+              %{\deduce{B : A \to \Set}
+              %        {A : \Set}} & \quad
+       \deduce{\repB : (x : \Bref) \to B(\repIndex(x))}
+              {\deduce{\repIndex : \Bref \to A}
+                      {\repA : \Aref \to A}}}
+\]
+%
+\begin{align*}
+\repn{0}(\ldots) &= \repA \\
+\repn{n + 1}(\ldots) &= \introA \circ \ArgA(\gammaA, [\repn{0}(\ldots), \ldots, \repn{n}(\ldots)], [\lambda x\,.\,\magic{}, \lambda x \oneelt\,.\,\repB(x)])
+\end{align*}
+
+%todo: say something about the use of complete induction?
+
+Define the set of terms ``built from $\introA$, $\Aref$ and  $\Bref$'' as
+%
+\[
+\Aterm(\gammaA, \Aref, \Bref) = (n : \Nat) \times \argn{n}(\gammaA, \Aref, \Bref) \enspace .
+\]
+%
+Each term can be mapped to the element in $A$ it denotes:
+%
+\[
+\infer{\repbar(\gammaA, \introA, \repA, \repIndex, \repB) : \Aterm(\gammaA, \Aref, \Bref) \to A}
+      {\gammaA : \SPA & \quad
+       \introA : \ArgA(\gammaA, A, B) \to A & \quad
+              %{\deduce{B : A \to \Set}
+              %        {A : \Set}} & \quad
+       \deduce{\repB : (x : \Bref) \to B(\repIndex(x))}
+              {\deduce{\repIndex : \Bref \to A}
+                      {\repA : \Aref \to A}}}
+\]
+%
+$\repbar(\ldots, \pair{n}{x}) = \repn{n}(\ldots, x)$
+
+
+\subsubsection{The universe $\SPB$ of descriptions of $B$}
+\label{sec:SPB}
+
+We now introduce the universe $\SPB : \SPA \to \TYPE$ of descriptions
+for $B$. It has formation rule
+%
+\[
+\infer{\SPB(\Aref, \Bref, \gammaA) : \TYPE}{\Aref, \Bref : \Set & \quad \gammaA : \SPA}
+\]
+%
+Again, we abuse notation and define $\SPB : \SPA \to \TYPE$ by
+$\SPB(\gammaA) \coloneqq \SPA(\zero, \zero, \gammaA)$.
+
+The introduction rules for $\SPB$ are similar to the ones for $\SPA$,
+except we now need to specify an index for the codomain of the
+constructor, and indices for arguments inductive in $B$ can be
+arbitrary terms built up from $\introA$ and elements we can refer to.
+
+\[
+\infer{\nilB(a) : \SPB(\Aref, \Bref, \gammaA)}{a : \Aterm(\gammaA, \Aref, \Bref)}
+\]
+%
+%The code $\nilA$ represents a trivial constructor $c : \one \to A$ (a base case).
+%
+\[
+\infer{\nonindB(K, \gamma) : \SPB(\Aref, \Bref, \gammaA))}{K : \Set & \quad \gamma : K \to \SPB(\Aref, \Bref, \gammaA)}
+\]
+%
+%The code $\nonindA(K, \gamma)$ represents a non-inductive argument $x: K$, with the rest of the arguments given by $\gamma(x)$.
+%
+\[
+\infer{\AindB(K, \gamma) : \SPB(\Aref, \Bref, \gammaA)}{K : \Set & \quad \gamma : \SPB(\Aref + K, \Bref, \gammaA)}
+\]
+%
+%The code $\AindA(K, \gamma)$ represents an inductive argument with
+%type $K \to A$, with the rest of the arguments given by
+%$\gamma$. Notice that $\gamma : \SPA(\Aref + K)$, so that the
+%remaining arguments can refer to more elements in $A$ (namely those
+%introduced by the inductive argument).
+%
+\[
+\infer{\BindB(K, \hindex, \gamma) : \SPB(\Aref, \Bref, \gammaA)}{K : \Set & \quad \hindex : K \to \Aterm(\Aref, \Bref, \gammaA) & \quad \gamma : \SPB(\Aref, \Bref + K, \gammaA)}
+\]
+%
+%Finally, the code $\BindA(K, \hindex, \gamma)$ represents an inductive
+%argument with type $(x : K) \to B(i(x))$, where the index $i(x)$ is
+%determined by $\hindex$, and the rest of the arguments are given by
+%$\gamma$.
+%
+\begin{example}
+  The constructor
+  % 
+  \[
+  \Pi : \big((\Gamma : \Ctxt) \times (\sigma : \Ty(\Gamma)) \times \Ty(\consCtxt{\Gamma}{\sigma})\big)\to \Ty(\Gamma)
+  \]
+  % 
+  is represented by the code
+  % 
+  \[
+  \gamma_{\Pi} = \AindB(\one,
+                  \BindB(\one, \lambda \oneelt\,.\,\widehat{\Gamma}, 
+                    \BindB(\one, \lambda \oneelt\,.\,\widehat{\text{in}\pair{\Gamma}{\sigma}},
+                      \nilB(\widehat{\Gamma}))))
+  \]
+  %
+  where $\widehat{\Gamma} = \pair{0}{\inr(\oneelt)}$ is the element
+  representing the first argument $\Gamma : \Ctxt$ and
+  $\widehat{\text{in}\pair{\Gamma}{\sigma}} =
+  \pair{1}{\pair{\twott}{\pair{(\lambda
+        \oneelt\,.\,\inr(\inr(\oneelt)))}{\pair{(\lambda
+          \oneelt\,.\,\oneelt)}{\oneelt}}}}$ is the element
+  representing $\consCtxt{\Gamma}{\sigma}$ (the number $1$ corresponds
+  to the fact that we are using one nesting of constructors).
+\blackqed
+\end{example}
+
+The definition of $\ArgB$ should now not come as a surprise. First, we have a formation rule:
+%
+\[
+\mathclap{%
+\infer{\ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \gamma) : \Set}
+                                        {\deduce{\Aref, \Bref : \Set}{\gammaA : \SPA}
+                                         & \quad \deduce{\introA : \ArgA(\gammaA, A, B) \to A}
+                                                        {\deduce{B : A \to \Set}{A : \Set}}
+                                         & \quad \deduce{\repB: (x : \Bref) \to B(\repIndex(x))}
+                                                        {\deduce{\repIndex : \Bref \to A}
+                                                                {\repA : \Aref \to X}}
+                                         & \quad \gamma : \SPB(\Aref, \Bref, \gammaA)}
+}
+\]
+%
+Once again, the definition is simpler for codes in $\SPB(\gammaA)$:
+\[
+\ArgB(\gammaA, A, B, \introA, \gamma) \coloneqq
+   \ArgB(\zero, \zero, \gammaA, A, B, \introA, \magic{A}, \magic{A}, \magic{B \circ \magic{A}}, \gamma)
+\]
+%
+We define:
+%todo: formatting
+\begin{align*} 
+&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \nilB(a)) = \one \\
+&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \nonindB(K, \gamma)) \\  
+&\quad= (x : K) \times \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \gamma(x)) \\
+&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \AindB(K, \gamma)) \\
+&\quad=  (j : K \to A) \times \ArgB(\Aref + K, \Bref, \gammaA, A, B, \introA,  [\repA, j], \repIndex, \repB, \gamma) \\
+&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
+&\quad= (j : (x : K) \to B((\repbar(\gammaA, \introA, \repA, \repIndex, \repB) \circ \hindex)(x))) \times {} \\ 
+& \qquad\quad     \ArgB(\Aref, \Bref + K, \gammaA, A, B, \introA, \repA, [\repIndex, \repbar(\ldots) \circ \hindex], [\repB, j], \gamma)
+\end{align*}
+
+Finally, we need the function $\IndexB(\ldots) : \ArgB(\gammaA, \gammaB, A, B,
+\introA) \to A$ which to each $b : \ArgB(\gammaA, \gammaB, A, B,
+\introA)$ assigns an index $a : A$ such that the element constructed
+from $b$ is in $B(a)$.
+%
+\[
+\mathclap{%
+\infer{\IndexB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \gamma) : \ArgB(\ldots) \to A}
+                                        {\deduce{\Aref, \Bref : \Set}{\gammaA : \SPA}
+                                         & \quad \deduce{\introA : \ArgA(\gammaA, A, B) \to A}
+                                                        {\deduce{B : A \to \Set}{A : \Set}}
+                                         & \quad \deduce{\repB: (x : \Bref) \to B(\repIndex(x))}
+                                                        {\deduce{\repIndex : \Bref \to A}
+                                                                {\repA : \Aref \to X}}
+                                         & \quad \gamma : \SPB(\Aref, \Bref, \gammaA)}
+}
+\]
+%
+As is standard for us at this point, we define $\IndexB :
+\ArgB(\gammaA, A, B, \introA, \gammaB) \to A$ by
+%
+\[
+\IndexB(\gammaA, A,B, \introA, \gammaB) \coloneqq
+   \IndexB(\zero, \zero, \gammaA, A, B, \introA, \magic{A}, \magic{A}, \magic{B \circ \magic{A}}, \gammaB)
+\]
+%
+For the equations, we will suppress all inferable arguments:
+%
+\begin{align*} 
+\IndexB(\ldots, \nilB(a), \oneelt) &= \repbar(\ldots, a) \\
+\IndexB(\ldots, \nonindB(K, \gamma), \pair{k}{y}) &= \IndexB(\ldots, \gamma(k), y) \\  
+\IndexB(\ldots, \AindB(K, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y) \\
+\IndexB(\ldots, \BindB(K, \hindex, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y)
+\end{align*}
+
+\begin{example}
+  $\ArgB$ and $\IndexB$ of $\gamma_{\Pi}$.
+\blackqed
+\end{example}
+
+\subsubsection{Formation and introduction rules}
+\label{sec:intro-elim}
+
+We are now ready to give the formation and introduction rules for $A$
+and $B$. They all have the common premises $\gammaA : \SPA$, $\gammaB
+: \SPB(\gammaA)$, which will be omitted.
+
+Formation rules:
+%
+\[
+A_{\gammaAB} : \Set \qquad\quad
+B_{\gammaAB} : A_{\gammaAB} \to \Set
+\]
+%
+Introduction rule for $A_{\gammaAB}$:
+%
+\[ %todo: check PML convention on variable names (x vs a)
+\infer{\intro{A_{\gammaAB}}(x) : A_{\gammaAB}}{x : \ArgA(\gammaA, A_{\gammaAB}, B_{\gammaAB})}
+\]
+%
+Introduction rule for $B_{\gammaAB}$:
+%
+\[
+\infer{\intro{B_{\gammaAB}}(x) : B_{\gammaAB}(\IndexB(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB, x))}{x : \ArgB(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB)}
+\]
+%
+
+Elimination rules can also be
+formulated~\cite{nordvallforsbergAltenkirchMorrisSetzer2011catsemindind}. Here,
+we just give the elimination rules for the data type of sorted lists
+(Example~\ref{ex:sorted-list}) as an example, and show how one can use them to
+define a function which inserts a number into a sorted list.
+
+\begin{example}
+   %todo: or simply Ctxt + types?
+\blackqed
+\end{example}
+
+\subsection{The examples revisited}
+\label{sec:examples-revisited}
+
+%\blackqed
+
+We show how to find \gammaAB{} for some well-known sets, including the
+examples in Section~\ref{sec:examples}.
+
+%natural numbers
+
+%vectors etc
+
+%ctxts and types
+
+
+\section{A set-theoretic model}
+\label{sec:model}
+
+%todo: rewrite from CSL article
+
+Even though $\SPA$ and $\SPB$ themselves are straightforward (large)
+inductive definitions, this axiomatisation does not reduce
+inductive-inductive definitions to indexed inductive definitions,
+since the formation and introduction rules are not instances of
+ordinary indexed inductive definitions.  (However, we do believe that
+the theory of inductive-inductive definitions \emph{can} be reduced to
+the theory of indexed inductive definitions with a bit of more
+work, %and plan to publish an article about this in the future.
+see Section~\ref{sec:indexed-induction}.) To make sure that our theory
+is consistent, it is thus neccessary to construct a model.
+
+
+We will develop a model in ZFC set theory, extended by two
+inaccessible cardinals in order to interpret $\Set$ and $\TYPE$.  Our
+model will be a simpler version of the models developed in
+\cite{dybjersetzer1999finax,dybjersetzer2006IIR}. %Hence the proof theoretical
+%strength required is, as expected significantly lower but still too
+%strong. 
+See Aczel \cite{aczel1999typesandsets} for a more detailed treatment
+of interpreting type theory in set theory.
+
+
+
+\subsection{Preliminaries}
+
+We will be working informally in ZFC extended with the existence of two
+strongly inaccessible cardinals $\cardz < \cardi$,
+and will be using standard set theoretic constructions, e.g.
+\begin{align*}
+\langle a, b\rangle &\coloneqq \{ \{ a \}, \{ a, b \}\}, \\
+\lambda x \in a.b(x) &\coloneqq \{\langle x, b(x)\rangle | x \in a \} \\
+\Pi_{x \in a}b(x) &\coloneqq \{ f : a \to \bigcup_{x \in a}b(x)\ |\ \forall x \in a.f(x) \in b(x)\}, \\
+\Sigma_{x \in a}b(x) &\coloneqq \{ \langle c , d\rangle\ |\ c \in a \land d
+\in b(c) \}, \\
+0 &\coloneqq \emptyset, 1 \coloneqq \{0\}, 2 \coloneqq \{0, 1\}, \ldots, \\
+\Nat &\coloneqq \text{smallest set containing $0$ and closed under successor} \\
+a_0 + \ldots + a_n &\coloneqq \Sigma_{i \in \{0, \ldots, n\}}a_i
+\end{align*}
+and the cumulative hierarchy $V_{\alpha} \coloneqq
+\displaystyle\bigcup_{\beta < \alpha} \mathcal{P}(V_{\beta})$. Whenever we
+introduce sets $A^{\alpha}$ indexed by ordinals $\alpha$, let \[A^{< \alpha}
+\coloneqq \displaystyle\bigcup_{\beta < \alpha}A^{\beta}.\]
+
+For every expression $A$ of our type theory, we will give an interpretation
+$\sem{A}_\rho$, regardless if $A : \TYPE$ or $A : B$ or not. Interpretations
+might however be undefined, written $\sem{A}_\rho\uparrow$. If $\sem{A}_\rho$
+is defined, we write $\sem{A}_\rho\downarrow$. We write $A \simeq B$ for
+partial equality, i.e.\ $A \simeq B$ if and only if $A\downarrow
+\Leftrightarrow B\downarrow$ and if $A\downarrow$, then $A = B$. We write $A
+\colonsimeq B$ if we define $A$ such that $A \simeq B$.
+
+Open terms will be interpreted relative to an environment $\rho$, i.e.\ a
+function mapping variables to terms. Write \rhoextend{x}{a} for the
+environment $\rho$ extended with $x \mapsto a$, i.e.\ $\rhoextend{x}{a}(y) = a$
+if $y = x$ and $\rho(y)$ otherwise. The interpretation $\sem{t}_{\rho}$ of closed
+terms $t$ will not depend on the environment, and we omit the subscript $\rho$.
+
+\subsection{Interpretation of Expressions}
+\noindent 
+The interpretation of the logical framework is as in
+\cite{dybjersetzer1999finax}:
+\begin{gather*}
+\sem{\Set} \colonsimeq V_{\cardz} \qquad \sem{\TYPE} \colonsimeq V_{\cardi} \\
+\sem{(x : A) \to B}_\rho \colonsimeq \Pi_{y \in
+  \sem{A}_\rho}\sem{B}_{\rhoextend{y}{x}} \qquad
+\sem{\lambda x:A.e}_\rho \colonsimeq \lambda y \in
+\sem{A}_\rho.\sem{e}_{\rhoextend{y}{x}} \\
+\sem{(x : A) \times B}_\rho \colonsimeq \Sigma_{y \in
+  \sem{A}_\rho}\sem{B}_{\rhoextend{y}{x}} \qquad
+\sem{\langle a, b \rangle}_\rho \colonsimeq \langle \sem{a}_\rho ,
+\sem{b}_\rho\rangle \\
+\sem{\zero} \colonsimeq 0 \qquad \sem{\one} \colonsimeq 1 \qquad
+\sem{\two} \colonsimeq 2 \qquad \sem{\oneelt} \colonsimeq 0 \qquad \sem{\twott} \colonsimeq 0 \qquad
+\sem{\twoff} \colonsimeq 1\\
+\sem{\IF~x~\THEN~a~\ELSE~b}_\rho \colonsimeq
+\begin{cases}
+\sem{a}_\rho & \text{if $\sem{x}_\rho = 0$} \\
+\sem{b}_\rho & \text{if $\sem{x}_\rho = 1$} \\
+\text{undefined} & \text{otherwise} \\
+\end{cases} \\
+\sem{!_A}_\rho \colonsimeq \text{unique inclusion $\iota_{\sem{A}} : \emptyset \to \sem{A}_\rho$ }
+\end{gather*}
+
+To interpret terms containing $\SPA$, $\SPB$, $\ArgA$, $\ArgB$, $\IndexB$, 
+$\nilA$, $\nonindA$, $\AindA$, $\BindA$, we first define $\sem{\SPA}$,
+$\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpret
+\begin{align*}
+\sem{\SPA(\Aref)}_\rho &\coloneqq \sem{\SPA}(\sem{\Aref}_\rho) \\
+\vdots \\
+\sem{\ArgA(\Aref, \gamma, A, B, \repA)}_\rho &\coloneqq
+\sem{\ArgA}(\sem{\Aref}_\rho, \sem{\gamma}_\rho, \sem{A}_\rho, \sem{B}_\rho, \sem{\repA}_\rho) \\
+\vdots \\
+\sem{\nonindA(K, \gamma)}_\rho &\coloneqq \sem{\nonindA}(\sem{K}_\rho,
+\sem{\gamma}_\rho) \\
+\vdots & \text{\quad etc.}
+\end{align*}
+In all future definitions, if we are currently defining $\sem{F}$ where $F : D
+\to E$, say, let $F(d)\uparrow$ if $d \notin \sem{D}$.
+
+$\sem{\SPA}(\Aref)$ is defined as the least set such that
+\begin{align*}
+\sem{\SPA}(\Aref) &= 1 + \sum_{K \in \sem{\Set}}(K \to \sem{\SPA}(\Aref))
+  + \sum_{K \in \sem{\Set}}\sem{\SPA}(\Aref + K) \\
+ & {} + \sum_{K \in \sem{\Set}}\sum_{h : K \to \Aref}\sem{\SPA}(\Aref).
+\end{align*}
+ By the inaccessibility of $\cardi$, there is a
+regular cardinal ${\kappa < \cardi}$ such that for all $K \in \sem{\Set}$, we
+have that the cardinality of $K$, $\Aref$, $\Aref + K$ and $(K \to \Aref)$ is less than
+$\kappa$. If we now iterate an appropriate operator $\kappa$ times, we get our
+solution, which must be an element of $\sem{\TYPE} = V_{\cardi}$ by the
+inaccessibility of $\cardi$.
+\begin{align*}
+ \sem{\nilA} \colonsimeq \langle 0, 0\rangle \quad
+ \sem{\BindA(K, h, \gamma)} \colonsimeq \langle 3 , \langle K, \langle h, \gamma \rangle\rangle\rangle
+   \\
+  \sem{\nonindA(K, \gamma)} \coloneqq \langle 1 , \langle K, \gamma
+  \rangle\rangle \quad \sem{\AindA(K, \gamma)} \colonsimeq \langle 2 , \langle K, \gamma \rangle\rangle
+\end{align*}
+$\sem{\SPB}$ and its constructors are defined
+analogously. $\sem{\ArgA}$, $\sem{\ArgB}$ and $\sem{\IndexB}$ are defined according to their equations,
+e.g.\ 
+\begin{align*}
+  \sem{\ArgA}(\Aref, \sem{\nilA}, A, B, \repA) &\colonsimeq 1 \\
+\sem{\ArgA}(\Aref, \sem{\nonindA}(K, \gamma), A. B. \repA) &\colonsimeq
+  \sum_{k \in K} \sem{\ArgA}(\Aref, \gamma(k), A, B, \repA) \\
+\sem{\ArgA}(\Aref, \sem{\AindA}(K, \gamma), A, B, \repA) &\colonsimeq
+  \sum_{j : K \to A}\sem{\ArgA}(\Aref + K, \gamma, A, B, [\repA, j]) \\
+\sem{\ArgA}(\Aref, \sem{\BindA}(K, h, \gamma), A, B, \repA) &\colonsimeq
+  \sum_{\mathclap{j \in \Pi_{k \in K} B(\repA (h(k)))}}\sem{\ArgA}(\Aref, \gamma, A, B, \repA).
+\end{align*}
+%
+% todo: rework to new axiomatisation
+%
+
+Finally, we have to interpret $A_{\gammaAB}$, $B_{\gammaAB}$,
+$\intro{A_{\gammaAB}}$ and $\intro{B_{\gammaAB}}$.  The high-level
+idea is to iterate $\ArgA$ until a fixed point is reached, then apply
+$\ArgB$ once, and repeat. This is necessary since $\ArgB$ expects an
+argument $\introA : \ArgA(\gammaA, A, B) \to A$, which can be chosen
+to be the identity if $A$ is a fixed point of $\ArgA(\gammaA, A, B)$
+(with $B$ fixed). In more detail, let
+\begin{gather*}
+\sem{A_{\gammaAB}} \colonsimeq A^{\cardz} \enspace\! , \quad\!\!
+\sem{B_{\gammaAB}}(a) \colonsimeq B^{\cardz}(a)\enspace\! , \quad\!\!
+\sem{\intro{A_{\gammaAB}}}(a) \colonsimeq a \enspace\! ,\quad\!\!
+\sem{\intro{B_{\gammaAB}}}(b) \colonsimeq b \enspace\! ,\\
+\end{gather*} \vskip -0.5cm \noindent 
+where $A^{\alpha}$ and $B^{\alpha}$ are
+simultaneously defined by recursion on $\alpha$ as
+\begin{align*}
+  A^{\alpha} & \coloneqq  \text{least fixed point of }
+       \lambda X\,.\, \sem{\ArgA}(\gamma_A, A^{< \alpha} \cup X, [B^{< \alpha}, \lambda x\,.\,\emptyset]) \enspace ,\\
+  B^{\alpha}(a) & \coloneqq \{b\ |\ b \in \sem{\ArgB}(\gamma_A, A^{< \alpha} \cup A^{\alpha},
+  [B^{< \alpha}, \lambda x\,.\,\emptyset], \id, \gamma_B) \\
+  & \quad \land \sem{\IndexB}(\gamma_A,
+  A^{< \alpha} \cup A^{\alpha}, [B^{< \alpha}, \lambda x\,.\,\emptyset], \id, \gamma_B, b) = a \}\enspace \hspace{-2.47968pt} .
+\end{align*}
+
+The (graph of the) eliminators can then be built up in the same
+stages.
+
+Having interpreted all terms, we finally interpret contexts as sets of environments:
+\begin{align*}
+  \sem{\emptyset} \colonsimeq \emptyset && \sem{\Gamma, x : A} \colonsimeq \{
+  \rhoextend{x}{a} \ |\ \rho \in \sem{\Gamma} \land a \in \sem{A}_\rho\}.
+\end{align*}
+
+\subsection{Soundness of the Rules}
+\begin{theorem}[Soundness] \mbox{}
+\label{thm:soundness}
+  \begin{enumerate}[(i)]
+  \item If ${} \tstile \Gamma \text{context}$, then
+    $\sem{\Gamma}\downarrow$. 
+  \item If $\Gamma \tstile A : E$, then $\sem{\Gamma}\downarrow$, and
+    for all $\rho \in \sem{\Gamma}$, ${\sem{A}_\rho \in \sem{E}_\rho}$, and also
+    $\sem{E}_\rho \in \sem{\TYPE}$ if $E \not\equiv \TYPE$.
+  \item If $\Gamma \tstile A = B : E$, then $\sem{\Gamma}\downarrow$, and
+    for all $\rho \in \sem{\Gamma}$, $\sem{A}_\rho = \sem{B}_\rho$,
+    $\sem{A}_\rho \in \sem{E}_\rho$ and also $\sem{E}_\rho \in \sem{\TYPE}$ if
+    $E \not\equiv \TYPE$. 
+  \item $\nvdash a : \zero$. \qed
+  \end{enumerate}
+\end{theorem}
+The proof of the soundness theorem is rather
+  straight\-forward. For the verification that $\sem{A_{\gamma_A, \gamma_B}}
+  \in \sem{\Set}$ and $\sem{B_{\gamma_A, \gamma_B}} : \sem{A_{\gamma_A,
+      \gamma_B}} \to \sem{\Set}$, one first verifies that $\sem{\ArgA}$,
+  $\sem{\ArgB}$, $\sem{\IndexB}$ are monotone in the following sense:
+  %
+  \begin{lemma}
+  \label{thm:Arg-monotone}
+  For all $\gammaA \in \sem{\SPA}$ and $\gammaB \in \sem{\SPB}(\gammaA)$:
+  \begin{enumerate}[(i)]
+  \item If $A \subseteq A'$ and $B(x) \subseteq B'(x)$ then
+    $\sem{\ArgA}(\gammaA, A, B) \subseteq \sem{\ArgA}(\gammaA, A', B')$.
+  \item If in addition $\introA(x) = \introA'(x)$ for all $x \in \ArgA(\gammaA, A, B)$, then
+    \[
+    \sem{\ArgB}(\gammaA, A, B, \introA, \gammaB) \subseteq \sem{\ArgA}(\gammaA, A', B', \introA', \gammaB)
+    \]
+    and
+    \[    
+    \sem{\IndexB}(\gammaA, A, B, \introA, \gammaB, x) = \sem{\IndexB}(\gammaA, A', B', \introA', \gammaB, x)
+    \]
+    for all $x \in \sem{\ArgB}(\gammaA, A, B, \introA, \gammaB)$. \qed
+  \end{enumerate}
+  \end{lemma}
+
+One can then prove some useful facts about $A^{\alpha}$ and
+  $B^{\alpha}$: % by induction on $\alpha$:
+\begin{lemma} \mbox{}
+\label{thm:A-in-Set}
+  \begin{enumerate}[(i)]
+  \item For $\alpha < \cardz$, $A^{\alpha} \in \sem{\Set}$ and $B^{\alpha} :
+    A^{\alpha} \to \sem{\Set}$.
+  \item For $\alpha < \beta$, $A^{\alpha} \subseteq A^{\beta}$ and  $B^{\alpha}(a) \subseteq
+    B^{\beta}(a)$ for all $a \in A^{\alpha}$. 
+  \item There is $\kappa < \cardz$ such that for  all $\alpha \geq \kappa$,
+    $A^{\alpha} = A^{\kappa}$ and $B^{\alpha}(a) =  B^{\kappa}(a)$ for all $a
+    \in A^{\alpha}$. \qed 
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  \begin{enumerate}[(i)]
+  \item Induction over $\alpha$.
+
+\notIncludedProof{  %todo
+  \begin{itemize}
+  \item If $\alpha = 0$, then $A^{\alpha} =  \text{least fixed point of }
+       \lambda X\,.\, \sem{\ArgA}(\gamma_A, X, \lambda x\,.\,\emptyset)$.
+ % \item If $\alpha = \beta + 1$
+ % \item If $\alpha = \lambda$ limit
+  \end{itemize}
+}
+  \item Induction over $\alpha$. %todo
+  \item Let $\kappa$ be a regular cardinal of cardinality greater than
+    that of all index sets which starts an inductive argument. By the
+    inaccessibility of $\cardz$, $\kappa < \cardz$.  %todo
+\qedhere
+  \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+  $\sem{A_{\gamma_A, \gamma_B}} \in \sem{\Set}$ and $\sem{B_{\gamma_A,
+      \gamma_B}} : \sem{A_{\gamma_A, \gamma_B}} \to \sem{\Set}$.
+\end{theorem}
+\begin{proof}
+  By Lemma~\ref{thm:A-in-Set}, $\sem{A_{\gamma_A, \gamma_B}} = A^{\cardz} = A^{\kappa} \in
+  \sem{\Set}$,  and similarly for $\sem{B_{\gamma_A, \gamma_B}}$. \qedhere
+\end{proof}
+
+
+
+\section{Remarks} %todo: better title
+\label{sec:remarks}
+
+\subsection{The r\^{o}le of large elimination}
+\label{sec:large-elim}
+
+
+
+\subsection{Indexed inductive definitions and induction-induction}
+\label{sec:indexed-induction}
+
+
+
+%\section{Conclusions}
+%\label{sec:conclusions}
+
+\bibliographystyle{alpha}
+\bibliography{../../references/biblio}
+
+
+\end{document}
+
