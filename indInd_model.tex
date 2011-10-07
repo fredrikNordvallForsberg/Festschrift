@@ -259,7 +259,7 @@ relation on surreal numbers which is also defined inductively:
 Both rules can be understood as inductive definitions. However, they
 are not formulated with a constructive reading in mind (too many
 negations!). Mamane~\cite{mamane2004surrealCoq} develops the theory of
-surreal nubmers in the proof assistant Coq. %todo: expand
+surreal numbers in the proof assistant Coq. %todo: expand
 \blackqed
 \end{example}
 
@@ -316,8 +316,8 @@ element set $\two : \Set$, with elements $\twott : \two$, $\twoff :
 $(a : \two) \to A(\twott) \to A(\twoff) \to A(a)$ where $i : \two
 \Rightarrow A(i) : \TYPE$. I should satisfy the obvious computation
 rules, i.e.\ $\IF~\twott~\THEN~a~\ELSE~b = a$ and
-$\IF~\twoff~\THEN~a~\ELSE~b = b$. Finally, we require the type $\Nat$
-of natural numbers.
+$\IF~\twoff~\THEN~a~\ELSE~b = b$.
+%Finally, we require the type $\Nat$ of natural numbers.
 
 With $\IF~\cdot~\THEN~\cdot~\ELSE~\cdot$ and dependent products, we can now
 % as in \cite[A.2]{dybjersetzer2006IIR}
@@ -334,15 +334,14 @@ $g : (b : B) \to C(\inr(b))$. The equality rules are
 [f, g](\inl(a)) &= f(a) \enspace , \\
 [f, g](\inr(b)) &= g(b) \enspace .
 \end{align*}
-We write $\bigplus_{k = 0}^n A_k$ for the iterated sum $A_0 + (A_1 +
-(\ldots + A_n)\cdots)$ and $[f_0, f_1, \ldots, f_n]$ for the iterated
-case distinction $[f_0, [f_1, [\ldots , f_n]]\cdots]$.
-% We write $A_0 + A_1 + \ldots + A_n$ for $A_0 + (A_1 + (\ldots +
-% A_n)\cdots)$ and $\inn_k(a)$ for the $k$th injection
-% $\inl(\inr^k(a))$ (with special case $\inn_n(a)$ = $\inr^{n}(a)$).
+%We write $\bigplus_{k = 0}^n A_k$ for the iterated sum $A_0 + (A_1 +
+%(\ldots + A_n)\cdots)$ and $[f_0, f_1, \ldots, f_n]$ for the iterated
+%case distinction $[f_0, [f_1, [\ldots , f_n]]\cdots]$.
 
 Intensional type theory in Martin-L\"of's logical framework extended with
-dependent products and $\zero$, $\one$, $\two$ and $\Nat$ has all the features we
+dependent products and $\zero$, $\one$, $\two$
+%and $\Nat$
+ has all the features we
 need. Thus, our development can be seen as an extension of
 the logical framework.
 
@@ -366,8 +365,8 @@ idea is to construct a universe consisting of codes for
 inductive-inductive definitions, together with a decoding function,
 which maps a code $\varphi$ to the domain of the constructor for the
 inductively defined set represented by $\varphi$.  Just as the second
-component $B : A \to \Set$ depends on the first set $A$, the universe $\SPB : \SPA \to \TYPE$
-of codes for the second component will depend on the universe $\SPA$ of codes
+component $B : A \to \Set$ depends on the first set $A$, the universe $\SPBp : \SPAp \to \TYPE$
+of codes for the second component will depend on the universe $\SPAp$ of codes
 for the first set.
 
 \subsection{Dissecting an inductive-inductive definition}
@@ -395,21 +394,35 @@ in negative positions in $\Phi_{\mathrm{A}}$ or $\Phi_{\mathrm{B}}$
 respectively. Thus, we restrict our attention to a class of strictly
 positive functors.
 
-%todo: non-ind, A-ind, B-ind
+These are based on the following analysis of what kind of premises
+that can occur in a definition. A premise is either \emph{inductive}
+or \emph{non-inductive}. A non-inductive premise consists of a
+previously constructed set $K$, which later premises can depend on. An
+inductive premise is inductive in $A$ or $B$. If it is inductive in
+$A$, it is of the form $(K \to A)$ for some previously constructed set
+$K$%
+%(this is also called a \emph{generalized} inductive premise, with
+%the special case $K = \one$ being called an \emph{ordinary} inductive
+%premise)
+. Premises inductive in $B$ are of the form $((x : K) \to
+B(i(x))$ for some $i : K \to A$. In the case of an ordinary inducive
+premise, $K = \one$ so that $i : \one \to A$ just amounts to a choice
+of an index $a = i(\oneelt)$ such that the inductive argument comes
+from $B(a)$.
+
+%todo: improve
 
 \subsection{The axiomatisation}
 \label{sec:formal-axiomatisation}
 
 We now give the formal rules for an inductive-inductive definition of
 $A : \Set$, $B : A \to \Set$. These consists of a set of rules for the
-universe $\SPA$ of descriptions of the set $A$ and its decoding
-function $\ArgA$, a set of rules for the universe $\SPB$ and its
-decoding function $\ArgB$, and formation and introduction rules for
-each pair of codes $\gammaA : \SPA$, $\gammaB : \SPB(\gammaA)$.
+universe $\SPAp$ of descriptions of the set $A$ and its decoding
+function $\ArgAp$, a set of rules for the universe $\SPBp$ and its
+decoding function $\ArgBp$, and formation and introduction rules for
+each pair of codes $\gammaA : \SPAp$, $\gammaB : \SPBp(\gammaA)$.
 
-%elimination rules (with only the type of \BOX_F)
-
-\subsubsection{The universe $\SPA$ of descriptions of $A$}
+\subsubsection{The universe $\SPAp$ of descriptions of $A$}
 \label{sec:SPA}
   
 We introduce the universe of codes for the index set with the
@@ -417,8 +430,12 @@ formation rule
 \[
 \infer{\SPA(\Aref) : \TYPE}{\Aref : \Set}
 \]
-and define (by abuse of notation) $\SPA \coloneqq \SPA(\zero)$. Thus
-codes in $\SPA$ do not refer to any elements to start with.
+The set $\Aref$ should be thought of as the elements of $A$ that we
+can refer to in the code that we are defining. To start with, we
+cannot refer to any elements in $A$, and so we define $\SPAp \coloneqq
+\SPA(\zero)$. After introducing an inductive argument $a : A$, we can
+refer to $a$ in later arguments, so that $\Aref$ will be extended to
+include $a$ as well for the construction of the rest of the code.
 
 The introduction rules for $\SPA$ reflects the informal discussion in
 Section~\ref{sec:dissect-ind}. The rules are as follows (we suppress
@@ -460,49 +477,47 @@ $\gamma$.
   The constructor $\consCtxtbare : ((\Gamma : \Ctxt) \times \Ty(\Gamma))
   \to \Ctxt$ is represented by the code
 \[
-\gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one, \widehat{\Gamma}, \nilA)) \enspace ,
+\gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one, \lambda (\oneelt : \one)\,.\,\widehat{\Gamma}, \nilA)) \enspace ,
 \]
-where $\widehat{\Gamma} = \lambda (\oneelt : \one)\,.\,\inr(\oneelt)$ is the representation of $\Gamma$ in $\Aref = \zero + \one$.
+where $\widehat{\Gamma} = \inr(\oneelt)$ is the representation of $\Gamma$ in $\Aref = \zero + \one$.
 \blackqed
 \end{example}
 
 We now define the decoding function $\ArgA$, which maps a code to the
-domain of the constructor it represents. In addition to a set $\Aref$
-and a code $\gamma : \SPA(\Aref)$, $\ArgA$ will take a set $X$ and a
-family $Y : X \to \Set$ as arguments to use as $A$ and $B$ in the
+domain of the constructor it represents. In addition to a set $\Xref$
+and a code $\gamma : \SPA(\Xref)$, $\ArgA$ will take a set $\A$ and a
+family $\B : \A \to \Set$ as arguments to use as $A$ and $B$ in the
 inductive arguments. These will later be instantiated recursively. We
-also require a function $\repA : \Aref \to X$ which we think of as
+also require a function $\repA : \Xref \to \A$ which we think of as
 mapping a ``referable'' element to the element it represents in
-$X$. All in all, $\ArgA$ has the following formation rule:
+$\A$. All in all, $\ArgA$ has the following formation rule:
 %
 \[
-\infer{\ArgA(\Aref, \gamma. X, Y, \repA) : \Set}{\Aref : \Set
-                                         & \quad \gamma : \SPA(\Aref)
-                                         & \quad X : \Set
-                                         & \quad Y : X \to \Set
-                                         & \quad \repA : \Aref \to X}
+\infer{\ArgA(\Xref, \gamma, \A, \B, \repA) : \Set}{\Xref : \Set
+                                         & \quad \gamma : \SPA(\Xref)
+                                         & \quad \A : \Set
+                                         & \quad \B : \A \to \Set
+                                         & \quad \repA : \Xref \to \A}
 \]
 %
-Notice that if $\gamma : \SPA$, i.e.\ if $\Aref = \zero$, then we can
-choose $\repA = {} \magic{X} : \zero \to X$ (indeed, extensionally,
+Notice that if $\gamma : \SPAp$, i.e.\ if $\Xref = \zero$, then we can
+choose $\repA = {} \magic{X} : \zero \to \A$ (indeed, extensionally,
 this is the only choice), so that we can define
 \[
-\ArgA : \SPA \to (X : \Set) \to (Y : X \to \Set) \Set
+\ArgAp : \SPAp \to (\A : \Set) \to (\B : \A \to \Set) \to \Set
 \]
-by $\ArgA(\gamma, X, Y) = \ArgA(\zero, \gamma, X, Y, \magic{X})$.
+by $\ArgAp(\gamma, \A, \B) = \ArgA(\zero, \gamma, \A, \B, \magic{X})$.
 
 The definition of $\ArgA$ follows the informal description of what the
 different codes represent above:
 
 %todo: formatting %todo mark changing arguments
 \begin{align*} 
-  \ArgA(\Aref, \nilA, X, Y, \repA) &= \one \\
-  \ArgA(\Aref, \nonindA(K, \gamma), X, Y, \repA) &= (x : K) \times \ArgA(\Aref, \gamma(x), X, Y, \repA) \\
-  \ArgA(\Aref, \AindA(K, \gamma), X, Y, \repA) &=  (j : K \to X) \times \ArgA(\Aref + K, \gamma, X, Y, [\repA, j]) \\
-  \ArgA(\Aref, \BindA(K, \hindex, \gamma), X, Y, \repA) &=  ((x : K) \to Y((\repA \circ \hindex)(x))) \times \ArgA(\Aref, \gamma, X, Y, \repA) \\
+  \ArgA(\Xref, \nilA, \A, \B, \repA) &= \one \\
+  \ArgA(\Xref, \nonindA(K, \gamma), \A, \B, \repA) &= (x : K) \times \ArgA(\Xref, \gamma(x), \A, \B, \repA) \\
+  \ArgA(\Xref, \AindA(K, \gamma), \A, \B, \repA) &=  (j : K \to \A) \times \ArgA(\Xref + K, \gamma, \A, \B, [\repA, j]) \\
+  \ArgA(\Xref, \BindA(K, \hindex, \gamma), \A, \B, \repA) &=  ((x : K) \to \B((\repA \circ \hindex)(x))) \times \ArgA(\Xref, \gamma, \A, \B, \repA) \\
 \end{align*}
-
-%todo: discuss Aind and Bind
 
 \begin{example}
   Recall the code $\gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one,
@@ -510,7 +525,7 @@ different codes represent above:
   constructor $\consCtxtbare : ((\Gamma : \Ctxt) \times \Ty(\Gamma)) \to
   \Ctxt$. We have 
 \[
-\ArgA(\gamma_{\consCtxtbare}, \Ctxt, \Ty) = (\Gamma : \one \to \Ctxt)
+\ArgAp(\gamma_{\consCtxtbare}, \Ctxt, \Ty) = (\Gamma : \one \to \Ctxt)
 \times (\one \to \Ty(\Gamma(\oneelt))) \times \one
 \]
 which, thanks to the $\eta$-rules for $\one$, is isomorphic to the
@@ -525,76 +540,77 @@ As we have seen in Example \ref{ex:ctxt-type}, it is important that
 the constructor $\introB$ for the second set $B : A \to \Set$ can
 refer to the constructor $\introA$ for the first set $A$. This means
 that inductive arguments might be of type $B(\introA(\overline{a}))$
-for some $\overline{a} : \ArgA(\gammaA, A, B)$ or even
+for some $\overline{a} : \ArgAp(\gammaA, A, B)$ or even
 $B(\introA(\ldots\introA\ldots(\overline{a})))$ for some $\overline{a}
-: \ArgA(\gammaA, \ldots \ArgA(\gammaA, A, B)\ldots, B')$. Thus, we
+: \ArgAp(\gammaA, \ldots \ArgAp(\gammaA, A, B)\ldots, B')$. Thus, we
 need to be able to represent such indices in the descriptions of the
 constructor $\introB$.
 
 First, it is no longer enough to only keep track of the referable
-elements $\Aref$ of $A$ -- we need to be able to refer to elements of
+elements $\Xref$ of $\A$ -- we need to be able to refer to elements of
 $B$ as well, since they could be used as arguments to $\introA$. We
-will represent the elements of $B$ we can refer to by a set $\Bref$,
-together with functions $\repIndex : \Bref \to A$ and $\repB : (x :
-\Bref) \to B(\repIndex(x))$ ; the function $\repIndex$ gives the index
+will represent the elements of $\B$ we can refer to by a set $\Yref$,
+together with functions $\repIndex : \Yref \to \A$ and $\repB : (x :
+\Yref) \to \B(\repIndex(x))$ ; the function $\repIndex$ gives the index
 of the represented element, and $\repB$ the actual element.
 
 %todo: consistent use of X, Y / A , B
 
-We want to represent elements in $\ArgA(\gammaA, A, B)$. We claim that
-the elements in $\ArgA(\gammaA, \Aref + \Bref, [\lambda x\,.\,\zero,
+We want to represent elements in $\ArgAp(\gammaA, \A, \B)$. We claim that
+the elements in $\ArgAp(\gammaA, \Xref + \Yref, [\lambda x\,.\,\zero,
 \lambda x\,.\,\one])$ are suitable for this purpose. To see this,
 first observe that we can define a functions
 \[
-f : \Aref + \Bref \to A
+f : \Xref + \Yref \to \A
 \]
 %
 %and
 %
 \[
-g : (x : \Aref + \Bref) \to
+g : (x : \Xref + \Yref) \to
     [\lambda x\,.\,\zero, \lambda x\,.\,\one](x)
-      \to B(f(x))
+      \to \B(f(x))
 \]
 %
-by $f = [\repA, \repIndex]$ and $g = [\lambda x\,.\,\magic{B \circ
+by $f = [\repA, \repIndex]$ and $g = [\lambda x\,.\,\magic{\B \circ
   \repA}, \lambda x \oneelt\,.\, \repB(x)]$. Then, we can lift these
 functions to a function
 %
 \[
-\ArgA(\gammaA, f, g) : \ArgA(\gammaA, \Aref +\Bref, [\lambda x\,.\,\zero, \lambda x\,.\,\one]) \to
-                       \ArgA(\gammaA, A, B)
+\ArgAp(\gammaA, f, g) : \ArgAp(\gammaA, \Xref +\Yref, [\lambda x\,.\,\zero, \lambda x\,.\,\one]) \to
+                       \ArgAp(\gammaA, \A, \B)
 \]
 %
-by observing that $\ArgA(\gammaA)$ is functorial:
+by observing that $\ArgAp(\gammaA)$ is functorial:
 
 \begin{lemma} %todo: reword. Do we want to avoid cat. theory?
-  For each $\gamma : \SPA$, $\ArgA(\gamma)$ extends to a functor from
-  families of sets to sets, i.e.\ given $f : A \to A'$ and $g : (x :
-  A) \to B(x) \to B'(f(x))$, one can define $\ArgA(\gamma, f, g) :
-  \ArgA(\gamma, A, B) \to \ArgA(\gamma, A', B')$ such that identities
+  For each $\gamma : \SPAp$, $\ArgAp(\gamma)$ extends to a functor from
+  families of sets to sets, i.e.\ given $f : \A \to \A'$ and $g : (x :
+  \A) \to \B(x) \to \B'(f(x))$, one can define $\ArgAp(\gamma, f, g) :
+  \ArgAp(\gamma, \A, \B) \to \ArgAp(\gamma, \A', \B')$ such that identities
   and compositions are preserved.
 \end{lemma}
-\begin{proof} %todo
-
+\begin{proof}
   This is straightforward in extensional type theory. In intensional
   type theory, we have to be more careful. The function $\ArgA(\gamma,
-  f, g)$ is defined by induction over $\gamma$ and $\Aref$: let $A$,
-  $B$, $\repA : \Aref \to A$, $A'$, $B'$, $\repA' : \Aref \to A'$ and
-  $f : A \to A'$, $g : (x : A) \to B(x) \to B'(f(x))$ be given. In
+  f, g)$ is defined by induction over $\gamma$%
+% and $\Xref$ % why did I write this??
+: let $\A$,
+  $\B$, $\repA : \Xref \to \A$, $\A'$, $\B'$, $\repA' : \Xref \to \A'$ and
+  $f : \A \to \A'$, $g : (x : \A) \to \B(x) \to \B'(f(x))$ be given. In
   addition, assume that $f(\repA(x)) = \repA'(x)$ for all $x :
-  \Aref$. It is enough for our purposes to state this in a
+  \Xref$. It is enough for our purposes to state this in a
   ``specialised Leibniz form''; we require a term
   \[
-  p : (x : \Aref) \to B'(f(\repA(x))) \to B'(\repA'(x)) \enspace .
+  p : (x : \Xref) \to \B'(f(\repA(x))) \to \B'(\repA'(x)) \enspace .
   \]
   % 
   Thus we define
   % 
   \[
-  \ArgA(\gamma, f, g, p) : %(p : (x : \Aref) \to B'(f(\repA(x))) \to B'(\repA'(x))) \to
-  \ArgA(\Aref, \gamma, A, B, \repA)
-  \to \ArgA(\Aref, \gamma, A', B', \repA')
+  \ArgA(\gamma, f, g, p) : %(p : (x : \Xref) \to \B'(f(\repA(x))) \to \B'(\repA'(x))) \to
+  \ArgA(\Xref, \gamma, \A, \B, \repA)
+  \to \ArgA(\Xref, \gamma, \A', \B', \repA')
   \]
   % 
   by induction over $\gamma$:
@@ -602,97 +618,136 @@ by observing that $\ArgA(\gammaA)$ is functorial:
     \ArgA(\nilA, f, g, p, \oneelt) &= \oneelt\\
     \ArgA(\nonindA(K, \gamma), f, g, p, \pair{k}{y}) &= \pair{k}{\ArgA(\gamma(k), f, g, p, y)}\\
     \ArgA(\AindA(K, \gamma), f, g, p, \pair{j}{y}) &= \pair{f \circ j}{\ArgA(\gamma, f, g, [p, \lambda x\,.\,\id], y)}\\
-    \ArgA(\BindA(K, \hindex, \gamma), f, g, p, \pair{j}{y}) &= \pair{\lambda k\,.\,p(h(k), g(\repA(h(k)), j(k)))}{\ArgA(\gamma, f, g, p, y)}
+    \ArgA(\BindA(K, \hindex, \gamma), f, g, p, \pair{j}{y}) &= \pair{\lambda k\,.\,p(\hindex(k), g(\repA(\hindex(k)), j(k)))}{\ArgA(\gamma, f, g, p, y)}
   \end{align*}
   
-  Finally, we can define $\ArgA(\gamma, f, g) : \ArgA(\gamma, A, B) \to
-  \ArgA(\gamma, A', B')$ by
+  Finally, we can define $\ArgAp(\gamma, f, g) : \ArgAp(\gamma, A, B) \to
+  \ArgAp(\gamma, A', B')$ by
   \[
-  \ArgA(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magic{B'(f(\repA(x))) \to B'(\repA'(x))} \enspace .
+  \ArgAp(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magic{B'(f(\repA(x))) \to B'(\repA'(x))}) \enspace .
   \]
   % 
   (Pointwise) preservation of identities and composition is easily checked.
 \end{proof}
 
 Recall that we want to use the lemma to represent elements in
-$\ArgA(\gammaA. A, B)$ by elements in $\ArgA(\gammaA, \Aref +\Bref,
+$\ArgAp(\gammaA, \A, \B)$ by elements in $\ArgAp(\gammaA, \Xref +\Yref,
 [\lambda x\,.\,\zero, \lambda x\,.\,\one])$. We can actually do one
-better, and represent arbitrarily terms built from elements in $A$ and
-$B$ with the use of a constructor $\introA : \ArgA(\gammaA, A, B) \to
-A$. For this, define $\argn{n}$ with formation rule
+better, and represent arbitrarily terms built from elements in $\A$ and
+$\B$ with the use of a constructor $\introA : \ArgAp(\gammaA, \A, \B) \to
+\A$. For this, define the set $\Aterm(\gammaA, \Xref, \Yref)$ of terms
+``built from $\introA$, $\Xref$ and $\Yref$'' with introduction rules
 %
 \[
-\infer{\argn{n}(\gammaA, \Aref, \Bref) : \Set}{n \in \Nat & \quad \gammaA : \SPA & \quad \Aref, \Bref : \Set}
+\infer{\termAref(x) : \Aterm(\gammaA, \Xref, \Yref)}{x : \Xref}
 \]
 %
-by letting
+%
+\[
+\infer{\termBref(x) : \Aterm(\gammaA, \Xref, \Yref)}{x : \Yref}
+\]
+%
+%
+\[
+\infer{\termArg(x) : \Aterm(\gammaA, \Xref, \Yref)}{x : \ArgAp(\gammaA, \Aterm(\gammaA, \Xref, \Yref), \Bterm(\gammaA, \Xref, \Yref))}
+\]
+Here, $\Bterm(\gammaA, \Xref, \Yref) : \Aterm(\gammaA, \Xref, \Yref) \to \Set$ is defined by
+\[
+\begin{tabular}{lcr}
+$\Bterm(\gammaA, \Xref, \Yref, \termAref(x))$ & $=$ & $\zero$ \\
+$\Bterm(\gammaA, \Xref, \Yref, \termBref(x))$ & $=$ & $\one$  \\
+$\Bterm(\gammaA, \Xref, \Yref, \termArg(x))$  & $=$ & $\zero$
+\end{tabular}
+\]
+Note that this is formally an inductive-recursive definition.
+The intuition behind the defintion of $\Bterm$ is that all elements of
+$\B$ we know are represented in $\Yref$, and only in $\Yref$. 
+
+All elements in $\Aterm(\gammaA,\Xref, \Yref)$ represents elements in
+$\A$, given that we have a function $\introA : \ArgAp(\gammaA, \A, \B) \to
+\A$ and the elements of $\Xref$ and $\Yref$ represents elements of $\A$
+and $\B$ respectively (i.e.\ we have $\repA : \Xref \to \A$, $\repIndex
+: \Yref \to \A$ and $\repB : (x : \Yref) \to \B(\repIndex(x))$).
+Formally, we can simultaneously define the following two functions:
+%
+\[ %\ldots = \gammaA, \introA, \repA, \repIndex, \repB
+\infer{\deduce{\repBbar(\ldots) : (x : \Aterm(\gammaA, \Xref, \Yref)) \to \Bterm(\gammaA, \Xref, \Yref, x) \to \B(\repAbar(\ldots, x))}
+              {\repAbar(\ldots) : \Aterm(\gammaA, \Xref, \Yref) \to \A}}
+      {\gammaA : \SPAp & \quad
+       \introA : \ArgAp(\gammaA, \A, \B) \to \A & \quad
+              %{\deduce{\B : \A \to \Set}
+              %        {\A : \Set}} & \quad
+       \deduce{\repB : (x : \Yref) \to \B(\repIndex(x))}
+              {\deduce{\repIndex : \Yref \to \A}
+                      {\repA : \Xref \to \A}}}
+\]
+%
+The definition of $\repAbar$ is straightforward. The interesting case
+is $\termArg(x)$, where we make use of the constructor $\introA$, the
+functoriality of $\ArgAp$ and the mutually defined $\repBbar$:
 \begin{align*}
-\argn{0}(\gammaA, \Aref, \Bref) &= \Aref \\
-\argn{n + 1}(\gammaA, \Aref, \Bref) &= \ArgA(\gammaA, \bigplus_{k = 0}^n \argn{k}(\gammaA, \Aref, \Bref) + \Bref,  [\lambda x\,.\,\zero, \lambda x\,.\,\one])
+  \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, \termAref(x)) &= \repA(x) \\
+  \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, \termBref(x)) &= \repIndex(x) \\
+  \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x)) 
+    &= \introA(\ArgAp(\gammaA, \repAbar(\ldots), \repBbar(\ldots), x))
+\end{align*}
+%
+The simultaneously defined $\repBbar$ is very simple:
+%
+\begin{align*}
+  \repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termAref(x), y) &= \magic{\B \circ \repAbar(\ldots)}(y) \\
+\repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termBref(x), \oneelt) &= \repB(y) \\
+\repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x), y) &= \magic{\B \circ \repAbar(\ldots)}(y) \\ \\
 \end{align*}
 
-%todo: motivate \bigplus
+\begin{example}
+  What are some terms in $\Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$, where
+  \[
+  \gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one,
+  \lambda (\oneelt : \one)\,.\,\inr(\oneelt), \nilA))
+  \]
+  is the code for the constructor
+  \[
+  \consCtxtbare : \big((\Gamma : \one \to A) \times (\one \to B(\Gamma(\oneelt))) \times \one\big) \to A \enspace ?
+  \]
+  Suppose that we have $\hat{a} : \Xref$ with $\repA(\hat{a}) = a : A$
+  and $\hat{b} : \Yref$ with $\repIndex(\hat{b}) = a$ and
+  $\repB(\hat{b}) = b : B(a)$. We then have 
+  \begin{itemize}
+  \item $\termAref(\hat{a}) : \Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$ with
+  $\repAbar(\gamma_{\consCtxtbare}, \consCtxtbare, \ldots, \hat{a}) =
+  a$ (so elements from $\Xref$ are terms),
+\item $\termBref(\hat{b}) :  \Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$ with
+  $\repAbar(\gamma_{\consCtxtbare}, \consCtxtbare, \ldots,
+  \termBref(\hat{b})) = a$ (so elements from $\Yref$ are terms,
+  representing the index of the element in $B$ they represent), and
+\item  $\widehat{a,b} \coloneqq \termArg(\langle (\lambda \oneelt.\,\termBref(\hat{b})) ,
+  \langle (\lambda \oneelt.\,\oneelt), \oneelt\rangle\rangle) :
+  \Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$ with
+  \[
+      \repAbar(\gamma_{\consCtxtbare}, \consCtxtbare, \ldots, \widehat{a,b})
+    = \consCtxt{(\repIndex(\hat{b}))}{(\repB(\hat{b}))} 
+    = \consCtxt{a}{b} \enspace .
+  \]
+% (λ _ → arg  (ff , ((λ _ → bref (inr _)) , ((λ _ → _) , _))))
+\end{itemize}
+%
+ \blackqed
+\end{example}
 
-Given a constructor $\introA : \ArgA(\gammaA, A, B) \to A$, all
-elements in $\argn{n}(\gammaA,\Aref, \Bref)$ represents elements in
-$A$, given that the elements of $\Aref$ and $\Bref$ represents elements
-of $A$ and $B$ respectively (i.e.\ we have $\repA : \Aref \to A$,
-$\repIndex : \Bref \to A$ and $\repB : (x : \Bref) \to
-B(\repIndex(x))$):
-%
-\[
-\infer{\repn{n}(\gammaA, \introA, \repA, \repIndex, \repB) : \argn{n}(\gammaA, \Aref, \Bref) \to A}
-      {n : \Nat & \quad
-       \gammaA : \SPA & \quad
-       \introA : \ArgA(\gammaA, A, B) \to A & \quad
-              %{\deduce{B : A \to \Set}
-              %        {A : \Set}} & \quad
-       \deduce{\repB : (x : \Bref) \to B(\repIndex(x))}
-              {\deduce{\repIndex : \Bref \to A}
-                      {\repA : \Aref \to A}}}
-\]
-%
-\begin{align*}
-\repn{0}(\ldots) &= \repA \\
-\repn{n + 1}(\ldots) &= \introA \circ \ArgA(\gammaA, [\repn{0}(\ldots), \ldots, \repn{n}(\ldots)], [\lambda x\,.\,\magic{}, \lambda x \oneelt\,.\,\repB(x)])
-\end{align*}
-
-%todo: say something about the use of complete induction?
-
-Define the set of terms ``built from $\introA$, $\Aref$ and  $\Bref$'' as
-%
-\[
-\Aterm(\gammaA, \Aref, \Bref) = (n : \Nat) \times \argn{n}(\gammaA, \Aref, \Bref) \enspace .
-\]
-%
-Each term can be mapped to the element in $A$ it denotes:
-%
-\[
-\infer{\repbar(\gammaA, \introA, \repA, \repIndex, \repB) : \Aterm(\gammaA, \Aref, \Bref) \to A}
-      {\gammaA : \SPA & \quad
-       \introA : \ArgA(\gammaA, A, B) \to A & \quad
-              %{\deduce{B : A \to \Set}
-              %        {A : \Set}} & \quad
-       \deduce{\repB : (x : \Bref) \to B(\repIndex(x))}
-              {\deduce{\repIndex : \Bref \to A}
-                      {\repA : \Aref \to A}}}
-\]
-%
-$\repbar(\ldots, \pair{n}{x}) = \repn{n}(\ldots, x)$
-
-
-\subsubsection{The universe $\SPB$ of descriptions of $B$}
+\subsubsection{The universe $\SPBp$ of descriptions of $B$}
 \label{sec:SPB}
 
-We now introduce the universe $\SPB : \SPA \to \TYPE$ of descriptions
+We now introduce the universe $\SPB$ of descriptions
 for $B$. It has formation rule
 %
 \[
-\infer{\SPB(\Aref, \Bref, \gammaA) : \TYPE}{\Aref, \Bref : \Set & \quad \gammaA : \SPA}
+\infer{\SPB(\Aref, \Bref, \gammaA) : \TYPE}{\Aref, \Bref : \Set & \quad \gammaA : \SPAp}
 \]
 %
-Again, we abuse notation and define $\SPB : \SPA \to \TYPE$ by
-$\SPB(\gammaA) \coloneqq \SPA(\zero, \zero, \gammaA)$.
+Again, we are interested in codes which initially do not refer to
+any elements and define $\SPBp : \SPAp \to \TYPE$ by $\SPBp(\gammaA)
+\coloneqq \SPB(\zero, \zero, \gammaA)$.
 
 The introduction rules for $\SPB$ are similar to the ones for $\SPA$,
 except we now need to specify an index for the codomain of the
@@ -761,73 +816,70 @@ The definition of $\ArgB$ should now not come as a surprise. First, we have a fo
 %
 \[
 \mathclap{%
-\infer{\ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \gamma) : \Set}
-                                        {\deduce{\Aref, \Bref : \Set}{\gammaA : \SPA}
-                                         & \quad \deduce{\introA : \ArgA(\gammaA, A, B) \to A}
-                                                        {\deduce{B : A \to \Set}{A : \Set}}
-                                         & \quad \deduce{\repB: (x : \Bref) \to B(\repIndex(x))}
-                                                        {\deduce{\repIndex : \Bref \to A}
-                                                                {\repA : \Aref \to X}}
-                                         & \quad \gamma : \SPB(\Aref, \Bref, \gammaA)}
+\infer{\ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma) : \Set}
+                                        {\deduce{\Xref, \Yref : \Set}{\gammaA : \SPAp}
+                                         & \quad \deduce{\introA : \ArgA(\gammaA, \A, \B) \to \A}
+                                                        {\deduce{\B : \A \to \Set}{\A : \Set}}
+                                         & \quad \deduce{\repB: (x : \Yref) \to \B(\repIndex(x))}
+                                                        {\deduce{\repIndex : \Yref \to \A}
+                                                                {\repA : \Xref \to \A}}
+                                         & \quad \gamma : \SPB(\Xref, \Yref, \gammaA)}
 }
 \]
 %
-Once again, the definition is simpler for codes in $\SPB(\gammaA)$:
+Once again, the definition is simpler for codes in $\SPBp(\gammaA)$:
 \[
-\ArgB(\gammaA, A, B, \introA, \gamma) \coloneqq
-   \ArgB(\zero, \zero, \gammaA, A, B, \introA, \magic{A}, \magic{A}, \magic{B \circ \magic{A}}, \gamma)
+\ArgBp(\gammaA, \A, \B, \introA, \gamma) \coloneqq
+   \ArgB(\zero, \zero, \gammaA, \A, \B, \introA, \magic{\A}, \magic{\A}, \magic{\B \circ \magic{\A}}, \gamma)
 \]
 %
 We define:
 %todo: formatting
 \begin{align*} 
-&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \nilB(a)) = \one \\
-&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \nonindB(K, \gamma)) \\  
-&\quad= (x : K) \times \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \gamma(x)) \\
-&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \AindB(K, \gamma)) \\
-&\quad=  (j : K \to A) \times \ArgB(\Aref + K, \Bref, \gammaA, A, B, \introA,  [\repA, j], \repIndex, \repB, \gamma) \\
-&  \ArgB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
-&\quad= (j : (x : K) \to B((\repbar(\gammaA, \introA, \repA, \repIndex, \repB) \circ \hindex)(x))) \times {} \\ 
-& \qquad\quad     \ArgB(\Aref, \Bref + K, \gammaA, A, B, \introA, \repA, [\repIndex, \repbar(\ldots) \circ \hindex], [\repB, j], \gamma)
+&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nilB(a)) = \one \\
+&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nonindB(K, \gamma)) \\  
+&\quad= (x : K) \times \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma(x)) \\
+&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \AindB(K, \gamma)) \\
+&\quad=  (j : K \to \A) \times \ArgB(\Xref + K, \Yref, \gammaA, \A, \B, \introA,  [\repA, j], \repIndex, \repB, \gamma) \\
+&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
+&\quad= (j : (x : K) \to \B((\repAbar(\gammaA, \introA, \repA, \repIndex, \repB) \circ \hindex)(x))) \times {} \\ 
+& \qquad\quad     \ArgB(\Xref, \Yref + K, \gammaA, \A, \B, \introA, \repA, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma)
 \end{align*}
 
-Finally, we need the function $\IndexB(\ldots) : \ArgB(\gammaA, \gammaB, A, B,
-\introA) \to A$ which to each $b : \ArgB(\gammaA, \gammaB, A, B,
-\introA)$ assigns an index $a : A$ such that the element constructed
-from $b$ is in $B(a)$.
+Finally, we need the function $\IndexBp(\ldots) : \ArgB(\gammaA, \gammaB, \A, \B,
+\introA) \to \A$ which to each $b : \ArgB(\gammaA, \gammaB, \A, \B,
+\introA)$ assigns an index $a : \A$ such that the element constructed
+from $b$ is in $\B(a)$.
 %
 \[
 \mathclap{%
-\infer{\IndexB(\Aref, \Bref, \gammaA, A, B, \introA, \repA, \repIndex, \repB, \gamma) : \ArgB(\ldots) \to A}
-                                        {\deduce{\Aref, \Bref : \Set}{\gammaA : \SPA}
-                                         & \quad \deduce{\introA : \ArgA(\gammaA, A, B) \to A}
-                                                        {\deduce{B : A \to \Set}{A : \Set}}
-                                         & \quad \deduce{\repB: (x : \Bref) \to B(\repIndex(x))}
-                                                        {\deduce{\repIndex : \Bref \to A}
-                                                                {\repA : \Aref \to X}}
-                                         & \quad \gamma : \SPB(\Aref, \Bref, \gammaA)}
+\infer{\IndexB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma) : \ArgB(\ldots) \to \A}
+                                        {\deduce{\Xref, \Yref : \Set}{\gammaA : \SPAp}
+                                         & \quad \deduce{\introA : \ArgA(\gammaA, \A, \B) \to \A}
+                                                        {\deduce{\B : \A \to \Set}{\A : \Set}}
+                                         & \quad \deduce{\repB: (x : \Yref) \to \B(\repIndex(x))}
+                                                        {\deduce{\repIndex : \Yref \to \A}
+                                                                {\repA : \Xref \to \A}}
+                                         & \quad \gamma : \SPB(\Xref, \Yref, \gammaA)}
 }
 \]
 %
-As is standard for us at this point, we define $\IndexB :
-\ArgB(\gammaA, A, B, \introA, \gammaB) \to A$ by
-%
-\[
-\IndexB(\gammaA, A,B, \introA, \gammaB) \coloneqq
-   \IndexB(\zero, \zero, \gammaA, A, B, \introA, \magic{A}, \magic{A}, \magic{B \circ \magic{A}}, \gammaB)
-\]
-%
+As we usually do, we define $\IndexBp : \ArgBp(\gammaA, \A, \B,
+\introA, \gammaB) \to \A$ by
+$\IndexBp(\gammaA, \A, \B, \introA, \gammaB) \coloneqq
+   \IndexB(\zero, \zero, \gammaA, \A, \B, \introA, \magic{\A}, \magic{\A}, \magic{\B \circ \magic{\A}}, \gammaB)$.
+
 For the equations, we will suppress all inferable arguments:
 %
 \begin{align*} 
-\IndexB(\ldots, \nilB(a), \oneelt) &= \repbar(\ldots, a) \\
+\IndexB(\ldots, \nilB(a), \oneelt) &= \repAbar(\ldots, a) \\
 \IndexB(\ldots, \nonindB(K, \gamma), \pair{k}{y}) &= \IndexB(\ldots, \gamma(k), y) \\  
 \IndexB(\ldots, \AindB(K, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y) \\
 \IndexB(\ldots, \BindB(K, \hindex, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y)
 \end{align*}
 
 \begin{example}
-  $\ArgB$ and $\IndexB$ of $\gamma_{\Pi}$.
+  $\ArgBp$ and $\IndexBp$ of $\gamma_{\Pi}$.
 \blackqed
 \end{example}
 
@@ -835,8 +887,8 @@ For the equations, we will suppress all inferable arguments:
 \label{sec:intro-elim}
 
 We are now ready to give the formation and introduction rules for $A$
-and $B$. They all have the common premises $\gammaA : \SPA$, $\gammaB
-: \SPB(\gammaA)$, which will be omitted.
+and $B$. They all have the common premises $\gammaA : \SPAp$, $\gammaB
+: \SPBp(\gammaA)$, which will be omitted.
 
 Formation rules:
 %
@@ -848,13 +900,13 @@ B_{\gammaAB} : A_{\gammaAB} \to \Set
 Introduction rule for $A_{\gammaAB}$:
 %
 \[ %todo: check PML convention on variable names (x vs a)
-\infer{\intro{A_{\gammaAB}}(x) : A_{\gammaAB}}{x : \ArgA(\gammaA, A_{\gammaAB}, B_{\gammaAB})}
+\infer{\intro{A_{\gammaAB}}(x) : A_{\gammaAB}}{x : \ArgAp(\gammaA, A_{\gammaAB}, B_{\gammaAB})}
 \]
 %
 Introduction rule for $B_{\gammaAB}$:
 %
 \[
-\infer{\intro{B_{\gammaAB}}(x) : B_{\gammaAB}(\IndexB(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB, x))}{x : \ArgB(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB)}
+\infer{\intro{B_{\gammaAB}}(x) : B_{\gammaAB}(\IndexBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB, x))}{x : \ArgBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB)}
 \]
 %
 
@@ -865,17 +917,62 @@ we just give the elimination rules for the data type of sorted lists
 define a function which inserts a number into a sorted list.
 
 \begin{example}
-   %todo: or simply Ctxt + types?
+ insert : $A \to \SortedList \to \SortedList$ %todo: or simply Ctxt + types? 
 \blackqed
 \end{example}
 
 \subsection{The examples revisited}
 \label{sec:examples-revisited}
 
-%\blackqed
-
 We show how to find \gammaAB{} for some well-known sets, including the
 examples in Section~\ref{sec:examples}.
+
+\subsubsection{Encoding multiple constructors into one}
+\label{sec:comb-constructors}
+
+The theory we have presented assumes that both $A$ and $B$ have
+exactly one constructor each. This is no limitation, as multiple
+constructors can always be encoded into one by using non-inductive
+arguments. Suppose that $\intro{0} : F_0(A, B) \to A$ and $\intro{1} :
+F_1(A, B) \to A$ are two constructors for $A$. Then we can combine
+them into one constructor
+\[
+\intro{0 + 1} : \big((i : \two) \times F_i(A, B)\big) \to A
+\]
+by defining $\intro{0 +1}(i, x) = \intro{i}(x)$.
+
+If $\intro{0}$ is described by the code $\gamma_0$ and $\intro{1}$ by
+$\gamma_1$, then $\intro{0 + 1}$ is described by the code
+\[
+\gamma_0 \plOP \gamma_1 \coloneqq
+\nonindA(\two, \lambda x.\IF~x~\THEN~\gamma_0~\ELSE~\gamma_1) \enspace .
+\]
+
+
+\subsubsection{Examples of codes for inductive-inductive definitions}
+
+\begin{description}
+\item[Well-orderings] Ordinary inductive definitions can be
+  interpreted as inductive-inductive definitions where we only care
+  about the index set $A$ and not about the family $B : A \to \Set$. A
+  canonical choice is to let $B$ have constructor $\introB : (x : A)
+  \to B(x)$, which is described by the code $\gamma_{\text{dummy}} \coloneqq 
+  \AindB(\one, \nilB(\termAref(\inr(\oneelt))))$.
+
+  For every $A : \Set$, $B : A \to \Set$, let
+  \[
+  \gamma_{W(A, B)} \coloneqq \nonindA(A, \lambda x\,.\,\AindA(B(x),\nilA))
+  \]
+  and define $W(A, B) \coloneqq A_{\gamma_{W(A, B)},
+    \gamma_{\text{dummy}}}$.  Then $W(A, B)$ has constructor
+  \[
+  \intro{W(A, B)} : \big((x : A) \times (B(x) \to W(A, B)) \times \one\big) \to W(A, B) \enspace .
+  \]
+
+\item[Finite sets]
+\item[Contexts and types]
+\item[Sorted lists] 
+\end{description}
 
 %natural numbers
 
@@ -923,8 +1020,8 @@ and will be using standard set theoretic constructions, e.g.
 \Pi_{x \in a}b(x) &\coloneqq \{ f : a \to \bigcup_{x \in a}b(x)\ |\ \forall x \in a.f(x) \in b(x)\}, \\
 \Sigma_{x \in a}b(x) &\coloneqq \{ \langle c , d\rangle\ |\ c \in a \land d
 \in b(c) \}, \\
-0 &\coloneqq \emptyset, 1 \coloneqq \{0\}, 2 \coloneqq \{0, 1\}, \ldots, \\
-\Nat &\coloneqq \text{smallest set containing $0$ and closed under successor} \\
+0 &\coloneqq \emptyset, 1 \coloneqq \{0\}, 2 \coloneqq \{0, 1\}, \\
+%\Nat &\coloneqq \text{smallest set containing $0$ and closed under successor} \\
 a_0 + \ldots + a_n &\coloneqq \Sigma_{i \in \{0, \ldots, n\}}a_i
 \end{align*}
 and the cumulative hierarchy $V_{\alpha} \coloneqq
@@ -976,10 +1073,10 @@ To interpret terms containing $\SPA$, $\SPB$, $\ArgA$, $\ArgB$, $\IndexB$,
 $\nilA$, $\nonindA$, $\AindA$, $\BindA$, we first define $\sem{\SPA}$,
 $\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpret
 \begin{align*}
-\sem{\SPA(\Aref)}_\rho &\coloneqq \sem{\SPA}(\sem{\Aref}_\rho) \\
+\sem{\SPA(\Xref)}_\rho &\coloneqq \sem{\SPA}(\sem{\Xref}_\rho) \\
 \vdots \\
-\sem{\ArgA(\Aref, \gamma, A, B, \repA)}_\rho &\coloneqq
-\sem{\ArgA}(\sem{\Aref}_\rho, \sem{\gamma}_\rho, \sem{A}_\rho, \sem{B}_\rho, \sem{\repA}_\rho) \\
+\sem{\ArgA(\Xref, \gamma, A, B, \repA)}_\rho &\coloneqq
+\sem{\ArgA}(\sem{\Xref}_\rho, \sem{\gamma}_\rho, \sem{A}_\rho, \sem{B}_\rho, \sem{\repA}_\rho) \\
 \vdots \\
 \sem{\nonindA(K, \gamma)}_\rho &\coloneqq \sem{\nonindA}(\sem{K}_\rho,
 \sem{\gamma}_\rho) \\
@@ -988,15 +1085,15 @@ $\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpr
 In all future definitions, if we are currently defining $\sem{F}$ where $F : D
 \to E$, say, let $F(d)\uparrow$ if $d \notin \sem{D}$.
 
-$\sem{\SPA}(\Aref)$ is defined as the least set such that
+$\sem{\SPA}(\Xref)$ is defined as the least set such that
 \begin{align*}
-\sem{\SPA}(\Aref) &= 1 + \sum_{K \in \sem{\Set}}(K \to \sem{\SPA}(\Aref))
-  + \sum_{K \in \sem{\Set}}\sem{\SPA}(\Aref + K) \\
- & {} + \sum_{K \in \sem{\Set}}\sum_{h : K \to \Aref}\sem{\SPA}(\Aref).
+\sem{\SPA}(\Xref) &= 1 + \sum_{K \in \sem{\Set}}(K \to \sem{\SPA}(\Xref))
+  + \sum_{K \in \sem{\Set}}\sem{\SPA}(\Xref + K) \\
+ & {} + \sum_{K \in \sem{\Set}}\sum_{h : K \to \Xref}\sem{\SPA}(\Xref).
 \end{align*}
  By the inaccessibility of $\cardi$, there is a
 regular cardinal ${\kappa < \cardi}$ such that for all $K \in \sem{\Set}$, we
-have that the cardinality of $K$, $\Aref$, $\Aref + K$ and $(K \to \Aref)$ is less than
+have that the cardinality of $K$, $\Xref$, $\Xref + K$ and $(K \to \Xref)$ is less than
 $\kappa$. If we now iterate an appropriate operator $\kappa$ times, we get our
 solution, which must be an element of $\sem{\TYPE} = V_{\cardi}$ by the
 inaccessibility of $\cardi$.
@@ -1011,13 +1108,13 @@ $\sem{\SPB}$ and its constructors are defined
 analogously. $\sem{\ArgA}$, $\sem{\ArgB}$ and $\sem{\IndexB}$ are defined according to their equations,
 e.g.\ 
 \begin{align*}
-  \sem{\ArgA}(\Aref, \sem{\nilA}, A, B, \repA) &\colonsimeq 1 \\
-\sem{\ArgA}(\Aref, \sem{\nonindA}(K, \gamma), A. B. \repA) &\colonsimeq
-  \sum_{k \in K} \sem{\ArgA}(\Aref, \gamma(k), A, B, \repA) \\
-\sem{\ArgA}(\Aref, \sem{\AindA}(K, \gamma), A, B, \repA) &\colonsimeq
-  \sum_{j : K \to A}\sem{\ArgA}(\Aref + K, \gamma, A, B, [\repA, j]) \\
-\sem{\ArgA}(\Aref, \sem{\BindA}(K, h, \gamma), A, B, \repA) &\colonsimeq
-  \sum_{\mathclap{j \in \Pi_{k \in K} B(\repA (h(k)))}}\sem{\ArgA}(\Aref, \gamma, A, B, \repA).
+  \sem{\ArgA}(\Xref, \sem{\nilA}, A, B, \repA) &\colonsimeq 1 \\
+\sem{\ArgA}(\Xref, \sem{\nonindA}(K, \gamma), A. B. \repA) &\colonsimeq
+  \sum_{k \in K} \sem{\ArgA}(\Xref, \gamma(k), A, B, \repA) \\
+\sem{\ArgA}(\Xref, \sem{\AindA}(K, \gamma), A, B, \repA) &\colonsimeq
+  \sum_{j : K \to A}\sem{\ArgA}(\Xref + K, \gamma, A, B, [\repA, j]) \\
+\sem{\ArgA}(\Xref, \sem{\BindA}(K, h, \gamma), A, B, \repA) &\colonsimeq
+  \sum_{\mathclap{j \in \Pi_{k \in K} B(\repA (h(k)))}}\sem{\ArgA}(\Xref, \gamma, A, B, \repA).
 \end{align*}
 %
 % todo: rework to new axiomatisation
@@ -1025,10 +1122,10 @@ e.g.\
 
 Finally, we have to interpret $A_{\gammaAB}$, $B_{\gammaAB}$,
 $\intro{A_{\gammaAB}}$ and $\intro{B_{\gammaAB}}$.  The high-level
-idea is to iterate $\ArgA$ until a fixed point is reached, then apply
-$\ArgB$ once, and repeat. This is necessary since $\ArgB$ expects an
-argument $\introA : \ArgA(\gammaA, A, B) \to A$, which can be chosen
-to be the identity if $A$ is a fixed point of $\ArgA(\gammaA, A, B)$
+idea is to iterate $\ArgAp$ until a fixed point is reached, then apply
+$\ArgBp$ once, and repeat. This is necessary since $\ArgBp$ expects an
+argument $\introA : \ArgAp(\gammaA, A, B) \to A$, which can be chosen
+to be the identity if $A$ is a fixed point of $\ArgAp(\gammaA, A, B)$
 (with $B$ fixed). In more detail, let
 \begin{gather*}
 \sem{A_{\gammaAB}} \colonsimeq A^{\cardz} \enspace\! , \quad\!\!
@@ -1040,10 +1137,10 @@ where $A^{\alpha}$ and $B^{\alpha}$ are
 simultaneously defined by recursion on $\alpha$ as
 \begin{align*}
   A^{\alpha} & \coloneqq  \text{least fixed point of }
-       \lambda X\,.\, \sem{\ArgA}(\gamma_A, A^{< \alpha} \cup X, [B^{< \alpha}, \lambda x\,.\,\emptyset]) \enspace ,\\
-  B^{\alpha}(a) & \coloneqq \{b\ |\ b \in \sem{\ArgB}(\gamma_A, A^{< \alpha} \cup A^{\alpha},
+       \lambda X\,.\, \sem{\ArgAp}(\gamma_A, A^{< \alpha} \cup X, [B^{< \alpha}, \lambda x\,.\,\emptyset]) \enspace ,\\
+  B^{\alpha}(a) & \coloneqq \{b\ |\ b \in \sem{\ArgBp}(\gamma_A, A^{< \alpha} \cup A^{\alpha},
   [B^{< \alpha}, \lambda x\,.\,\emptyset], \id, \gamma_B) \\
-  & \quad \land \sem{\IndexB}(\gamma_A,
+  & \quad \land \sem{\IndexBp}(\gamma_A,
   A^{< \alpha} \cup A^{\alpha}, [B^{< \alpha}, \lambda x\,.\,\emptyset], \id, \gamma_B, b) = a \}\enspace \hspace{-2.47968pt} .
 \end{align*}
 
@@ -1075,24 +1172,24 @@ Having interpreted all terms, we finally interpret contexts as sets of environme
 The proof of the soundness theorem is rather
   straight\-forward. For the verification that $\sem{A_{\gamma_A, \gamma_B}}
   \in \sem{\Set}$ and $\sem{B_{\gamma_A, \gamma_B}} : \sem{A_{\gamma_A,
-      \gamma_B}} \to \sem{\Set}$, one first verifies that $\sem{\ArgA}$,
-  $\sem{\ArgB}$, $\sem{\IndexB}$ are monotone in the following sense:
+      \gamma_B}} \to \sem{\Set}$, one first verifies that $\sem{\ArgAp}$,
+  $\sem{\ArgBp}$, $\sem{\IndexBp}$ are monotone in the following sense:
   %
   \begin{lemma}
   \label{thm:Arg-monotone}
-  For all $\gammaA \in \sem{\SPA}$ and $\gammaB \in \sem{\SPB}(\gammaA)$:
+  For all $\gammaA \in \sem{\SPAp}$ and $\gammaB \in \sem{\SPBp}(\gammaA)$:
   \begin{enumerate}[(i)]
   \item If $A \subseteq A'$ and $B(x) \subseteq B'(x)$ then
-    $\sem{\ArgA}(\gammaA, A, B) \subseteq \sem{\ArgA}(\gammaA, A', B')$.
-  \item If in addition $\introA(x) = \introA'(x)$ for all $x \in \ArgA(\gammaA, A, B)$, then
+    $\sem{\ArgAp}(\gammaA, A, B) \subseteq \sem{\ArgAp}(\gammaA, A', B')$.
+  \item If in addition $\introA(x) = \introA'(x)$ for all $x \in \ArgAp(\gammaA, A, B)$, then
     \[
-    \sem{\ArgB}(\gammaA, A, B, \introA, \gammaB) \subseteq \sem{\ArgA}(\gammaA, A', B', \introA', \gammaB)
+    \sem{\ArgBp}(\gammaA, A, B, \introA, \gammaB) \subseteq \sem{\ArgBp}(\gammaA, A', B', \introA', \gammaB)
     \]
     and
     \[    
-    \sem{\IndexB}(\gammaA, A, B, \introA, \gammaB, x) = \sem{\IndexB}(\gammaA, A', B', \introA', \gammaB, x)
+    \sem{\IndexBp}(\gammaA, A, B, \introA, \gammaB, x) = \sem{\IndexBp}(\gammaA, A', B', \introA', \gammaB, x)
     \]
-    for all $x \in \sem{\ArgB}(\gammaA, A, B, \introA, \gammaB)$. \qed
+    for all $x \in \sem{\ArgBp}(\gammaA, A, B, \introA, \gammaB)$. \qed
   \end{enumerate}
   \end{lemma}
 
@@ -1117,7 +1214,7 @@ One can then prove some useful facts about $A^{\alpha}$ and
 \notIncludedProof{  %todo
   \begin{itemize}
   \item If $\alpha = 0$, then $A^{\alpha} =  \text{least fixed point of }
-       \lambda X\,.\, \sem{\ArgA}(\gamma_A, X, \lambda x\,.\,\emptyset)$.
+       \lambda X\,.\, \sem{\ArgAp}(\gamma_A, X, \lambda x\,.\,\emptyset)$.
  % \item If $\alpha = \beta + 1$
  % \item If $\alpha = \lambda$ limit
   \end{itemize}
@@ -1141,11 +1238,11 @@ One can then prove some useful facts about $A^{\alpha}$ and
 
 
 
-% \section{Remarks} %todo: better title
-% \label{sec:remarks}
+ \section{Remarks} %todo: better title
+ \label{sec:remarks}
 
-% \subsection{The r\^{o}le of large elimination}
-% \label{sec:large-elim}
+ \subsection{The r\^{o}le of large elimination}
+ \label{sec:large-elim}
 
 
 

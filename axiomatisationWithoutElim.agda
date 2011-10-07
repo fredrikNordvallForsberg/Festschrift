@@ -1,0 +1,1 @@
+/home/csfnf/work/agda/indind/finite/axiomatisationWithoutElim.agda
