@@ -883,8 +883,39 @@ For the equations, we will suppress all inferable arguments:
 \IndexB(\ldots, \BindB(K, \hindex, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y)
 \end{align*}
 
-\begin{example}
-  $\ArgBp$ and $\IndexBp$ of $\gamma_{\Pi}$.
+\begin{example} %todo
+  The constructor $\Pi : \big((\Gamma : \Ctxt) \times (\sigma : \Ty(\Gamma))
+  \times \Ty(\consCtxt{\Gamma}{\sigma})\big) \to \Ty(\Gamma)$ from Example
+\ref{ex:ctxt-type} is represented by the code
+%
+\[
+\gamma_{\Pi} = \AindB(\one, \BindB(\one, (\lambda \oneelt.\,\widehat{\Gamma}),\BindB(\one,
+(\lambda \oneelt.\,\widehat{\consCtxt{\Gamma}{\sigma}}, \nilB(\widehat{\Gamma}))))) : \SPBp(\gamma_{\consCtxtbare}) \enspace ,
+\]
+  where $\widehat{\Gamma} = \termAref(\inr(\oneelt)) : \Aterm(\zero +
+  \one, \zero, \gamma_{\consCtxtbare})$ and
+  \[
+  \widehat{\consCtxt{\Gamma}{\sigma}} = \termArg(\langle (\lambda
+  \oneelt.\termBref(\inr(\oneelt))), \langle \lambda \oneelt.\oneelt,
+  \oneelt\rangle\rangle) : \Aterm(\zero + \one, \zero + \one,
+  \gamma_{\consCtxtbare}) \enspace .
+  \]
+%
+We have 
+\begin{multline*}
+  \ArgBp(\gamma_{\consCtxtbare}, \Ctxt, \Ty, \consCtxtbare,
+  \gamma_{\Pi}) = \\
+ (\Gamma : \one \to \Ctxt) \times (\sigma : \one \to
+  \Ty(\Gamma(\oneelt))) \times (\one \to
+  \Ty(\consCtxt{\Gamma(\oneelt)}{\sigma(\oneelt)}) \times \one
+\end{multline*}
+and $\IndexBp(\gamma_{\consCtxtbare}, \Ctxt, \Ty, \consCtxtbare,
+\gamma_{\Pi}, \langle \Gamma, \sigma, \tau, \oneelt\rangle) =
+\Gamma(\oneelt)$.
+
+
+%(and also $\widehat{\Gamma} : \Aterm({\zero + \one}, {\zero + \one + \one}, \gamma_{\Ctxt})$)
+
 \blackqed
 \end{example}
 
@@ -1059,10 +1090,11 @@ above. Rather than trying to explain it, we just give the definition:
 \[
 \stepind{\consLessbare}(m, n, \ell, p, q, p', \stepindarg{\ell}, \stepindarg{p}, \stepindarg{p'}, x, r) =
 \begin{cases}
-  \consLess{}{}{}{}{r}{\consLess{}{}{}{}{q}{p'}} & \text{where $m \leq n$} \\
-  \consLess{}{}{}{}{q}{\stepindarg{p'}(x, r)} & \text{where $n \leq m$} 
+  \consLess{m}{x}{\consList{n}{\ell}{p}}{\consLess{m}{n}{\ell}{p}{s}{\lessListtrans{s}{p}}}{r}{\consLess{m}{n}{\ell}{p}{q}{p'}} & \text{where $s : m \leq n$} \\
+  \consLess{m}{n}{p'}{\stepindarg{p}(x, s)}{q}{\stepindarg{p'}(x, r)} & \text{where $s : n \leq m$} 
 \end{cases}
 \]
+%
 With all pieces in place, we can now define $\Listinsert : \SortedList
 \to \Nat \to \SortedList$ as $\Listinsert = \elim_{\SortedList}(P, Q,
 \stepind{\nilList}, \stepind{\consListbare}, \stepind{\nilLess{}},
@@ -1210,12 +1242,12 @@ $\gamma_1$, then $\intro{0 + 1}$ is described by the code
 The codes for the contexts and types from Example \ref{ex:ctxt-type}: \vskip
 0.2cm
 \begin{tabular}{lcl}
-$\gamma_{\Ctxt}$ &$=$& $\nilA \plOP \AindA(\one, \BindA(\one, (\lambda \oneelt .\,\inr(\star)),
+$\gamma_{\Ctxt}$ &$=$& $\nilA \plOP \AindA(\one, \BindA(\one, (\lambda \oneelt .\,\inr(\oneelt)),
 \nilA)) : \SPAp$ \\
 $\gamma_{\baseTybare}$ &$=$& $\AindB(\one, \nilB(\termAref(\inr(\oneelt))))$ \\
-$\gamma_{\Pi}$ &$=$& $\AindB(\one, \BindB(\one, (\lambda \oneelt.\,\termAref(\inr(\star))),\BindB(\one,$ \\
+$\gamma_{\Pi}$ &$=$& $\AindB(\one, \BindB(\one, (\lambda \oneelt.\,\termAref(\inr(\oneelt))),\BindB(\one,$ \\
 && \qquad\quad $(\lambda \oneelt.\termArg(\langle \twoff, \langle (\lambda
-\oneelt.\termBref(\inr(\oneelt)))),$ 
+\oneelt.\termBref(\inr(\oneelt))),$ 
  $\langle \lambda \oneelt.\oneelt, \oneelt\rangle\rangle\rangle),$ \\
 && \qquad\qquad $\nilB(\termAref(\inr(\oneelt))))))$ \\
 $\gamma_{\Ty}$ &$=$& $\gamma_{\baseTybare} \plOP \gamma_{\Pi} : \SPBp(\gamma_{\Ctxt})\enspace .$
@@ -1236,10 +1268,10 @@ and we can define the usual constructors by
 \end{tabular}
 \vskip 0.2cm
 \begin{tabular}{l}
-$\Pi : (\Gamma : \Ctxt) \to (A : \Ty(\Gamma)) \to \Ty(\consCtxt{\Gamma}{A}) \to
+$\Pi : (\Gamma : \Ctxt) \to (\sigma : \Ty(\Gamma)) \to \Ty(\consCtxt{\Gamma}{\sigma}) \to
 \Ty(\Gamma)$ \\
-$\Pi(\Gamma, A, B) = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twoff, \langle (\lambda
-    \oneelt.\Gamma), \langle (\lambda \oneelt.A),\langle (\lambda \oneelt. B) , \oneelt\rangle\rangle \rangle\rangle)$\enspace .
+$\Pi(\Gamma, \sigma, \tau) = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twoff, \langle (\lambda
+    \oneelt.\Gamma), \langle (\lambda \oneelt.\sigma),\langle (\lambda \oneelt. \tau) , \oneelt\rangle\rangle \rangle\rangle)$\enspace .
 \end{tabular}
 
 % γCtxt : SPA ⊥
