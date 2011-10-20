@@ -12,6 +12,8 @@
 \usepackage{enumerate}
 \usepackage{microtype}
 
+\usepackage{color}
+
 \usepackage{hyperref}
 
 %\title{A set-theoretic model of induction-induction}
@@ -83,7 +85,7 @@ of inductive families~\cite{dybjer1994indfam}, where a family $X : I
 simultaneously. For the family $\Fin : \Nat \to \Set$ of finite sets,
 the index set is $\Nat$:
 \[
-\infer{\finzero : \Fin(1)}{} \qquad
+\infer{\finzero{n} : \Fin(n + 1)}{n : \Nat} \qquad
 \infer{\finsucc{n}{m} : \Fin(n + 1)}{n : \Nat & \quad m : \Fin(n)}
 \]
 Each constructor constructs elements in $\Fin(k)$ for some $k : \Nat$,
@@ -196,7 +198,7 @@ one can define $A$ and $P$ simultaneously and achieve that every
 element of $A$ satisfies $P$ by construction. One example of such a
 data type is the type of sorted lists:
 
-\begin{example}[Sorted lists] %todo: rewrite with trans. in mind
+\begin{example}[Sorted lists]
 \label{ex:sorted-list}
 
 Let us define a data type consisting of sorted lists (of natural
@@ -224,6 +226,12 @@ inductively $m \lessList \ell$, then $m \lessList \consList{n}{\ell}{p}$:
 %      {m, n : \Nat \quad & \ell : \SortedList \quad & p : n \lessList \ell \quad &
        {q : m \leq n \quad & p_{m, \ell} : m \lessList \ell}
 \]
+This makes sense even if the order $\leq$ is not transitive. If it is
+(as the standard order on the natural numbers, for example), the
+argument $p_{m, \ell} : m \lessList \ell$ can be dropped from the
+constructor $\consLessbare$, since we already have $q : m \leq n$ and
+$p : n \lessList \ell$, hence by transitivity we must have $m
+\lessList \ell$.
 
  Of course, there are also many alternative ways to define such a data type
  using ordinary induction.
@@ -554,8 +562,6 @@ together with functions $\repIndex : \Yref \to \A$ and $\repB : (x :
 \Yref) \to \B(\repIndex(x))$ ; the function $\repIndex$ gives the index
 of the represented element, and $\repB$ the actual element.
 
-%todo: consistent use of X, Y / A , B
-
 We want to represent elements in $\ArgAp(\gammaA, \A, \B)$. We claim that
 the elements in $\ArgAp(\gammaA, \Xref + \Yref, [\lambda x\,.\,\zero,
 \lambda x\,.\,\one])$ are suitable for this purpose. To see this,
@@ -730,9 +736,8 @@ The simultaneously defined $\repBbar$ is very simple:
     = \consCtxt{a}{b} \enspace .
   \]
 % (λ _ → arg  (ff , ((λ _ → bref (inr _)) , ((λ _ → _) , _))))
+\blackqed
 \end{itemize}
-%
- \blackqed
 \end{example}
 
 \subsubsection{The universe $\SPBp$ of descriptions of $B$}
@@ -899,14 +904,14 @@ B_{\gammaAB} : A_{\gammaAB} \to \Set
 %
 Introduction rule for $A_{\gammaAB}$:
 %
-\[ %todo: check PML convention on variable names (x vs a)
-\infer{\intro{A_{\gammaAB}}(x) : A_{\gammaAB}}{x : \ArgAp(\gammaA, A_{\gammaAB}, B_{\gammaAB})}
+\[ 
+\infer{\intro{A_{\gammaAB}}(a) : A_{\gammaAB}}{a : \ArgAp(\gammaA, A_{\gammaAB}, B_{\gammaAB})}
 \]
 %
 Introduction rule for $B_{\gammaAB}$:
 %
 \[
-\infer{\intro{B_{\gammaAB}}(x) : B_{\gammaAB}(\IndexBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB, x))}{x : \ArgBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB)}
+\infer{\intro{B_{\gammaAB}}(a) : B_{\gammaAB}(\IndexBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB, a))}{a : \ArgBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB)}
 \]
 %
 
@@ -917,8 +922,178 @@ we just give the elimination rules for the data type of sorted lists
 define a function which inserts a number into a sorted list.
 
 \begin{example}
- insert : $A \to \SortedList \to \SortedList$ %todo: or simply Ctxt + types? 
+  The elimination rules for sorted lists and the $\lessList$ predicate
+  state that functions $\elim_{\SortedList}$ and $\elim_{\lessList}$
+  with the following types exist:
+  \begin{align*}
+    \elim_{\SortedList} :\ & (P : \SortedList \to \Set) \to \\
+                       & (Q : (n : \Nat) \to (\ell : \SortedList) \to n \lessList \ell \to P(\ell) \to \Set) \to \\
+                       & (\stepind{\nilList} : P(\nilList)) \to \\
+                       & \big(\stepind{\consListbare} : (n : \Nat) \to (\ell : \SortedList) \to (p : n \lessList \ell) \to (\stepindarg{\ell} : P(\ell)) \\
+                       & \qquad \to Q(n, \ell, p, \stepindarg{\ell}) \to P(\consList{n}{\ell}{p})\big) \to \\
+                       & \big(\stepind{\nilLess{}} : (m : \Nat) \to Q(m, \nilList, \nilLess{n}, \stepind{\nilList})\big) \to \\
+                       & \big(\stepind{\consLessbare} : (m : \Nat) \to (n : \Nat) \to (\ell : \SortedList) \to (p : n \lessList \ell) \\
+                       & \qquad \to (q : m \leq n) \to (p' : m \lessList \ell) \to
+                       (\stepindarg{\ell} : P(\ell)) \\ 
+                       & \qquad \to (\stepindarg{p} : Q(n, \ell,p, \stepindarg{\ell}))
+                       \to (\stepindarg{p'} : Q(m, \ell, p', \stepindarg{\ell})) \\
+                       & \qquad \to Q(m,\consList{n}{\ell}{p}, \consLess{m}{n}{\ell}{p}{q}{p'}, \stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \stepindarg{p}))\big) \to \\
+                       & (\ell : \SortedList) \to P(\ell) \enspace , \\
+% 
+     \elim_{\lessList} :\ & (P : \SortedList \to \Set) \to \\
+                       & (Q : (n : \Nat) \to (\ell : \SortedList) \to n \lessList \ell \to P(\ell) \to \Set) \to \\
+                       & (\stepind{\nilList} : \ldots) \to \\
+                       & \big(\stepind{\consListbare} : \ldots\big) \to \\
+                       & \big(\stepind{\nilLess{}} : \ldots\big) \to \\
+                       & \big(\stepind{\consLessbare} : \ldots\big) \to \\
+                       & (n : \Nat) \to (\ell : \SortedList) \to (p : n \lessList \ell) \\
+                       & \qquad \to Q(n, \ell, p, \elim_{\SortedList}(\ldots, \ell)) \enspace .
+  \end{align*}
+with computation rules
+%
+\[
+\elim_{\SortedList}(P, Q, \stepind{\nilList}, \stepind{\consListbare}, \stepind{\nilLess{}}, \stepind{\consLessbare}, \nilList) = \stepind{\nilList}
+\]
+and
+\begin{multline*}
+\elim_{\SortedList}(P, Q, \stepind{\nilList}, \stepind{\consListbare}, \stepind{\nilLess{}}, \stepind{\consLessbare}, \consList{n}{\ell}{p}) \\
+= \stepind{\consListbare}(n, \ell, p, \elim_{\SortedList}(\ldots, \ell), 
+\elim_{\lessList}(\ldots, n, \ell, p))  
+\end{multline*}
+%
+for $\elim_{\SortedList}$, and
+\[
+\elim_{\lessList}(P, Q, \stepind{\nilList}, \stepind{\consListbare}, \stepind{\nilLess{}}, \stepind{\consLessbare}, m, \nilList, \nilLess{m}) = \stepind{\nilLess{}}(m)
+\]
+and
+\begin{multline*}
+\elim_{\lessList}(P, Q, \stepind{\nilList}, \stepind{\consListbare}, \stepind{\nilLess{}}, \stepind{\consLessbare}, m, \consList{n}{\ell}{p}, \consLess{m}{n}{\ell}{p}{q}{p'}) \\
+= \stepind{\consLessbare}(m, n, \ell, p, q, p', \elim_{\SortedList}(\ldots, \ell), \\
+\elim_{\lessList}(\ldots, n, \ell, p), \elim_{\lessList}(\ldots, m, \ell, p'))
+\end{multline*}
+for $\elim_{\lessList}$. Notice how the computation rules for
+$\elim_{\lessList}$ are well-typed because of the computation rules
+for $\elim_{\SortedList}$.
+
+Now, suppose that we want to define a function $\Listinsert :
+\SortedList \to \Nat \to \SortedList$ which inserts a number $m$ into
+its appropriate place in a sorted list $\ell$ to create a new sorted
+list. From a high-level perspective, this is easy: the elimination
+rules allows us to make case distinctions between empty and non-empty
+lists, so it suffices to handle these two cases separately. The empty
+list is easy to handle, and for non-empty lists, we compare $m$ with
+the first element $n$ of the list $\ell = [n, \ldots]$, which is
+possible since $\leq$ on natural numbers is decidable. If $m \leq n$,
+the result should be $[m, n, \ldots]$, otherwise we recursively insert
+$m$ into the tail of the list.
+
+In detail, we choose $P(\ell) = \Nat \to \SortedList$ and, in our
+first attempt, $Q(n, \ell, p, \stepindarg{\ell}) = \one$, since we are
+only interested in getting a function $\elim_{\SortedList}(\ldots) :
+\SortedList \to \Nat \to \SortedList$. We need to give functions
+$\stepind{\nilList} : (m : \Nat) \to \SortedList$ and $\stepind{\consListbare}(n, \ell, p) :
+%(n : \Nat) \to (\ell : \SortedList) \to (p : n \lessList \ell) \to
+(\stepindarg{\ell} : \Nat \to \SortedList) \to Q(n, \ell, p,
+\stepindarg{\ell}) \to (m : \Nat) \to \SortedList$ to use when
+inserting into the empty list $\nilList$ or the list
+$\consList{n}{\ell}{p}$ respectively. The argument $\stepindarg{\ell}
+: \Nat \to \SortedList$ gives the result of a recursive call on
+$\ell$.
+
+The function $\stepind{\nilList}$ is easy to define: it should be
+\[
+\stepind{\nilList}(m) = \consList{m}{\nilList}{\nilLess{m}}
+\]
+For $\stepind{\consListbare}$, the decidability of $\leq$ (combined
+with the fact that $\leq$ is total) allows us to distinguish between
+the cases when $m \leq n$ and $n \leq m$. We try:
+\[
+\stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \oneelt, m) =
+\begin{cases}
+  \consList{m}{\consList{n}{\ell}{p}}{\consLess{m}{n}{\ell}{p}{q}{\lessListtrans{q}{p}}} & \text{where $q : m \leq n$} \\
+  \consList{n}{\stepindarg{\ell}(m)}{\SHED} & \text{where $q : n \leq m$} 
+\end{cases}
+\]
+Here, $\lessListtransbare : m \leq n \to n \lessList \ell \to m
+\lessList \ell$ witnesses a kind of transitivity of $\leq$ and
+$\lessList$. It can be straightforwardly defined with the elimination
+rules. The question is what we should fill the hole $\SHED$ with. We
+need to provide a proof that $n \lessList \stepindarg{l}(m)$, i.e.\
+that $n \lessList \Listinsert(l, m)$ if we remember that
+$\stepindarg{l}$ is the result of the recursive call on $\ell$. We
+need to prove this simultaneously as we define $\Listinsert$!
+Fortunately, this is exactly what the elimination rules allow us to do
+if we choose a more meaningful $Q$.
+
+Thus, we try again, but this time with 
+\[
+Q(n, \ell, p,\stepindarg{\ell})
+   = (m : \Nat) \to n \leq m \to n \lessList \stepindarg{l}(m) \enspace .
+\]
+The argument $\oneelt : \one$ to $\stepind{\consListbare}$ in our
+first attempt has now been replaced with the argument $\stepindarg{p}
+: (m : \Nat) \to n \leq m \to n \lessList \stepindarg{l}(m)$, and we can define
+\[
+\stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \stepindarg{p}, m) =
+\begin{cases}
+  \consList{m}{\consList{n}{\ell}{p}}{\consLess{m}{n}{\ell}{p}{q}{\lessListtrans{q}{p}}} & \text{where $q : m \leq n$} \\
+  \consList{n}{\stepindarg{\ell}(m)}{\stepindarg{p}(m, q)} & \text{where $q : n \leq m$} 
+\end{cases}
+\]
+%
+Now we must also define $\stepind{\nilLess{}} : (n : \Nat) \to Q(n,
+\nilList, \nilLess{n}, \stepind{\nilList})$ and
+$\stepind{\consLessbare}$ with type as above for our choice of $P$ and
+$Q$. This presents us with no further difficulties. For
+$\stepind{\nilLess{}}$, expanding $Q(n, \nilList, \nilLess{n},
+\stepind{\nilList})$ and replacing $\stepind{\nilLess{}}$ with its
+definition, we see that we should give a function of type
+\[
+\stepind{\nilLess{}} : (n : \Nat) \to (m : \Nat) \to n \leq m \to n
+\lessList \consList{m}{\nilList}{\nilLess{m}} \enspace ,
+\]
+so we can define $\stepind{\nilLess{}}(n, m, p) = {}
+\consLess{n}{m}{\nilList}{\nilLess{m}}{p}{\nilLess{n}}$. The
+definition of follows the pattern of $\stepind{\consListbare}$
+above. Rather than trying to explain it, we just give the definition:
+\[
+\stepind{\consLessbare}(m, n, \ell, p, q, p', \stepindarg{\ell}, \stepindarg{p}, \stepindarg{p'}, x, r) =
+\begin{cases}
+  \consLess{}{}{}{}{r}{\consLess{}{}{}{}{q}{p'}} & \text{where $m \leq n$} \\
+  \consLess{}{}{}{}{q}{\stepindarg{p'}(x, r)} & \text{where $n \leq m$} 
+\end{cases}
+\]
+With all pieces in place, we can now define $\Listinsert : \SortedList
+\to \Nat \to \SortedList$ as $\Listinsert = \elim_{\SortedList}(P, Q,
+\stepind{\nilList}, \stepind{\consListbare}, \stepind{\nilLess{}},
+\stepind{\consLessbare})$.
 \blackqed
+
+% P : SList -> Set
+% P ys = (n : ℕ) -> SList
+
+% Q : (y : ℕ) -> (ys : SList) -> y ≤L ys -> P ys -> Set
+% Q y ys p insert[_,ys] = (x : ℕ) -> y ≤ x ->  y ≤L insert[_,ys] x
+
+% step[] : P []
+% step[] m = m :: [] 〈 triv
+
+%step:: : (n : ℕ) -> (ys : SList) -> (p : n ≤L ys) -> (pp : P ys) -> Q n ys p pp 
+%             -> P (n :: ys 〈 p)
+%step:: n ys p insert[_,ys] lemma[_,ys,p] m with m ≤? n 
+%... | yes q = m :: n :: ys 〈 p 〈 cons q (≤L-trans ys q p)
+%... | no ¬q = n :: (insert[_,ys] m) 〈 lemma[_,ys,p] m (¬x<y→y<x ¬q)
+
+% steptriv : (n : ℕ) -> Q n [] triv step[]
+% steptriv y x y<x = cons y<x triv
+
+% stepcons : (m : ℕ) -> {n : ℕ} -> {ys : SList} -> {p : n ≤L ys} -> 
+%            (q : m ≤ n) -> (p' : m ≤L ys) ->
+%            (pp : P ys) -> (qq : Q n ys p pp) -> (qqq : Q m ys p' pp)
+%              -> Q m (n :: ys 〈 p) (cons {m} {n} {ys} {p} q p') (step:: n ys p pp qq)
+% stepcons m {n} {ys} {p} q m<ys insert[_,ys] lemma[_,ys,p] lemma[_,ys,m<ys] x r with x ≤? n
+% ... | yes q = cons r (cons q m<ys)
+% ... | no ¬q = cons q (lemma[_,ys,m<ys] x r)
 \end{example}
 
 \subsection{The examples revisited}
@@ -969,17 +1144,133 @@ $\gamma_1$, then $\intro{0 + 1}$ is described by the code
   \intro{W(A, B)} : \big((x : A) \times (B(x) \to W(A, B)) \times \one\big) \to W(A, B) \enspace .
   \]
 
-\item[Finite sets]
+\item[Finite sets] Indexed inductive definitions can also be
+  interpreted as inductive-inductive definitions, namely those where
+  the index set just is an isomorphic copy of a previously constructed
+  set (i.e.\ with constructor $\introA : I \to A$ for some $I : \Set$).
+
+  For the family $\Fin : \Nat \to \Set$ of finite sets, the index set
+  is $\Nat$, so we define
+  \[
+  \gamma_A \coloneqq \nonindA(\Nat, \lambda n\,.\,\nilA) : \SPAp
+  \]
+  and
+  \[
+  \gamma_{\Fin} \coloneqq \gamma_{\finzeroBare} \plOP \gamma_{\finsuccBare} : \SPBp(\gammaA)
+  \]
+  where
+  \begin{align*}
+    \gamma_{\finzeroBare} &\coloneqq \nonindB(\Nat, \lambda n\,.\,\nilB(\termArg(\pair{n + 1}{\oneelt}))) \enspace ,\\
+    \gamma_{\finsuccBare} &\coloneqq \nonindB(\Nat, \lambda n\,.\,\BindB(\one, (\lambda \oneelt . \termArg(\pair{n}{\oneelt})), \nilB(\termArg(\pair{n + 1}{\oneelt})))) \enspace .
+  \end{align*} 
+
+  Then $\intro{A_{\gamma_A, \gamma_{\Fin}}} : \Nat \times \one \to
+  A_{\gamma_A, \gamma_{\Fin}}$ is one part of an isomorphism $\Nat
+  \cong \Nat \times \one \cong A_{\gamma_A, \gamma_{\Fin}}$, and if we
+  define $\Fin : \Nat \to \Set$ by $\Fin(n) = B_{\gamma_A,
+    \gamma_{\Fin}}(\intro{A_{\gamma_A,
+    \gamma_{\Fin}}}(\pair{n}{\oneelt}))$, then we can define
+  constructors
+  \begin{align*}
+    \infer{\finzero{n} : \Fin(n + 1)}{n : \Nat} \qquad
+\infer{\finsucc{n}{m} : \Fin(n + 1)}{n : \Nat & \quad m : \Fin(n)}
+  \end{align*}
+  by $\finzero{n} = \intro{B_{\gamma_A,
+      \gamma_{\Fin}}}(\pair{\twott}{\pair{n}{\oneelt}})$ and
+  \[
+  \finsucc{n}{m} = \intro{B_{\gamma_A,
+      \gamma_{\Fin}}}(\pair{\twoff}{\pair{n}{\pair{(\lambda
+        \oneelt\,.\,m)}{\oneelt}}} \enspace .
+  \]
+% γℕ' : SPA ⊥
+% γℕ' = nonind ℕ (λ n → nilA)
+
+% γFin : SPB ⊥ ⊥ γℕ'
+% γFin =     nonind ℕ (λ n → nilB (inn (suc n , _)))
+%        +++ nonind ℕ (λ n → B-ind ⊤ (λ _ → inn (n , _)) (nilB (inn ((suc n) , _))))
+
+% ℕ' : Set
+% ℕ' = A γℕ' γFin
+
+% i : ℕ -> ℕ'
+% i n = introA (n , _)
+
+% Fin : ℕ -> Set
+% Fin n = B γℕ' γFin (i n)
+
+% fz : (n : ℕ) -> Fin (suc n)
+% fz n = introB (tt , (n , _))
+
+% fsuc : (n : ℕ) -> Fin n -> Fin (suc n)
+% fsuc n m = introB (ff , n , ((λ _ → m) , _))
+
+
 \item[Contexts and types]
-\item[Sorted lists] 
+
+The codes for the contexts and types from Example \ref{ex:ctxt-type}: \vskip
+0.2cm
+\begin{tabular}{lcl}
+$\gamma_{\Ctxt}$ &$=$& $\nilA \plOP \AindA(\one, \BindA(\one, (\lambda \oneelt .\,\inr(\star)),
+\nilA)) : \SPAp$ \\
+$\gamma_{\baseTybare}$ &$=$& $\AindB(\one, \nilB(\termAref(\inr(\oneelt))))$ \\
+$\gamma_{\Pi}$ &$=$& $\AindB(\one, \BindB(\one, (\lambda \oneelt.\,\termAref(\inr(\star))),\BindB(\one,$ \\
+&& \qquad\quad $(\lambda \oneelt.\termArg(\langle \twoff, \langle (\lambda
+\oneelt.\termBref(\inr(\oneelt)))),$ 
+ $\langle \lambda \oneelt.\oneelt, \oneelt\rangle\rangle\rangle),$ \\
+&& \qquad\qquad $\nilB(\termAref(\inr(\oneelt))))))$ \\
+$\gamma_{\Ty}$ &$=$& $\gamma_{\baseTybare} \plOP \gamma_{\Pi} : \SPBp(\gamma_{\Ctxt})\enspace .$
+\end{tabular}
+\vskip 0.2cm \noindent
+We have $\Ctxt = A_{\gamma_{\Ctxt}, \gamma_{\Ty}}$ and $\Ty =
+B_{\gamma_{\Ctxt}, \gamma_{\Ty}}$
+and we can define the usual constructors by
+\vskip 0.2cm
+\begin{tabular}{l@{\qquad\qquad}l}
+  $\emptyCtxt : \Ctxt$ & $\baseTybare : (\Gamma : \Ctxt) \to \Ty(\Gamma)$ \\
+  $\emptyCtxt = \intro{A_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \oneelt\rangle)\enspace ,$ & $\baseTy{\Gamma} = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \langle (\lambda \oneelt.\Gamma), \oneelt\rangle\rangle)\enspace ,$\\
+\end{tabular}
+\vskip 0.2cm
+\begin{tabular}{l}
+  $\consCtxtbare : (\Gamma : \Ctxt) \to \Ty(\Gamma) \to \Ctxt$ \\
+  $\consCtxt{\Gamma}{\sigma} = \intro{A_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twoff, \langle (\lambda \oneelt.\Gamma), \langle (\lambda \oneelt.\sigma), \oneelt\rangle \rangle\rangle)$ \enspace ,\\
+\end{tabular}
+\vskip 0.2cm
+\begin{tabular}{l}
+$\Pi : (\Gamma : \Ctxt) \to (A : \Ty(\Gamma)) \to \Ty(\consCtxt{\Gamma}{A}) \to
+\Ty(\Gamma)$ \\
+$\Pi(\Gamma, A, B) = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twoff, \langle (\lambda
+    \oneelt.\Gamma), \langle (\lambda \oneelt.A),\langle (\lambda \oneelt. B) , \oneelt\rangle\rangle \rangle\rangle)$\enspace .
+\end{tabular}
+
+% γCtxt : SPA ⊥
+% γCtxt = nilA ++ A-ind ⊤ (B-ind ⊤ (λ _ → inr _) nilA)
+
+% γTy : SPB ⊥ ⊥ γCtxt
+% γTy = A-ind ⊤ (nilB  (aref (inr _))) +++
+%       A-ind ⊤ (B-ind ⊤  (λ _ → aref (inr _)) (B-ind ⊤ (λ _ → arg  (ff , ((λ _ → bref (inr _)) , ((λ _ → _) , _)))) (nilB  (aref (inr _)))))
+
+
+% Ctxt : Set
+% Ctxt = A γCtxt γTy
+
+% Ty : Ctxt -> Set
+% Ty = B γCtxt γTy
+
+
+% ε : Ctxt
+% ε = introA (tt , _)
+
+% cons : (Γ : Ctxt) -> Ty Γ -> Ctxt
+% cons Γ σ = introA ((ff , (λ _ → Γ) , (λ _ → σ) , _))
+
+% ι : {Γ : Ctxt} -> Ty Γ
+% ι {Γ} = introB ((tt , (λ _ → Γ) , _))
+
+% Π : (Γ : Ctxt) -> (A : Ty Γ) -> (B : Ty (cons Γ A)) -> Ty Γ
+% Π Γ A B = introB (ff , ((λ _ → Γ ) , ((λ _ → A) , ((λ _ → B) , _))))
+
+%\item[Sorted lists] 
 \end{description}
-
-%natural numbers
-
-%vectors etc
-
-%ctxts and types
-
 
 \section{A set-theoretic model}
 \label{sec:model}
@@ -993,9 +1284,10 @@ since the formation and introduction rules are not instances of
 ordinary indexed inductive definitions.  (However, we do believe that
 the theory of inductive-inductive definitions \emph{can} be reduced to
 the theory of indexed inductive definitions with a bit of more
-work, %and plan to publish an article about this in the future.
-see Section~\ref{sec:indexed-induction}.) To make sure that our theory
-is consistent, it is thus neccessary to construct a model.
+work.) %and plan to publish an article about this in the future.
+%see Section~\ref{sec:indexed-induction}.)
+To make sure that our theory is consistent, it is thus neccessary to
+construct a model.
 
 
 We will develop a model in ZFC set theory, extended by two
@@ -1238,16 +1530,16 @@ One can then prove some useful facts about $A^{\alpha}$ and
 
 
 
- \section{Remarks} %todo: better title
- \label{sec:remarks}
+ %\section{Remarks} %todo: better title
+ %\label{sec:remarks}
 
- \subsection{The r\^{o}le of large elimination}
- \label{sec:large-elim}
+% \subsection{The r\^{o}le of large elimination}
+% \label{sec:large-elim}
 
 
 
-\subsection{Indexed inductive definitions and induction-induction}
-\label{sec:indexed-induction}
+%\subsection{Indexed inductive definitions and induction-induction}
+%\label{sec:indexed-induction}
 
 
 

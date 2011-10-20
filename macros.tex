@@ -52,10 +52,6 @@
 % Towards SPB
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%\newcommand{\repn}[1]{\ensuremath{\text{rep}_{#1}}}
-
-%\newcommand{\argn}[1]{\ensuremath{\text{arg}^{#1}}}
-
 \newcommand{\Aterm}{\ensuremath{\text{A-Term}}}
 \newcommand{\Bterm}{\ensuremath{\text{B-Term}}}
 
@@ -125,8 +121,10 @@
 %%%%%%%%%%
 
 \newcommand{\Fin}{\ensuremath{\text{Fin}}}
-\newcommand{\finzero}{\ensuremath{\text{z}}}
+\newcommand{\finzero}[1]{\ensuremath{\text{z}(#1)}}
+\newcommand{\finzeroBare}{\ensuremath{\text{z}}}
 \newcommand{\finsucc}[2]{\ensuremath{\text{s}_{#1}(#2)}}
+\newcommand{\finsuccBare}{\ensuremath{\text{s}}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Contexts and types
@@ -157,11 +155,29 @@
 \newcommand{\consList}[3]{\ensuremath{\consListbare(#1, #2, #3)}}
 
 \newcommand{\nilLess}[1]{\ensuremath{\text{triv}_{#1}}}
-\newcommand{\consLess}[6]{\ensuremath{\ll #5, #6\gg_{#4, #1, #2, #3}}}
+%\newcommand{\consLess}[6]{\ensuremath{\ll #5, #6\gg_{#4, #1, #2, #3}}}
+\newcommand{\consLess}[6]{\ensuremath{\ll #5, #6\gg}}
 \newcommand{\consLessbare}{\ensuremath{\ll \cdot \gg}}
 
 \newcommand{\ArgSList}{\ensuremath{\text{Arg}_{\text{SList}}}}
 \newcommand{\ArglessList}{\ensuremath{\text{Arg}_{\lessList}}}
+
+\newcommand{\Listinsert}{\ensuremath{\text{insert}}}
+\newcommand{\lessListtrans}[2]{\ensuremath{\text{tra}_{\lessList}(#1, #2)}}
+\newcommand{\lessListtransbare}{\ensuremath{\text{tra}_{\lessList}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Eliminators
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\elim}{\ensuremath{\text{elim}}}
+\newcommand{\stepind}[1]{\ensuremath{\text{step}_{#1}}}
+\newcommand{\stepindarg}[1]{\ensuremath{\widetilde{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Pretending to be Agda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\SHED}{\raisebox{0in}[0in][0in]{\colorbox[rgb]{0.5,1,0.5}{\(\{?\}\)}}}
+\newcommand{\SHEDARG}[1]{\colorbox[rgb]{0.5,1,0.5}{\(\{#1\}\)}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
