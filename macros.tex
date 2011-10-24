@@ -126,6 +126,17 @@
 \newcommand{\finsucc}[2]{\ensuremath{\text{s}_{#1}(#2)}}
 \newcommand{\finsuccBare}{\ensuremath{\text{s}}}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Vectors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Vecind}{\ensuremath{\text{Nonempty}_{\text{ind}}}}
+\newcommand{\Vecrec}{\ensuremath{\text{Nonempty}_{\text{rec}}}}
+
+\newcommand{\singleVec}[1]{\ensuremath{[#1]}}
+\newcommand{\consVecbare}{\ensuremath{\text{cons}}}
+\newcommand{\consVec}[2]{\ensuremath{\consVecbare(#1, #2)}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Contexts and types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -220,10 +231,10 @@
 
 \newcommand{\notIncludedProof}[1]{} %for proofs that shouldn't be included in article
 \newcommand{\IncludedProof}[1]{ %for proofs that should be temporarily included in article
-%\framebox{%
-%\begin{minipage}{\textwidth}
+\framebox{%
+\begin{minipage}{\textwidth}
   #1
-%\end{minipage}}
+\end{minipage}}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -264,10 +264,12 @@ relation on surreal numbers which is also defined inductively:
   \end{itemize}
 \end{itemize}
 
-Both rules can be understood as inductive definitions. However, they
-are not formulated with a constructive reading in mind (too many
-negations!). Mamane~\cite{mamane2004surrealCoq} develops the theory of
-surreal numbers in the proof assistant Coq. %todo: expand
+Both rules can be understood as inductive definitions. Notice how the
+second definition only makes sense in the presence of the first
+definition, and how the first definition already refers to the second.
+Mamane~\cite{mamane2004surrealCoq} develops the theory of surreal
+numbers in the proof assistant Coq, using an encoding to reduce the
+inductive-inductive to an ordinary inductive definition.
 \blackqed
 \end{example}
 
@@ -279,21 +281,50 @@ surreal numbers in the proof assistant Coq. %todo: expand
 
 In both an inductive-inductive and an inductive-recursive definition,
 a set $U$ and a family $T : U \to \Set$ are defined
-simultaneously. The difference between the two principles lies in how
-$T$ is defined. In an inductive-inductive definition, $T$ is generated
+simultaneously. The difference between the two principles is how $T$
+is defined: inductively or recursively. To examplify the difference,
+consider the following two definitions of a data type $\Vecind : \Nat
+\to \Set$ of non-empty lists of a certain length (with elements from a set $A$):
+
+\begin{description}
+\item[Inductive definition] The singleton list has length 1, and if $a$ is
+  an element, and the list $\ell$ has length $n$, then
+  $\consVec{a}{\ell}$ is a list of length $n + 1$. As an inductive
+  definition, this becomes
+\[
+\infer{\singleVec{a} : \Vecind(1)}{a : A} \qquad \infer{\consVec{a}{\ell} :
+  \Vecind(n + 1)}{a : A & \quad \ell : \Vecind(n)}
+\]
+Notice how there is no constructor which constructs elements in
+$\Vecind(0)$.
+\item[Recursive definition] In the recursive definition, we define the
+  set $\Vecrec(n)$ for every natural number:
+  \begin{align*}
+    \Vecrec(0) &= \zero \\
+    \Vecrec(1) &= A \\
+    \Vecrec(n + 2) &= A \times \Vecrec(n + 1)
+  \end{align*}
+
+\end{description}
+%
+This difference is now carried over to an
+inductive-recursive/inductive-inductive definition of $U : \Set$, $T :
+U \to \Set$. In an inductive-inductive definition, $T$ is generated
 inductively, i.e.\ given by a constructor $\intro{T} : (x : F(U, T))
 \to T(i(x))$ for some (strictly positive) functor
 $F$. %todo: mention i : F(U, T) \to U?
 In an inductive-recursive definition, on the other hand, $T$ is
 defined by recursion on the way the elements of $U$ are
 generated. This means that $T(\intro{U}(x))$ must be given completely
-as soon as the constructor $\intro{U} : G(U, T) \to U$ is
-introduced. In an inductive-inductive definition, many different
-constructors for $T$ can contribute to the set $T(\intro{U}(x))$.
-However, because of the inductive generation of $T$, $T$ can only
-occur positively in the type of the constructors for $U$ (and $T$),
-whereas $T$ can occur also negatively in an inductive-recursive
-definition.
+as soon as the constructor $\intro{U} : G(U, T) \to U$ is introduced.
+
+There are some practical differences between the two approaches. An
+inductive-inductive definition gives more freedom to describe the data
+type, in the sense that many different constructors for $T$ can
+contribute to the set $T(\intro{U}(x))$.  However, because of the
+inductive generation of $T$, $T$ can only occur positively in the type
+of the constructors for $U$ (and $T$), whereas $T$ can occur also
+negatively in an inductive-recursive definition.
 
 \section{Type-theoretical preliminaries}
 \label{sec:preliminaries}
@@ -883,7 +914,7 @@ For the equations, we will suppress all inferable arguments:
 \IndexB(\ldots, \BindB(K, \hindex, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y)
 \end{align*}
 
-\begin{example} %todo
+\begin{example} 
   The constructor $\Pi : \big((\Gamma : \Ctxt) \times (\sigma : \Ty(\Gamma))
   \times \Ty(\consCtxt{\Gamma}{\sigma})\big) \to \Ty(\Gamma)$ from Example
 \ref{ex:ctxt-type} is represented by the code
@@ -970,6 +1001,8 @@ define a function which inserts a number into a sorted list.
                        \to (\stepindarg{p'} : Q(m, \ell, p', \stepindarg{\ell})) \\
                        & \qquad \to Q(m,\consList{n}{\ell}{p}, \consLess{m}{n}{\ell}{p}{q}{p'}, \stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \stepindarg{p}))\big) \to \\
                        & (\ell : \SortedList) \to P(\ell) \enspace , \\
+  \end{align*}
+  \begin{align*}
 % 
      \elim_{\lessList} :\ & (P : \SortedList \to \Set) \to \\
                        & (Q : (n : \Nat) \to (\ell : \SortedList) \to n \lessList \ell \to P(\ell) \to \Set) \to \\
@@ -1307,8 +1340,6 @@ $\Pi(\Gamma, \sigma, \tau) = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \t
 \section{A set-theoretic model}
 \label{sec:model}
 
-%todo: rewrite from CSL article
-
 Even though $\SPA$ and $\SPB$ themselves are straightforward (large)
 inductive definitions, this axiomatisation does not reduce
 inductive-inductive definitions to indexed inductive definitions,
@@ -1316,7 +1347,7 @@ since the formation and introduction rules are not instances of
 ordinary indexed inductive definitions.  (However, we do believe that
 the theory of inductive-inductive definitions \emph{can} be reduced to
 the theory of indexed inductive definitions with a bit of more
-work.) %and plan to publish an article about this in the future.
+work, and plan to do this in the future.) %and plan to publish an article about this in the future.
 %see Section~\ref{sec:indexed-induction}.)
 To make sure that our theory is consistent, it is thus necessary to
 construct a model.
@@ -1407,7 +1438,7 @@ $\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpr
 \vdots & \text{\quad etc.}
 \end{align*}
 In all future definitions, if we are currently defining $\sem{F}$ where $F : D
-\to E$, say, let $F(d)\uparrow$ if $d \notin \sem{D}$.
+\to E$, say, let $\sem{F}(d)\uparrow$ if $d \notin \sem{D}$.
 
 $\sem{\SPA}(\Xref)$ is defined as the least set such that
 \begin{align*}
@@ -1415,25 +1446,33 @@ $\sem{\SPA}(\Xref)$ is defined as the least set such that
   + \sum_{K \in \sem{\Set}}\sem{\SPA}(\Xref + K) \\
  & {} + \sum_{K \in \sem{\Set}}\sum_{h : K \to \Xref}\sem{\SPA}(\Xref).
 \end{align*}
- By the inaccessibility of $\cardi$, there is a
-regular cardinal ${\kappa < \cardi}$ such that for all $K \in \sem{\Set}$, we
-have that the cardinality of $K$, $\Xref$, $\Xref + K$ and $(K \to \Xref)$ is less than
-$\kappa$. If we now iterate an appropriate operator $\kappa$ times, we get our
-solution, which must be an element of $\sem{\TYPE} = V_{\cardi}$ by the
-inaccessibility of $\cardi$.
+%
+Since $\Xref \in \sem{\Set}$, we have $(\Xref + K)$, $(K \to \Xref)$
+$\in \sem{\Set}$ for all $K \in \sem{\Set} = V_{\cardz}$ by the
+inaccessibility of $\cardz$. Hence all ``premisses'' have cardinality
+at most $\cardz$, which is regular, so that the appropriate operator
+has a fixed point after $\cardz$ iterations, which must be an element
+of $\sem{\TYPE} = V_{\cardi}$ by the inaccessibility of $\cardi$.
+%
+%  By the inaccessibility of $\cardi$, there is a
+% regular cardinal ${\kappa < \cardi}$ such that for all $K \in \sem{\Set}$, we
+% have that the cardinality of $K$, $\Xref$, $\Xref + K$ and $(K \to \Xref)$ is less than
+% $\kappa$. If we now iterate an appropriate operator $\kappa$ times, we get our
+% solution, which must be an element of $\sem{\TYPE} = V_{\cardi}$ by the
+% inaccessibility of $\cardi$.
 \begin{align*}
  \sem{\nilA} \colonsimeq \langle 0, 0\rangle \quad
- \sem{\BindA(K, h, \gamma)} \colonsimeq \langle 3 , \langle K, \langle h, \gamma \rangle\rangle\rangle
+ \sem{\BindA}(K, h, \gamma) \colonsimeq \langle 3 , \langle K, \langle h, \gamma \rangle\rangle\rangle
    \\
-  \sem{\nonindA(K, \gamma)} \coloneqq \langle 1 , \langle K, \gamma
-  \rangle\rangle \quad \sem{\AindA(K, \gamma)} \colonsimeq \langle 2 , \langle K, \gamma \rangle\rangle
+  \sem{\nonindA}(K, \gamma) \coloneqq \langle 1 , \langle K, \gamma
+  \rangle\rangle \quad \sem{\AindA}(K, \gamma) \colonsimeq \langle 2 , \langle K, \gamma \rangle\rangle
 \end{align*}
-$\sem{\SPB}$ and its constructors are defined
-analogously. $\sem{\ArgA}$, $\sem{\ArgB}$ and $\sem{\IndexB}$ are defined according to their equations,
-e.g.\ 
+$\sem{\SPB}$ and its constructors are defined analogously. The
+functions $\sem{\ArgA}$, $\sem{\ArgB}$ and $\sem{\IndexB}$ are defined
+according to their equations, e.g.\
 \begin{align*}
   \sem{\ArgA}(\Xref, \sem{\nilA}, A, B, \repA) &\colonsimeq 1 \\
-\sem{\ArgA}(\Xref, \sem{\nonindA}(K, \gamma), A. B. \repA) &\colonsimeq
+\sem{\ArgA}(\Xref, \sem{\nonindA}(K, \gamma), A, B, \repA) &\colonsimeq
   \sum_{k \in K} \sem{\ArgA}(\Xref, \gamma(k), A, B, \repA) \\
 \sem{\ArgA}(\Xref, \sem{\AindA}(K, \gamma), A, B, \repA) &\colonsimeq
   \sum_{j : K \to A}\sem{\ArgA}(\Xref + K, \gamma, A, B, [\repA, j]) \\
@@ -1523,7 +1562,7 @@ One can then prove some useful facts about $A^{\alpha}$ and
 \label{thm:A-in-Set}
   \begin{enumerate}[(i)]
   \item For $\alpha < \cardz$, $A^{\alpha} \in \sem{\Set}$ and $B^{\alpha} :
-    A^{\alpha} \to \sem{\Set}$.
+    A^{\alpha} \to \sem{\Set}$. 
   \item For $\alpha < \beta$, $A^{\alpha} \subseteq A^{\beta}$ and  $B^{\alpha}(a) \subseteq
     B^{\beta}(a)$ for all $a \in A^{\alpha}$. 
   \item There is $\kappa < \cardz$ such that for  all $\alpha \geq \kappa$,
@@ -1535,19 +1574,38 @@ One can then prove some useful facts about $A^{\alpha}$ and
   \begin{enumerate}[(i)]
   \item Induction over $\alpha$.
 
-\notIncludedProof{  %todo
+\notIncludedProof{ 
   \begin{itemize}
   \item If $\alpha = 0$, then $A^{\alpha} =  \text{least fixed point of }
        \lambda X\,.\, \sem{\ArgAp}(\gamma_A, X, \lambda x\,.\,\emptyset)$.
- % \item If $\alpha = \beta + 1$
- % \item If $\alpha = \lambda$ limit
+       Let $\kappa$ be a regular cardinal of cardinality greater than
+       that of all index sets which starts an inductive argument. By the
+       inaccessibility of $\cardz$, $\kappa < \cardz$. Now by the standard argument, 
+       the fixed point is reached after $\kappa$ iterations, and by the inaccessibility
+       of $\cardz$, we must have $A^0 \in V_{\cardz}$.
+
+       Let $a \in A^{0}$. Then
+       \begin{multline*}
+       B^0(a) = \{b\ |\ b \in \sem{\ArgBp}(\gamma_A, A^{0},
+       \lambda x\,.\,\emptyset, \id, \gamma_B) \\
+         \land \sem{\IndexBp}(\gamma_A,
+         A^{0}, \lambda x\,.\,\emptyset, \id, \gamma_B, b) = a \}
+       \end{multline*}
+       which is in $V_{\cardz}$ by the inaccessibility of $\cardz$.
+     \item If $\alpha = \beta + 1$. As argued above, one iteration is
+       not going to make us reach $V_{\cardz}$.
+  \item If $\alpha = \lambda$ limit. Since $\lambda < \cardz$ and cf($\cardz$) = $\cardz$, $\lim_{\beta \to \lambda} A^\beta < \cardz$.
   \end{itemize}
 }
-  \item Induction over $\alpha$. %todo
+  \item Induction over $\alpha$ and $\beta$, using Lemma~\ref{thm:Arg-monotone}. %todo
   \item Let $\kappa$ be a regular cardinal of cardinality greater than
     that of all index sets which starts an inductive argument. By the
-    inaccessibility of $\cardz$, $\kappa < \cardz$.  %todo
-\qedhere
+    inaccessibility of $\cardz$, $\kappa < \cardz$, and by the
+    standard argument (see e.g.\ \cite{aczel1977indDef}), a fixed
+    point of $B^{\alpha}$ (and hence also of $A^{\alpha}$) is reached
+    after $\kappa$ iterations.
+
+ \qedhere
   \end{enumerate}
 \end{proof}
 
