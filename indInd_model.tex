@@ -40,7 +40,7 @@ Swansea SA2 8PP, UK}
   $A : \Set$, $B : A \to \Set$. Both $A$ and $B$ are defined
   inductively, and the constructors for $A$ can refer to $B$ and vice
   versa. In addition, the constructor for $B$ can refer to \emph{the
-    constructor} for $A$. Induction induction occurs in a natural way
+    constructor} for $A$. Induction-induction occurs in a natural way
   when formalising dependent type theory in type theory.  We give some
   examples of inductive-inductive definitions, such as the set of
   surreal numbers. We then give a new finite axiomatisation of the
@@ -53,23 +53,19 @@ Swansea SA2 8PP, UK}
 \section{Introduction} %todo: rewrite introduction
 \label{sec:introduction}
 
-%Martin-L\"of Type Theory \cite{martinlof1984bibliopolis} is a
-%foundational framework for constructive mathematics, where induction
-%plays a major part in the construction of sets.
-
 Induction is an important principle of definition and reasoning,
 especially so in constructive mathematics.  Martin-L\"of's
 formulation~\cite{martinlof1984bibliopolis} of type theory, for
 instance, includes inductive definitions of among others Cartesian
 products, disjoint unions, the natural numbers, lists, well-orderings,
 the identity set, finite sets and a universe \`a la
-Tarski~\cite{palmgren1998twentyfiveyears}.
+Tarski. %~\cite{palmgren1998twentyfiveyears}.
 
 These examples can be categorised as different kinds of inductive
 definitions. The first few (up to well-orderings) are just ordinary inductive
 definitions, where a single set is defined inductively. A typical
 example is the type of well-orderings, parameterised by $A : \Set$, $B
-: A \to \Set$:
+: A \to \Set$. The introduction rule is:
 \[
 \infer{\Wsup(a, f) : W(A, B)}{a : A & \quad f : B(a) \to W(A, B)}
 \]
@@ -163,7 +159,7 @@ concentrate on contexts and types.
 Informally, we have an empty context $\emptyCtxt$, and if we have any
 context $\Gamma$ and a valid type $\sigma$ in that context, then we
 can extend the context with a fresh variable $x : \sigma$ to get a new
-context $\Gamma, x : \sigma$, and this is the only way contexts are
+context $\Gamma, x : \sigma$. This is the only way contexts are
 formed. We end up with the following inductive definition of the set
 of contexts (with $\consCtxt{\Gamma}{\sigma}$ meaning $\Gamma, x :
 \sigma$ since we are using de Bruijn indices):
@@ -227,7 +223,7 @@ inductively $m \lessList \ell$, then $m \lessList \consList{n}{\ell}{p}$:
        {q : m \leq n \quad & p_{m, \ell} : m \lessList \ell}
 \]
 This makes sense even if the order $\leq$ is not transitive. If it is
-(as the standard order on the natural numbers, for example), the
+(as the standard order on the natural numbers is, for example), the
 argument $p_{m, \ell} : m \lessList \ell$ can be dropped from the
 constructor $\consLessbare$, since we already have $q : m \leq n$ and
 $p : n \lessList \ell$, hence by transitivity we must have $m
@@ -283,11 +279,11 @@ In both an inductive-inductive and an inductive-recursive definition,
 a set $U$ and a family $T : U \to \Set$ are defined
 simultaneously. The difference between the two principles is how $T$
 is defined: inductively or recursively. To examplify the difference,
-consider the following two definitions of a data type $\Vecind : \Nat
+consider the following two definitions of a data type $\Vecbare : \Nat
 \to \Set$ of non-empty lists of a certain length (with elements from a set $A$):
 
 \begin{description}
-\item[Inductive definition] The singleton list has length 1, and if $a$ is
+\item[Inductive definition] The singleton list $\singleVec{a}$ has length 1, and if $a$ is
   an element, and the list $\ell$ has length $n$, then
   $\consVec{a}{\ell}$ is a list of length $n + 1$. As an inductive
   definition, this becomes
@@ -664,7 +660,8 @@ by observing that $\ArgAp(\gammaA)$ is functorial:
   \ArgAp(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magic{B'(f(\repA(x))) \to B'(\repA'(x))}) \enspace .
   \]
   % 
-  (Pointwise) preservation of identities and composition is easily checked.
+  (Pointwise) preservation of identities and composition is easily
+  checked, again by induction over $\gamma$.
 \end{proof}
 
 Recall that we want to use the lemma to represent elements in
@@ -785,8 +782,8 @@ Again, we are interested in codes which initially do not refer to
 any elements and define $\SPBp : \SPAp \to \TYPE$ by $\SPBp(\gammaA)
 \coloneqq \SPB(\zero, \zero, \gammaA)$.
 
-The introduction rules for $\SPB$ are similar to the ones for $\SPA$,
-except we now need to specify an index for the codomain of the
+The introduction rules for $\SPB$ are similar to the ones for $\SPA$.
+However, we now need to specify an index for the codomain of the
 constructor, and indices for arguments inductive in $B$ can be
 arbitrary terms built up from $\introA$ and elements we can refer to.
 
@@ -794,21 +791,23 @@ arbitrary terms built up from $\introA$ and elements we can refer to.
 \infer{\nilB(a) : \SPB(\Aref, \Bref, \gammaA)}{a : \Aterm(\gammaA, \Aref, \Bref)}
 \]
 %
-%The code $\nilA$ represents a trivial constructor $c : \one \to A$ (a base case).
+The code $\nilB(\widehat{a})$ represents a trivial constructor $c :
+\one \to B(a)$ (a base case), where the index $a$ is encoded by
+$\widehat{a} : \Aterm(\gammaA, \Aref, \Bref)$.
 %
 \[
 \infer{\nonindB(K, \gamma) : \SPB(\Aref, \Bref, \gammaA))}{K : \Set & \quad \gamma : K \to \SPB(\Aref, \Bref, \gammaA)}
 \]
 %
-%The code $\nonindA(K, \gamma)$ represents a non-inductive argument $x: K$, with the rest of the arguments given by $\gamma(x)$.
+The code $\nonindB(K, \gamma)$ represents a non-inductive argument $x: K$, with the rest of the arguments given by $\gamma(x)$.
 %
 \[
 \infer{\AindB(K, \gamma) : \SPB(\Aref, \Bref, \gammaA)}{K : \Set & \quad \gamma : \SPB(\Aref + K, \Bref, \gammaA)}
 \]
 %
-%The code $\AindA(K, \gamma)$ represents an inductive argument with
-%type $K \to A$, with the rest of the arguments given by
-%$\gamma$. Notice that $\gamma : \SPA(\Aref + K)$, so that the
+The code $\AindB(K, \gamma)$ represents an inductive argument with
+type $K \to A$, with the rest of the arguments given by
+$\gamma$. %Notice that $\gamma : \SPA(\Aref + K)$, so that the
 %remaining arguments can refer to more elements in $A$ (namely those
 %introduced by the inductive argument).
 %
@@ -816,10 +815,11 @@ arbitrary terms built up from $\introA$ and elements we can refer to.
 \infer{\BindB(K, \hindex, \gamma) : \SPB(\Aref, \Bref, \gammaA)}{K : \Set & \quad \hindex : K \to \Aterm(\Aref, \Bref, \gammaA) & \quad \gamma : \SPB(\Aref, \Bref + K, \gammaA)}
 \]
 %
-%Finally, the code $\BindA(K, \hindex, \gamma)$ represents an inductive
-%argument with type $(x : K) \to B(i(x))$, where the index $i(x)$ is
-%determined by $\hindex$, and the rest of the arguments are given by
-%$\gamma$.
+At last, the code $\BindB(K, \hindex, \gamma)$ represents an inductive
+argument with type $(x : K) \to B(i(x))$, where the index $i(x)$ is
+determined by $\hindex$, and the rest of the arguments are given by
+$\gamma$. Notice how the index is now encoded by arbitrary terms in
+$\Aterm(\Aref, \Bref, \gammaA)$.
 %
 \begin{example}
   The constructor
@@ -837,15 +837,12 @@ arbitrary terms built up from $\introA$ and elements we can refer to.
                       \nilB(\widehat{\Gamma}))))
   \]
   %
-  where $\widehat{\Gamma} = \pair{0}{\inr(\oneelt)}$ is the element
+  where $\widehat{\Gamma} = \termAref(\inr(\oneelt))$ is the element
   representing the first argument $\Gamma : \Ctxt$ and
-  $\widehat{\text{in}\pair{\Gamma}{\sigma}} =
-  \pair{1}{\pair{\twott}{\pair{(\lambda
-        \oneelt\,.\,\inr(\inr(\oneelt)))}{\pair{(\lambda
-          \oneelt\,.\,\oneelt)}{\oneelt}}}}$ is the element
-  representing $\consCtxt{\Gamma}{\sigma}$ (the number $1$ corresponds
-  to the fact that we are using one nesting of constructors).
-\blackqed
+  $\widehat{\text{in}\pair{\Gamma}{\sigma}} = \termArg(\langle
+  (\lambda \oneelt.\termBref(\inr(\oneelt))), \langle \lambda
+  \oneelt.\oneelt, \oneelt\rangle\rangle)$ is the element representing
+  $\consCtxt{\Gamma}{\sigma}$.  \blackqed
 \end{example}
 
 The definition of $\ArgB$ should now not come as a surprise. First, we have a formation rule:
@@ -1059,10 +1056,9 @@ $\stepind{\nilList} : (m : \Nat) \to \SortedList$ and $\stepind{\consListbare}(n
 %(n : \Nat) \to (\ell : \SortedList) \to (p : n \lessList \ell) \to
 (\stepindarg{\ell} : \Nat \to \SortedList) \to Q(n, \ell, p,
 \stepindarg{\ell}) \to (m : \Nat) \to \SortedList$ to use when
-inserting into the empty list $\nilList$ or the list
-$\consList{n}{\ell}{p}$ respectively. The argument $\stepindarg{\ell}
-: \Nat \to \SortedList$ gives the result of a recursive call on
-$\ell$.
+inserting into the empty list or the list $\consList{n}{\ell}{p}$
+respectively. The argument $\stepindarg{\ell} : \Nat \to \SortedList$
+gives the result of a recursive call on $\ell$.
 
 The function $\stepind{\nilList}$ is easy to define: it should be
 \[
@@ -1118,7 +1114,7 @@ definition, we see that we should give a function of type
 \]
 so we can define $\stepind{\nilLess{}}(n, m, p) = {}
 \consLess{n}{m}{\nilList}{\nilLess{m}}{p}{\nilLess{n}}$. The
-definition of follows the pattern of $\stepind{\consListbare}$
+definition of $\stepind{\consLessbare}$ follows the pattern of $\stepind{\consListbare}$
 above. Rather than trying to explain it, we just give the definition:
 \[
 \stepind{\consLessbare}(m, n, \ell, p, q, p', \stepindarg{\ell}, \stepindarg{p}, \stepindarg{p'}, x, r) =
@@ -1355,8 +1351,9 @@ construct a model.
 
 We will develop a model in ZFC set theory, extended by two
 inaccessible cardinals in order to interpret $\Set$ and $\TYPE$.  Our
-model will be a simpler version of the models developed in
-\cite{dybjersetzer1999finax,dybjersetzer2006IIR}. %Hence the proof theoretical
+model will be a simpler version of the models developed by Dybjer and
+Setzer~\cite{dybjersetzer1999finax,dybjersetzer2006IIR} for
+induction-recursion. %Hence the proof theoretical
 %strength required is, as expected significantly lower but still too
 %strong. 
 See Aczel \cite{aczel1999typesandsets} for a more detailed treatment
@@ -1371,7 +1368,7 @@ strongly inaccessible cardinals $\cardz < \cardi$,
 and will be using standard set theoretic constructions, e.g.
 \begin{align*}
 \langle a, b\rangle &\coloneqq \{ \{ a \}, \{ a, b \}\}, \\
-\lambda x \in a.b(x) &\coloneqq \{\langle x, b(x)\rangle | x \in a \} \\
+\lambda x \in a.b(x) &\coloneqq \{\langle x, b(x)\rangle\,|\,x \in a \} \\
 \Pi_{x \in a}b(x) &\coloneqq \{ f : a \to \bigcup_{x \in a}b(x)\ |\ \forall x \in a.f(x) \in b(x)\}, \\
 \Sigma_{x \in a}b(x) &\coloneqq \{ \langle c , d\rangle\ |\ c \in a \land d
 \in b(c) \}, \\
@@ -1437,8 +1434,8 @@ $\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpr
 \sem{\gamma}_\rho) \\
 \vdots & \text{\quad etc.}
 \end{align*}
-In all future definitions, if we are currently defining $\sem{F}$ where $F : D
-\to E$, say, let $\sem{F}(d)\uparrow$ if $d \notin \sem{D}$.
+In all future definitions, if we are currently defining $\sem{F}_{\rho}$ where $F : D
+\to E$, say, let $\sem{F}_{\rho}(d)\uparrow$ if $d \notin \sem{D}_{\rho}$.
 
 $\sem{\SPA}(\Xref)$ is defined as the least set such that
 \begin{align*}
@@ -1499,12 +1496,12 @@ to be the identity if $A$ is a fixed point of $\ArgAp(\gammaA, A, B)$
 where $A^{\alpha}$ and $B^{\alpha}$ are
 simultaneously defined by recursion on $\alpha$ as
 \begin{align*}
-  A^{\alpha} & \coloneqq  \text{least fixed point of }
-       \lambda X\,.\, \sem{\ArgAp}(\gamma_A, A^{< \alpha} \cup X, [B^{< \alpha}, \lambda x\,.\,\emptyset]) \enspace ,\\
-  B^{\alpha}(a) & \coloneqq \{b\ |\ b \in \sem{\ArgBp}(\gamma_A, A^{< \alpha} \cup A^{\alpha},
-  [B^{< \alpha}, \lambda x\,.\,\emptyset], \id, \gamma_B) \\
+  A^{\alpha} & \coloneqq  \text{least fixed point containing $A^{< \alpha}$ of }
+       \lambda X\,.\, \sem{\ArgAp}(\gamma_A, X, B^{< \alpha}) \enspace ,\\
+  B^{\alpha}(a) & \coloneqq \{b\ |\ b \in \sem{\ArgBp}(\gamma_A, A^{\alpha},
+  B^{< \alpha}, \id, \gamma_B) \\
   & \quad \land \sem{\IndexBp}(\gamma_A,
-  A^{< \alpha} \cup A^{\alpha}, [B^{< \alpha}, \lambda x\,.\,\emptyset], \id, \gamma_B, b) = a \}\enspace \hspace{-2.47968pt} .
+  A^{\alpha}, B^{< \alpha}, \id, \gamma_B, b) = a \}\enspace \hspace{-2.47968pt} .
 \end{align*}
 
 The (graph of the) eliminators can then be built up in the same
