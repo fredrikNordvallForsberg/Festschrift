@@ -1427,8 +1427,8 @@ $\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpr
 \begin{align*}
 \sem{\SPA(\Xref)}_\rho &\coloneqq \sem{\SPA}(\sem{\Xref}_\rho) \\
 \vdots \\
-\sem{\ArgA(\Xref, \gamma, A, B, \repA)}_\rho &\coloneqq
-\sem{\ArgA}(\sem{\Xref}_\rho, \sem{\gamma}_\rho, \sem{A}_\rho, \sem{B}_\rho, \sem{\repA}_\rho) \\
+\sem{\ArgA(\Xref, \gamma, X, Y, \repA)}_\rho &\coloneqq
+\sem{\ArgA}(\sem{\Xref}_\rho, \sem{\gamma}_\rho, \sem{X}_\rho, \sem{Y}_\rho, \sem{\repA}_\rho) \\
 \vdots \\
 \sem{\nonindA(K, \gamma)}_\rho &\coloneqq \sem{\nonindA}(\sem{K}_\rho,
 \sem{\gamma}_\rho) \\
@@ -1444,12 +1444,7 @@ $\sem{\SPA}(\Xref)$ is defined as the least set such that
  & {} + \sum_{K \in \sem{\Set}}\sum_{h : K \to \Xref}\sem{\SPA}(\Xref).
 \end{align*}
 %
-Since $\Xref \in \sem{\Set}$, we have $(\Xref + K)$, $(K \to \Xref)$
-$\in \sem{\Set}$ for all $K \in \sem{\Set} = V_{\cardz}$ by the
-inaccessibility of $\cardz$. Hence all ``premisses'' have cardinality
-at most $\cardz$, which is regular, so that the appropriate operator
-has a fixed point after $\cardz$ iterations, which must be an element
-of $\sem{\TYPE} = V_{\cardi}$ by the inaccessibility of $\cardi$.
+The constructors are then interpreted as
 %
 %  By the inaccessibility of $\cardi$, there is a
 % regular cardinal ${\kappa < \cardi}$ such that for all $K \in \sem{\Set}$, we
@@ -1468,13 +1463,13 @@ $\sem{\SPB}$ and its constructors are defined analogously. The
 functions $\sem{\ArgA}$, $\sem{\ArgB}$ and $\sem{\IndexB}$ are defined
 according to their equations, e.g.\
 \begin{align*}
-  \sem{\ArgA}(\Xref, \sem{\nilA}, A, B, \repA) &\colonsimeq 1 \\
-\sem{\ArgA}(\Xref, \sem{\nonindA}(K, \gamma), A, B, \repA) &\colonsimeq
-  \sum_{k \in K} \sem{\ArgA}(\Xref, \gamma(k), A, B, \repA) \\
-\sem{\ArgA}(\Xref, \sem{\AindA}(K, \gamma), A, B, \repA) &\colonsimeq
-  \sum_{j : K \to A}\sem{\ArgA}(\Xref + K, \gamma, A, B, [\repA, j]) \\
-\sem{\ArgA}(\Xref, \sem{\BindA}(K, h, \gamma), A, B, \repA) &\colonsimeq
-  \sum_{\mathclap{j \in \Pi_{k \in K} B(\repA (h(k)))}}\sem{\ArgA}(\Xref, \gamma, A, B, \repA).
+  \sem{\ArgA}(\Xref, \sem{\nilA}, X, Y, \repA) &\colonsimeq 1 \\
+\sem{\ArgA}(\Xref, \sem{\nonindA}(K, \gamma), X, Y, \repA) &\colonsimeq
+  \sum_{k \in K} \sem{\ArgA}(\Xref, \gamma(k), X, Y, \repA) \\
+\sem{\ArgA}(\Xref, \sem{\AindA}(K, \gamma), X, Y, \repA) &\colonsimeq
+  \sum_{j : K \to A}\sem{\ArgA}(\Xref + K, \gamma, X, Y, [\repA, j]) \\
+\sem{\ArgA}(\Xref, \sem{\BindA}(K, h, \gamma), X, Y, \repA) &\colonsimeq
+  \sum_{\mathclap{j \in \Pi_{k \in K} B(\repA (h(k)))}}\sem{\ArgA}(\Xref, \gamma, X, Y, \repA).
 \end{align*}
 %
 % todo: rework to new axiomatisation
@@ -1514,28 +1509,47 @@ Having interpreted all terms, we finally interpret contexts as sets of environme
 \end{align*}
 
 \subsection{Soundness of the Rules}
-\begin{theorem}[Soundness] \mbox{}
-\label{thm:soundness}
-  \begin{enumerate}[(i)]
-  \item If ${} \tstile \Gamma \text{context}$, then
-    $\sem{\Gamma}\downarrow$. 
-  \item If $\Gamma \tstile A : E$, then $\sem{\Gamma}\downarrow$, and
-    for all $\rho \in \sem{\Gamma}$, ${\sem{A}_\rho \in \sem{E}_\rho}$, and also
-    $\sem{E}_\rho \in \sem{\TYPE}$ if $E \not\equiv \TYPE$.
-  \item If $\Gamma \tstile A = B : E$, then $\sem{\Gamma}\downarrow$, and
-    for all $\rho \in \sem{\Gamma}$, $\sem{A}_\rho = \sem{B}_\rho$,
-    $\sem{A}_\rho \in \sem{E}_\rho$ and also $\sem{E}_\rho \in \sem{\TYPE}$ if
-    $E \not\equiv \TYPE$. 
-  \item $\nvdash a : \zero$. \qed
-  \end{enumerate}
-\end{theorem}
-The proof of the soundness theorem is rather
-  straight\-forward. For the verification that $\sem{A_{\gamma_A, \gamma_B}}
-  \in \sem{\Set}$ and $\sem{B_{\gamma_A, \gamma_B}} : \sem{A_{\gamma_A,
-      \gamma_B}} \to \sem{\Set}$, one first verifies that $\sem{\ArgAp}$,
-  $\sem{\ArgBp}$, $\sem{\IndexBp}$ are monotone in the following sense:
+
+A detailed verification of the soundness of all the rules falls
+outside the scope of this paper. The main difficulty lies in proving
+that $\sem{\SPA}$ and $\sem{\SPB}$ are well-defined, and that
+$\sem{A_{\gamma_A, \gamma_B}} \in \sem{\Set}$ and $\sem{B_{\gamma_A,
+    \gamma_B}} : \sem{A_{\gamma_A, \gamma_B}} \to \sem{\Set}$. Full
+details of the proof will be provided in a future publication (in
+preparation).
+
+$\sem{\SPA}$ is obtained by iterating the appropriate operator $\Gamma
+: (\sem{\Set} \to \sem{\Set}) \to (\sem{\Set} \to \sem{\Set})$ up to
+$\cardz$ times. Since $\Xref \in \sem{\Set}$, we have $(\Xref + K)$,
+$(K \to \Xref)$ $\in \sem{\Set}$ for all $K \in \sem{\Set} =
+V_{\cardz}$ by the inaccessibility of $\cardz$. Hence all
+``premisses'' have cardinality at most $\cardz$, which is regular, so
+that the operator has a fixed point after $\cardz$ iterations, which
+must be an element of $\sem{\TYPE} = V_{\cardi}$ by the
+inaccessibility of $\cardi$.
+
+% \begin{theorem}[Soundness] \mbox{}
+% \label{thm:soundness}
+%   \begin{enumerate}[(i)]
+%   \item If ${} \tstile \Gamma \text{context}$, then
+%     $\sem{\Gamma}\downarrow$. 
+%   \item If $\Gamma \tstile A : E$, then $\sem{\Gamma}\downarrow$, and
+%     for all $\rho \in \sem{\Gamma}$, ${\sem{A}_\rho \in \sem{E}_\rho}$, and also
+%     $\sem{E}_\rho \in \sem{\TYPE}$ if $E \not\equiv \TYPE$.
+%   \item If $\Gamma \tstile A = B : E$, then $\sem{\Gamma}\downarrow$, and
+%     for all $\rho \in \sem{\Gamma}$, $\sem{A}_\rho = \sem{B}_\rho$,
+%     $\sem{A}_\rho \in \sem{E}_\rho$ and also $\sem{E}_\rho \in \sem{\TYPE}$ if
+%     $E \not\equiv \TYPE$. 
+%   \item $\nvdash a : \zero$. \qed
+%   \end{enumerate}
+% \end{theorem}
+
+To see that $\sem{A_{\gamma_A, \gamma_B}} \in \sem{\Set}$ and
+$\sem{B_{\gamma_A, \gamma_B}} : \sem{A_{\gamma_A, \gamma_B}} \to
+\sem{\Set}$, one first verifies that $\sem{\ArgAp}$, $\sem{\ArgBp}$,
+$\sem{\IndexBp}$ are monotone in the following sense:
   %
-  \begin{lemma}
+\begin{lemma}
   \label{thm:Arg-monotone}
   For all $\gammaA \in \sem{\SPAp}$ and $\gammaB \in \sem{\SPBp}(\gammaA)$:
   \begin{enumerate}[(i)]
@@ -1551,10 +1565,61 @@ The proof of the soundness theorem is rather
     \]
     for all $x \in \sem{\ArgBp}(\gammaA, A, B, \introA, \gammaB)$. \qed
   \end{enumerate}
+\end{lemma}
+
+% We are interested in the monotonicity of $\sem{\ArgAp}$,
+% $\sem{\ArgBp}$, $\sem{\IndexBp}$ because of the following adaption of
+% the standard result~\cite{aczel1977indDef} for monotone
+% operators. 
+% %TODO: introduce type of F, G?
+% Let us say that $F$, $G$ are $\kappa$-based if
+% \begin{align*}
+% x \in F(X, Y) \quad & \text{ implies } \quad x \in F(X', Y') \\
+% y \in G(X, Y, \intro{}, x) \quad & \text{ implies } \quad y \in G(X', Y', \intro{}', x)
+% \end{align*}
+% for some $X' \subseteq X$, $Y'(x) \subseteq Y(x)$ for all $x \in X'$
+% and $\intro{}' : F(X', Y') \to X'$ with $\abs{X'} < \kappa$ and $\sup_{x
+%   \in X'}\abs{Y'(x)} < \kappa$.
+
+% If all index sets $K$ which starts an inductive argument occuring in
+% $\sem{\ArgAp}(\gammaA)$, $\sem{\ArgBp}(\gamma_A, \text{--}, \text{--}, \text{--},
+% \gammaB)$ have cardinality $< \kappa$, then
+% $\sem{\ArgAp}(\gammaA)$, $\sem{\ArgBp}(\gamma_A, \text{--},\text{--},\text{--},
+% \gammaB)$ is $\kappa$-based.
+
+% \begin{proposition}
+%   \label{thm:mono-fixpoint}
+%   Let $F$, $G$ be a $\kappa$-based monotone operators where $\kappa$
+%   is regular. Then $F^\kappa = F^{< \kappa}$ and $G^\kappa = G^{< \kappa}$.
+% \end{proposition}
+% \IncludedProof{%
+%   \begin{proof}
+%     It is enough to prove $F^\kappa \subseteq F^{< \kappa}$ and $G^\kappa(x)
+%     \subseteq G^{< \kappa}(x)$ for all $x$. So let $x \in F^\kappa$
+
+%   \end{proof}
+% }{}
+
+We can then adapt the standard results~\cite{aczel1977indDef} about
+monotone operators. First, we note that one application of
+$\sem{\ArgAp}$ and $\sem{\ArgBp}$ is not enough to take us outside of
+$\sem{\Set}$:
+
+
+\begin{lemma}
+  For all $\gammaA \in \sem{\SPAp}$ and $\gammaB \in \sem{\SPBp}(\gammaA)$:
+  \begin{enumerate}[(i)]
+  \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$, then $\sem{\ArgAp}(\gammaA, X, Y) \in \sem{\Set}$.
+  \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$, then $\sem{\ArgBp}(\gammaA, X, Y, \intro{X}, \gammaB) \in \sem{\Set}$.
+  \end{enumerate}
   \end{lemma}
 
-One can then prove some useful facts about $A^{\alpha}$ and
-  $B^{\alpha}$: % by induction on $\alpha$:
+
+  We then iterate, using $A^{\alpha}$ and $B^{\alpha}$, in order to
+  reach a fixed point. This uses that fact that both $\sem{\ArgAp}$
+  and $\sem{\ArgBp}$ are $\kappa$-continuous for large enough
+  $\kappa$:
+
 \begin{lemma} \mbox{}
 \label{thm:A-in-Set}
   \begin{enumerate}[(i)]
@@ -1567,71 +1632,52 @@ One can then prove some useful facts about $A^{\alpha}$ and
     \in A^{\alpha}$. \qed 
   \end{enumerate}
 \end{lemma}
-\begin{proof}
-  \begin{enumerate}[(i)]
-  \item Induction over $\alpha$.
+% \begin{proof}
+%   \begin{enumerate}[(i)]
+%   \item Induction over $\alpha$.
 
-\notIncludedProof{ 
-  \begin{itemize}
-  \item If $\alpha = 0$, then $A^{\alpha} =  \text{least fixed point of }
-       \lambda X\,.\, \sem{\ArgAp}(\gamma_A, X, \lambda x\,.\,\emptyset)$.
-       Let $\kappa$ be a regular cardinal of cardinality greater than
-       that of all index sets which starts an inductive argument. By the
-       inaccessibility of $\cardz$, $\kappa < \cardz$. Now by the standard argument, 
-       the fixed point is reached after $\kappa$ iterations, and by the inaccessibility
-       of $\cardz$, we must have $A^0 \in V_{\cardz}$.
+% \notIncludedProof{ 
+%   \begin{itemize}
+%   \item If $\alpha = 0$, then $A^{\alpha} =  \text{least fixed point of }
+%        \lambda X\,.\, \sem{\ArgAp}(\gamma_A, X, \lambda x\,.\,\emptyset)$.
+%        Let $\kappa$ be a regular cardinal of cardinality greater than
+%        that of all index sets which starts an inductive argument. By the
+%        inaccessibility of $\cardz$, $\kappa < \cardz$. Now by the standard argument, 
+%        the fixed point is reached after $\kappa$ iterations, and by the inaccessibility
+%        of $\cardz$, we must have $A^0 \in V_{\cardz}$.
 
-       Let $a \in A^{0}$. Then
-       \begin{multline*}
-       B^0(a) = \{b\ |\ b \in \sem{\ArgBp}(\gamma_A, A^{0},
-       \lambda x\,.\,\emptyset, \id, \gamma_B) \\
-         \land \sem{\IndexBp}(\gamma_A,
-         A^{0}, \lambda x\,.\,\emptyset, \id, \gamma_B, b) = a \}
-       \end{multline*}
-       which is in $V_{\cardz}$ by the inaccessibility of $\cardz$.
-     \item If $\alpha = \beta + 1$. As argued above, one iteration is
-       not going to make us reach $V_{\cardz}$.
-  \item If $\alpha = \lambda$ limit. Since $\lambda < \cardz$ and cf($\cardz$) = $\cardz$, $\lim_{\beta \to \lambda} A^\beta < \cardz$.
-  \end{itemize}
-}
-  \item Induction over $\alpha$ and $\beta$, using Lemma~\ref{thm:Arg-monotone}. %todo
-  \item Let $\kappa$ be a regular cardinal of cardinality greater than
-    that of all index sets which starts an inductive argument. By the
-    inaccessibility of $\cardz$, $\kappa < \cardz$, and by the
-    standard argument (see e.g.\ \cite{aczel1977indDef}), a fixed
-    point of $B^{\alpha}$ (and hence also of $A^{\alpha}$) is reached
-    after $\kappa$ iterations.
+%        Let $a \in A^{0}$. Then
+%        \begin{multline*}
+%        B^0(a) = \{b\ |\ b \in \sem{\ArgBp}(\gamma_A, A^{0},
+%        \lambda x\,.\,\emptyset, \id, \gamma_B) \\
+%          \land \sem{\IndexBp}(\gamma_A,
+%          A^{0}, \lambda x\,.\,\emptyset, \id, \gamma_B, b) = a \}
+%        \end{multline*}
+%        which is in $V_{\cardz}$ by the inaccessibility of $\cardz$.
+%      \item If $\alpha = \beta + 1$. As argued above, one iteration is
+%        not going to make us reach $V_{\cardz}$.
+%   \item If $\alpha = \lambda$ limit. Since $\lambda < \cardz$ and cf($\cardz$) = $\cardz$, $\lim_{\beta \to \lambda} A^\beta < \cardz$.
+%   \end{itemize}
+% }
+%   \item Induction over $\alpha$ and $\beta$, using Lemma~\ref{thm:Arg-monotone}. %todo
+%   \item Let $\kappa$ be a regular cardinal of cardinality greater than
+%     that of all index sets which start an inductive argument. 
+%     %TODO: Why does \kappa exist?#
+%     Apply Proposition \ref{thm:mono-fixpoint}.
+%  \qedhere
+%   \end{enumerate}
+% \end{proof}
 
- \qedhere
-  \end{enumerate}
-\end{proof}
+Now we are done, since %by Lemma~\ref{thm:A-in-Set}
+$\sem{A_{\gamma_A, \gamma_B}} = A^{\cardz} = A^{\kappa} \in
+\sem{\Set}$, and similarly for $\sem{B_{\gamma_A, \gamma_B}}$.
 
-\begin{theorem}
-  $\sem{A_{\gamma_A, \gamma_B}} \in \sem{\Set}$ and $\sem{B_{\gamma_A,
-      \gamma_B}} : \sem{A_{\gamma_A, \gamma_B}} \to \sem{\Set}$.
-\end{theorem}
-\begin{proof}
-  By Lemma~\ref{thm:A-in-Set}, $\sem{A_{\gamma_A, \gamma_B}} = A^{\cardz} = A^{\kappa} \in
-  \sem{\Set}$,  and similarly for $\sem{B_{\gamma_A, \gamma_B}}$. \qedhere
-\end{proof}
+%\begin{theorem}
+%  $\sem{A_{\gamma_A, \gamma_B}} \in \sem{\Set}$ and $\sem{B_{\gamma_A,
+%      \gamma_B}} : \sem{A_{\gamma_A, \gamma_B}} \to \sem{\Set}$.
+%\end{theorem}
 
 
-
- %\section{Remarks} %todo: better title
- %\label{sec:remarks}
-
-% \subsection{The r\^{o}le of large elimination}
-% \label{sec:large-elim}
-
-
-
-%\subsection{Indexed inductive definitions and induction-induction}
-%\label{sec:indexed-induction}
-
-
-
-%\section{Conclusions}
-%\label{sec:conclusions}
 
 \bibliographystyle{alpha}
 \bibliography{biblio}
