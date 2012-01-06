@@ -229,8 +229,10 @@ constructor $\consLessbare$, since we already have $q : m \leq n$ and
 $p : n \lessList \ell$, hence by transitivity we must have $m
 \lessList \ell$.
 
- Of course, there are also many alternative ways to define such a data type
- using ordinary induction.
+Of course, there are also many alternative ways to define such a data
+type using ordinary induction (or using e.g.\ induction-recursion,
+similarly to C. Coquand's definition of fresh lists as reported by
+Dybjer~\cite{dybjer2000IR}).
 %, but the inductive-inductive one seems
 % natural and might be more convenient for some purposes.
 \blackqed
@@ -241,10 +243,11 @@ $p : n \lessList \ell$, hence by transitivity we must have $m
 
 Conway \cite{conway2001ONAG} informally uses induction-induction (but
 couched in ZF set theory, not type theory) in order to define his
-\emph{surreal numbers}. The ``set''\footnote{There are some size
-  issues, since the surreal numbers contain the class of ordinals.} of
-surreal numbers is defined inductively, together with an order
-relation on surreal numbers which is also defined inductively:
+\emph{surreal numbers}. The class \footnote{The surreal numbers form a
+  class, not a set, since they contain the class of ordinals. This can
+  be avoided by referring to a universe.} of surreal numbers is
+defined inductively, together with an order relation on surreal
+numbers which is also defined inductively:
 
 \begin{itemize}
 \item A surreal number $X = (X_\mathrm{L}, X_\mathrm{R})$ consists of
@@ -252,23 +255,63 @@ relation on surreal numbers which is also defined inductively:
   that no element from $X_\mathrm{L}$ is greater than any element from
   $X_\mathrm{R}$.
 \item A surreal number $Y = (Y_\mathrm{L}, Y_\mathrm{R})$ is greater
-  than another surreal number $X = (X_\mathrm{L}, X_\mathrm{R})$, $X \leq Y$, if and
+  than another surreal number $X = (X_\mathrm{L}, X_\mathrm{R})$, $X \Surleq Y$, if and
   only if
   \begin{itemize}
-  \item there is no $x \in X_\mathrm{L}$ such that $Y \leq x$, and
-  \item there is no $y \in Y_\mathrm{R}$ such that $y \leq X$.
+  \item there is no $x \in X_\mathrm{L}$ such that $Y \Surleq x$, and
+  \item there is no $y \in Y_\mathrm{R}$ such that $y \Surleq X$.
   \end{itemize}
 \end{itemize}
 
 Both rules can be understood as inductive definitions. Notice how the
 second definition only makes sense in the presence of the first
 definition, and how the first definition already refers to the second.
+
+As an inductive definition, the negative occurrence of $\leq$ in the
+definition of the class of surreal numbers is problematic. We can get
+around this by simultaneously defining the class $\Sur : \Set$
+together with two relations ${ \Surleq {} : \Sur \to \Sur \to \Set}$ and
+${ \Surnleq {} : \Sur \to \Sur \to \Set}$ as follows:
+
+\begin{itemize}
+\item If $X_\mathrm{L}$ and $X_\mathrm{R}$ are sets of surreal
+  numbers, and for all $x \in X_\mathrm{L}$, $y \in X_\mathrm{R}$ we
+  have $x \Surnleq y$, then $(X_\mathrm{L}, X_\mathrm{R})$ is a surreal number.
+
+\item Assume $X = (X_\mathrm{L}, X_\mathrm{R})$ and $Y = (Y_\mathrm{L}, Y_\mathrm{R})$ are surreal numbers.
+ If 
+ \begin{itemize}
+ \item for all $x \in X_\mathrm{L}$ we have $Y \Surnleq x$, and
+ \item for all $y \in Y_\mathrm{R}$ we have $y \Surnleq X$,
+ \end{itemize}
+then $X \Surleq Y$.
+
+\item Assume $X = (X_\mathrm{L}, X_\mathrm{R})$ and $Y = (Y_\mathrm{L}, Y_\mathrm{R})$ are surreal numbers.
+ \begin{itemize}
+ \item If there exist $x \in X_\mathrm{L}$ such that $Y \Surleq x$, then $X \Surnleq Y$.
+ \item If there exist $y \in Y_\mathrm{R}$ such that $y \Surleq X$, then $X \Surnleq Y$.
+ \end{itemize}
+\end{itemize}
+
+
 Mamane~\cite{mamane2004surrealCoq} develops the theory of surreal
 numbers in the proof assistant Coq, using an encoding to reduce the
 inductive-inductive to an ordinary inductive definition.
 \blackqed
 \end{example}
 
+Note that these examples strictly speaking refer to extensions of
+inductive-inductive definitions as presented in this article. Example
+\ref{ex:ctxt-type} in full would be an example of a defining of a
+telescope $A : \Set$, $B : A \to \Set$, $C : (x : A) \to B(x) \to
+\Set$, \ldots inductive-inductively. In Example \ref{ex:sorted-list},
+$A : \Set$ and $B : A \to I \to \Set$ for some previously defined set
+$I$ is defined, and Example \ref{ex:surreal} gives an
+inductive-inductive definition of $A : \Set$, $B : A \to A \to
+\Set$. In the future, we plan to publish an axiomatisation which
+captures all these examples in full. For pedagogical reasons, it might
+be preferable to first only treat the simpler case $A : \Set$, $B : A
+\to \Set$ as in the current article.
 
 \subsection{Inductive-inductive definitions versus inductive-recursive definitions}
 \label{sec:indind-vs-IR}
@@ -278,7 +321,8 @@ inductive-inductive to an ordinary inductive definition.
 In both an inductive-inductive and an inductive-recursive definition,
 a set $U$ and a family $T : U \to \Set$ are defined
 simultaneously. The difference between the two principles is how $T$
-is defined: inductively or recursively. To examplify the difference,
+is defined: inductively or recursively.
+To exemplify the difference,
 consider the following two definitions of a data type $\Vecbare : \Nat
 \to \Set$ of non-empty lists of a certain length (with elements from a set $A$):
 
@@ -302,10 +346,11 @@ $\Vecind(0)$.
   \end{align*}
 
 \end{description}
-%
+
 This difference is now carried over to an
 inductive-recursive/inductive-inductive definition of $U : \Set$, $T :
-U \to \Set$. In an inductive-inductive definition, $T$ is generated
+U \to \Set$.
+In an inductive-inductive definition, $T$ is generated
 inductively, i.e.\ given by a constructor $\intro{T} : (x : F(U, T))
 \to T(i(x))$ for some (strictly positive) functor
 $F$. %todo: mention i : F(U, T) \to U?
@@ -313,6 +358,10 @@ In an inductive-recursive definition, on the other hand, $T$ is
 defined by recursion on the way the elements of $U$ are
 generated. This means that $T(\intro{U}(x))$ must be given completely
 as soon as the constructor $\intro{U} : G(U, T) \to U$ is introduced.
+
+% To exemplify the difference, we consider two definitions of a data
+% type of sorted lists. An inductive-inductive definitions has already
+% been given in Example \ref{ex:sorted-list}.
 
 There are some practical differences between the two approaches. An
 inductive-inductive definition gives more freedom to describe the data
@@ -342,14 +391,14 @@ $\langle a , b \rangle$, where $a : A$ and $b : B[x \coloneqq a]$.
 We also have $\beta$- and $\eta$-rules for both dependent function types
 and products.
 
-We need an empty type $\zero : \Set$, with elimination ${!_A : \zero
-  \to A}$ for every $A : \Set$. We need a unit type $\one : \Set$,
+We add an empty type $\zero : \Set$, with elimination ${!_A : \zero
+  \to A}$ for every $A : \Set$. We also add a unit type $\one : \Set$,
 with unique element $\oneelt : \one$ and an $\eta$-rule stating that
 if $x : \one$, then $x = \oneelt : \one$. Moreover, we include a two
 element set $\two : \Set$, with elements $\twott : \two$, $\twoff :
 \two$ and elimination constant $\IF~\cdot~\THEN~\cdot~\ELSE~\cdot :$
 $(a : \two) \to A(\twott) \to A(\twoff) \to A(a)$ where $i : \two
-\Rightarrow A(i) : \TYPE$. I should satisfy the obvious computation
+\Rightarrow A(i) : \TYPE$. It satisfies the obvious computation
 rules, i.e.\ $\IF~\twott~\THEN~a~\ELSE~b = a$ and
 $\IF~\twoff~\THEN~a~\ELSE~b = b$.
 %Finally, we require the type $\Nat$ of natural numbers.
@@ -362,9 +411,9 @@ define the disjoint union of two sets $A + B \coloneqq$ ${(x : \two)}
 . \langle \twoff , b \rangle$, and prove the usual formation,
 introduction, elimination and equality rules. Importantly, we get
 large elimination for sums, since we have large elimination for
-$\two$. We write the eliminator $[f, g] : {(c : A + B)} \to C(c)$, where
-$i : A + B \Rightarrow A(i) : \TYPE$ and $f : (a : A) \to C(\inl(a))$,
-$g : (b : B) \to C(\inr(b))$. The equality rules are
+$\two$. We can define the eliminator ${[f, g] : {(c : A + B)} \to C(c)}$, where
+$x : A + B \Rightarrow C(x) : \TYPE$ and $f : (a : A) \to C(\inl(a))$,
+$g : (b : B) \to C(\inr(b))$, satisfying the definitional equalities
 \begin{align*}
 [f, g](\inl(a)) &= f(a) \enspace , \\
 [f, g](\inr(b)) &= g(b) \enspace .
@@ -388,8 +437,8 @@ the logical framework.
 In this section, we give a finite axiomatisation of a type theory with
 inductive-inductive definitions. This axiomatisation differs slightly
 from our previous
-axiomatisation~\cite{nordvallforsbergSetzer2010indind}, in that it
-hopefully is easier to understand. However, the definable sets should
+axiomatisation~\cite{nordvallforsbergSetzer2010indind}, and is
+hopefully easier to understand. However, the definable sets should
 be the same for both axiomatisations.
 
 %TODO: rewrite
@@ -407,7 +456,7 @@ for the first set.
 \subsection{Dissecting an inductive-inductive definition}
 \label{sec:dissect-ind}
 
-We wish to formalise and internalise an inductive-inductive definition
+We want to formalise and internalise an inductive-inductive definition
 given by constructors
 \[
 \introA : \Phi_{\mathrm{A}}(A, B) \to A
@@ -429,21 +478,33 @@ in negative positions in $\Phi_{\mathrm{A}}$ or $\Phi_{\mathrm{B}}$
 respectively. Thus, we restrict our attention to a class of strictly
 positive functors.
 
-These are based on the following analysis of what kind of premises
-that can occur in a definition. A premise is either \emph{inductive}
-or \emph{non-inductive}. A non-inductive premise consists of a
-previously constructed set $K$, which later premises can depend on. An
-inductive premise is inductive in $A$ or $B$. If it is inductive in
-$A$, it is of the form $(K \to A)$ for some previously constructed set
-$K$%
+These are based on the following analysis of what kind of premises can
+occur in a definition. A premise is either \emph{inductive} or
+\emph{non-inductive}. A non-inductive premise consists of a previously
+constructed set $K$, which later premises can depend on. An inductive
+premise is inductive in $A$ or $B$. If it is inductive in $A$, it is
+of the form $K \to A$ for some previously constructed set $K$%
 %(this is also called a \emph{generalized} inductive premise, with
 %the special case $K = \one$ being called an \emph{ordinary} inductive
 %premise)
-. Premises inductive in $B$ are of the form $((x : K) \to
-B(i(x))$ for some $i : K \to A$. In the case of an ordinary inductive
-premise, $K = \one$ so that $i : \one \to A$ just amounts to a choice
-of an index $a = i(\oneelt)$ such that the inductive argument comes
-from $B(a)$.
+. Premises inductive in $B$ are of the form $(x : K) \to
+B(i(x))$ for some $i : K \to A$. 
+
+If $K = \one$, we have the special case of a single inductive
+premise. In the case of $B$-inductive arguments, the choice of $i :
+\one \to A$ is then just a choice of a single element $a = i(\oneelt)
+: A$ so that the premise is of the form $B(a)$.
+
+%If $K = \one$ we get in case of $A$-inductive arguments
+%single inductive arguments
+%and in case of $B$-inductive arguments, if we choose 
+%$i : \one \to A$, $i = \lambda \oneelt\,.\,a$
+%inductive-arguments referring to $B(a)$
+
+%In the case of an ordinary inductive
+%premise, $K = \one$ so that $i : \one \to A$ just amounts to a choice
+%of an index $a = i(\oneelt)$ such that the inductive argument comes
+%from $B(a)$.
 
 %todo: improve
 
@@ -455,7 +516,8 @@ $A : \Set$, $B : A \to \Set$. These consists of a set of rules for the
 universe $\SPAp$ of descriptions of the set $A$ and its decoding
 function $\ArgAp$, a set of rules for the universe $\SPBp$ and its
 decoding function $\ArgBp$, and formation and introduction rules for
-each pair of codes $\gammaA : \SPAp$, $\gammaB : \SPBp(\gammaA)$.
+$A: \Set$, $B: A \to \Set$ defined inductive-inductively by a pair of
+codes $\gammaA : \SPAp$, $\gammaB : \SPBp(\gammaA)$.
 
 \subsubsection{The universe $\SPAp$ of descriptions of $A$}
 \label{sec:SPA}
@@ -522,10 +584,11 @@ We now define the decoding function $\ArgA$, which maps a code to the
 domain of the constructor it represents. In addition to a set $\Xref$
 and a code $\gamma : \SPA(\Xref)$, $\ArgA$ will take a set $\A$ and a
 family $\B : \A \to \Set$ as arguments to use as $A$ and $B$ in the
-inductive arguments. These will later be instantiated recursively. We
-also require a function $\repA : \Xref \to \A$ which we think of as
-mapping a ``referable'' element to the element it represents in
-$\A$. All in all, $\ArgA$ has the following formation rule:
+inductive arguments. These will later be instantiated by the sets
+defined inductive-inductively. We also require a function $\repA :
+\Xref \to \A$ which we think of as mapping a ``referable'' element to
+the element it represents in $\A$. All in all, $\ArgA$ has the
+following formation rule:
 %
 \[
 \infer{\ArgA(\Xref, \gamma, \A, \B, \repA) : \Set}{\Xref : \Set
@@ -620,23 +683,35 @@ by observing that $\ArgAp(\gammaA)$ is functorial:
   For each $\gamma : \SPAp$, $\ArgAp(\gamma)$ extends to a functor from
   families of sets to sets, i.e.\ given $f : \A \to \A'$ and $g : (x :
   \A) \to \B(x) \to \B'(f(x))$, one can define $\ArgAp(\gamma, f, g) :
-  \ArgAp(\gamma, \A, \B) \to \ArgAp(\gamma, \A', \B')$ such that identities
-  and compositions are preserved.
+  \ArgAp(\gamma, \A, \B) \to \ArgAp(\gamma, \A', \B')$.
 \end{lemma}
+\begin{remark}
+  In extensional type theory, one can also prove that $\ArgAp(\gamma,
+  f, g) : \ArgAp(\gamma, \A, \B) \to \ArgAp(\gamma, \A', \B')$
+  actually is a functor, i.e.\ that identities and compositions are
+  preserved, but that will not be needed for the current development.
+\end{remark}
 \begin{proof}
   This is straightforward in extensional type theory. In intensional
-  type theory, we have to be more careful. The function $\ArgA(\gamma,
-  f, g)$ is defined by induction over $\gamma$%
-% and $\Xref$ % why did I write this??
-: let $\A$,
-  $\B$, $\repA : \Xref \to \A$, $\A'$, $\B'$, $\repA' : \Xref \to \A'$ and
-  $f : \A \to \A'$, $g : (x : \A) \to \B(x) \to \B'(f(x))$ be given. In
-  addition, assume that $f(\repA(x)) = \repA'(x)$ for all $x :
-  \Xref$. It is enough for our purposes to state this in a
-  ``specialised Leibniz form''; we require a term
+  type theory without propositional identity types, we have to be more
+  careful. The function $\ArgAp(\gamma, f, g)$ is defined by induction
+  over $\gamma$. In order to do this, we need to refer inductively to
+  the case when $\Xref$ is no longer $\zero$. Hence, we need to
+  consider the more general case where $\A$, $\B$, $\A'$, $\B'$, $f$
+  and $g$ have types as above, and $\Xref, : \Set$, $\repA : \Xref \to
+  \A$, $\repA' : \Xref \to \A'$. One expects the equality $f(\repA(x))
+  = \repA'(x)$ to hold for all $x : \Xref$. In order to avoid the use
+  of identity types, we state this in a form of Leibniz equality,
+  specialised to the instance we actually need;  we require a term
   \[
   p : (x : \Xref) \to \B'(f(\repA(x))) \to \B'(\repA'(x)) \enspace .
   \]
+% let $\A$,
+%  $\B$, $\repA : \Xref \to \A$, $\A'$, $\B'$, $\repA' : \Xref \to \A'$ and
+%  $f : \A \to \A'$, $g : (x : \A) \to \B(x) \to \B'(f(x))$ be given. In
+%  addition, assume that $f(\repA(x)) = \repA'(x)$ for all $x :
+%  \Xref$. It is enough for our purposes to state this in a
+%  ``specialised Leibniz form''; we require a term
   % 
   Thus we define
   % 
@@ -659,18 +734,19 @@ by observing that $\ArgAp(\gammaA)$ is functorial:
   \[
   \ArgAp(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magic{B'(f(\repA(x))) \to B'(\repA'(x))}) \enspace .
   \]
-  % 
-  (Pointwise) preservation of identities and composition is easily
-  checked, again by induction over $\gamma$.
+%  % 
+%  (Pointwise) preservation of identities and composition is easily
+%  checked, again by induction over $\gamma$.
 \end{proof}
 
 Recall that we want to use the lemma to represent elements in
-$\ArgAp(\gammaA, \A, \B)$ by elements in $\ArgAp(\gammaA, \Xref +\Yref,
-[\lambda x\,.\,\zero, \lambda x\,.\,\one])$. We can actually do one
-better, and represent arbitrarily terms built from elements in $\A$ and
-$\B$ with the use of a constructor $\introA : \ArgAp(\gammaA, \A, \B) \to
-\A$. For this, define the set $\Aterm(\gammaA, \Xref, \Yref)$ of terms
-``built from $\introA$, $\Xref$ and $\Yref$'' with introduction rules
+$\ArgAp(\gammaA, \A, \B)$ by elements in $\ArgAp(\gammaA, \Xref
++\Yref, [\lambda x\,.\,\zero, \lambda x\,.\,\one])$. We can actually
+do better, and represent arbitrarily terms built from elements in $\A$
+and $\B$ with the use of a constructor $\introA : \ArgAp(\gammaA, \A,
+\B) \to \A$. For this, define the set $\Aterm(\gammaA, \Xref, \Yref)$
+of terms ``built from $\introA$, $\Xref$ and $\Yref$'' with
+introduction rules
 %
 \[
 \infer{\termAref(x) : \Aterm(\gammaA, \Xref, \Yref)}{x : \Xref}
@@ -735,14 +811,14 @@ The simultaneously defined $\repBbar$ is very simple:
 \end{align*}
 
 \begin{example}
-  What are some terms in $\Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$, where
+  We define some terms in $\Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$, where
   \[
   \gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one,
   \lambda (\oneelt : \one)\,.\,\inr(\oneelt), \nilA))
   \]
   is the code for the constructor
   \[
-  \consCtxtbare : \big((\Gamma : \one \to A) \times (\one \to B(\Gamma(\oneelt))) \times \one\big) \to A \enspace ?
+  \consCtxtbare : \big((\Gamma : \one \to A) \times (\one \to B(\Gamma(\oneelt))) \times \one\big) \to A \enspace .
   \]
   Suppose that we have $\hat{a} : \Xref$ with $\repA(\hat{a}) = a : A$
   and $\hat{b} : \Yref$ with $\repIndex(\hat{b}) = a$ and
@@ -750,11 +826,13 @@ The simultaneously defined $\repBbar$ is very simple:
   \begin{itemize}
   \item $\termAref(\hat{a}) : \Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$ with
   $\repAbar(\gamma_{\consCtxtbare}, \consCtxtbare, \ldots, \hat{a}) =
-  a$ (so elements from $\Xref$ are terms),
-\item $\termBref(\hat{b}) :  \Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$ with
-  $\repAbar(\gamma_{\consCtxtbare}, \consCtxtbare, \ldots,
-  \termBref(\hat{b})) = a$ (so elements from $\Yref$ are terms,
-  representing the index of the element in $B$ they represent), and
+  a$ (so elements from $\Xref$ are terms).
+\item $\termBref(\hat{b}) : \Aterm(\gamma_{\consCtxtbare}, \Xref,
+  \Yref)$ with $\repAbar(\gamma_{\consCtxtbare}, \consCtxtbare,
+  \ldots, \termBref(\hat{b})) = a$ (so elements from $\Yref$ are
+  terms, representing the index of the element in $B$ they
+  represent). Furthermore $\repBbar(\gamma_{\consCtxtbare}, \consCtxtbare, \ldots, \termBref(\hat{b}),
+  \oneelt) = b$.
 \item  $\widehat{a,b} \coloneqq \termArg(\langle (\lambda \oneelt.\,\termBref(\hat{b})) ,
   \langle (\lambda \oneelt.\,\oneelt), \oneelt\rangle\rangle) :
   \Aterm(\gamma_{\consCtxtbare}, \Xref, \Yref)$ with
@@ -948,7 +1026,7 @@ and $\IndexBp(\gamma_{\consCtxtbare}, \Ctxt, \Ty, \consCtxtbare,
 \end{example}
 
 \subsubsection{Formation and introduction rules}
-\label{sec:intro-elim}
+\label{sec:intro}
 
 We are now ready to give the formation and introduction rules for $A$
 and $B$. They all have the common premises $\gammaA : \SPAp$, $\gammaB
@@ -973,6 +1051,9 @@ Introduction rule for $B_{\gammaAB}$:
 \infer{\intro{B_{\gammaAB}}(a) : B_{\gammaAB}(\IndexBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB, a))}{a : \ArgBp(\gammaA, A_{\gammaAB}, B_{\gammaAB}, \intro{A_{\gammaAB}}, \gammaB)}
 \]
 %
+
+\subsubsection{Elimination rules by example}
+\label{sec:elim}
 
 Elimination rules can also be
 formulated~\cite{nordvallforsbergAltenkirchMorrisSetzer2011catsemindind}. Here,
@@ -1192,8 +1273,11 @@ $\gamma_1$, then $\intro{0 + 1}$ is described by the code
   interpreted as inductive-inductive definitions where we only care
   about the index set $A$ and not about the family $B : A \to \Set$. A
   canonical choice is to let $B$ have constructor $\introB : (x : A)
-  \to B(x)$, which is described by the code $\gamma_{\text{dummy}} \coloneqq 
-  \AindB(\one, \nilB(\termAref(\inr(\oneelt))))$.
+  \to B(x)$, which is described by the code $\gamma_{\text{dummy}}
+  \coloneqq \AindB(\one,
+  \nilB(\termAref(\inr(\oneelt))))$\footnote{Another choice is
+    $\gamma_{\text{dummy}} = \nonindB(\zero, !_{\SPBp(\gammaA)})$, which makes $B(x)$
+    an empty type.}.
 
   For every $A : \Set$, $B : A \to \Set$, let
   \[
@@ -1268,7 +1352,7 @@ $\gamma_1$, then $\intro{0 + 1}$ is described by the code
 
 \item[Contexts and types]
 
-The codes for the contexts and types from Example \ref{ex:ctxt-type}: \vskip
+The codes for the contexts and types from Example \ref{ex:ctxt-type} are as follows: \vskip
 0.2cm
 \begin{tabular}{lcl}
 $\gamma_{\Ctxt}$ &$=$& $\nilA \plOP \AindA(\one, \BindA(\one, (\lambda \oneelt .\,\inr(\oneelt)),
@@ -1418,7 +1502,7 @@ The interpretation of the logical framework is as in
 \sem{b}_\rho & \text{if $\sem{x}_\rho = 1$} \\
 \text{undefined} & \text{otherwise} \\
 \end{cases} \\
-\sem{!_A}_\rho \colonsimeq \text{unique inclusion $\iota_{\sem{A}} : \emptyset \to \sem{A}_\rho$ }
+\sem{!_A}_\rho \colonsimeq \emptyset \text{ (the unique inclusion $\emptyset \to \sem{A}_\rho$ )}
 \end{gather*}
 
 To interpret terms containing $\SPA$, $\SPB$, $\ArgA$, $\ArgB$, $\IndexB$, 

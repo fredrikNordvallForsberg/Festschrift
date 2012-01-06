@@ -91,3 +91,19 @@ inr b = ff , b
                                    (λ b → g b))
 ---------------------------------------------------------------------
 
+-- The equality rules hold definitionally ---------------------------
+
+data Id {A : Set1} (x : A) : A -> Set where
+  refl : Id x x
+
+[f,g][inl[a]]=f[a] : {A B : Set} -> {C : A + B -> Set1} ->
+                     (f : (a : A) -> C (inl a)) ->
+                     (g : (b : B) -> C (inr b)) ->
+                     (x : A) -> Id ([_,_] {C = C} f g (inl x)) (f x)
+[f,g][inl[a]]=f[a] f g x = refl
+
+[f,g][inr[b]]=g[b] : {A B : Set} -> {C : A + B -> Set1} ->
+                     (f : (a : A) -> C (inl a)) ->
+                     (g : (b : B) -> C (inr b)) ->
+                     (x : B) -> Id ([_,_] {C = C} f g (inr x)) (g x)
+[f,g][inr[b]]=g[b] f g x = refl
