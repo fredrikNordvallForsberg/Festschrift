@@ -64,7 +64,7 @@ Tarski. %~\cite{palmgren1998twentyfiveyears}.
 These examples can be categorised as different kinds of inductive
 definitions. The first few (up to well-orderings) are just ordinary inductive
 definitions, where a single set is defined inductively. A typical
-example is the type of well-orderings, parameterised by $A : \Set$, $B
+example is the type $W(A, B)$ of well-orderings, parameterised by $A : \Set$, $B
 : A \to \Set$. The introduction rule is:
 \[
 \infer{\Wsup(a, f) : W(A, B)}{a : A & \quad f : B(a) \to W(A, B)}
@@ -79,13 +79,18 @@ The identity type and the finite sets are examples
 of inductive families~\cite{dybjer1994indfam}, where a family $X : I
 \to \Set$ for some fixed index set $I$ is defined inductively
 simultaneously. For the family $\Fin : \Nat \to \Set$ of finite sets,
-the index set is $\Nat$:
+the index set is $\Nat$, and we have introduction rules
 \[
 \infer{\finzero{n} : \Fin(n + 1)}{n : \Nat} \qquad
 \infer{\finsucc{n}{m} : \Fin(n + 1)}{n : \Nat & \quad m : \Fin(n)}
 \]
-Each constructor constructs elements in $\Fin(k)$ for some $k : \Nat$,
-and the type of the inductive argument $m : \Fin(n)$ has index $n$,
+Thus the type $\Fin(n+1)$ has $n + 1$ elements $\finzero{n}$,
+$\finsucc{n}{\finzero{n-1}}$,
+$\finsucc{n}{\finsucc{n-1}{\finzero{n-2}}}$ up to
+$\finsucc{n}{\finsucc{n-1}{\cdots\finsucc{1}{\finzero{0}}}}$.
+%Each constructor constructs elements in $\Fin(k)$ for some $k : \Nat$,
+%and 
+The type of the inductive argument $m : \Fin(n)$ has index $n$,
 which is different from the index $n + 1$ of the type of the
 constructed element. Thus the whole family has to be defined
 simultaneously.
@@ -121,7 +126,7 @@ as $B$ is constructed inductively, not recursively.
 In this article, we give a new finite axiomatisation of a type theory
 with inductive-inductive definitions. It differs from our earlier
 axiomatisation~\cite{nordvallforsbergSetzer2010indind} in that it is
-finite and hopefully easier to understand. The price we have to pay
+finite, and is hopefully easier to understand. The price we have to pay
 for this simplicity is that the natural full function space
 set-theoretical model construction becomes slightly more involved.
 
@@ -292,11 +297,13 @@ then $X \Surleq Y$.
  \item If there exist $y \in Y_\mathrm{R}$ such that $y \Surleq X$, then $X \Surnleq Y$.
  \end{itemize}
 \end{itemize}
+We see that $\Sur : \Set$ together with ${ \Surleq, \Surnleq : \Sur
+  \to \Sur \to \Set}$ are defined inductive-inductively.
 
 
 Mamane~\cite{mamane2004surrealCoq} develops the theory of surreal
 numbers in the proof assistant Coq, using an encoding to reduce the
-inductive-inductive to an ordinary inductive definition.
+inductive-inductive definition to an ordinary inductive one.
 \blackqed
 \end{example}
 
@@ -307,11 +314,11 @@ telescope $A : \Set$, $B : A \to \Set$, $C : (x : A) \to B(x) \to
 \Set$, \ldots inductive-inductively. In Example \ref{ex:sorted-list},
 $A : \Set$ and $B : A \to I \to \Set$ for some previously defined set
 $I$ is defined, and Example \ref{ex:surreal} gives an
-inductive-inductive definition of $A : \Set$, $B : A \to A \to
+inductive-inductive definition of $A : \Set$, $B, B' : A \to A \to
 \Set$. In the future, we plan to publish an axiomatisation which
-captures all these examples in full. For pedagogical reasons, it might
-be preferable to first only treat the simpler case $A : \Set$, $B : A
-\to \Set$ as in the current article.
+captures all these examples in full. For pedagogical reasons, we think
+it is preferable to first only treat the simpler case $A : \Set$, $B :
+A \to \Set$ as in the current article.
 
 \subsection{Inductive-inductive definitions versus inductive-recursive definitions}
 \label{sec:indind-vs-IR}
@@ -321,10 +328,11 @@ be preferable to first only treat the simpler case $A : \Set$, $B : A
 In both an inductive-inductive and an inductive-recursive definition,
 a set $U$ and a family $T : U \to \Set$ are defined
 simultaneously. The difference between the two principles is how $T$
-is defined: inductively or recursively.
-To exemplify the difference,
-consider the following two definitions of a data type $\Vecbare : \Nat
-\to \Set$ of non-empty lists of a certain length (with elements from a set $A$):
+is defined: inductively or recursively. We discuss in the following
+first the difference between an inductive and a recursive definition.
+To exemplify this difference, consider the following two definitions
+of a data type $\Vecbare : \Nat \to \Set$ of non-empty lists of a
+certain length (with elements from a set $A$):
 
 \begin{description}
 \item[Inductive definition] The singleton list $\singleVec{a}$ has length 1, and if $a$ is
@@ -337,6 +345,7 @@ consider the following two definitions of a data type $\Vecbare : \Nat
 \]
 Notice how there is no constructor which constructs elements in
 $\Vecind(0)$.
+
 \item[Recursive definition] In the recursive definition, we define the
   set $\Vecrec(n)$ for every natural number:
   \begin{align*}
@@ -346,6 +355,11 @@ $\Vecind(0)$.
   \end{align*}
 
 \end{description}
+
+In the recursive definition, $\Vecrec(k)$ is defined in one go,
+whereas the inductively defined $\Vecind(k)$ is built up from
+below. In order to prove that $\Vecind(0)$ is empty, one has to carry
+out a proof by induction over $\Vecind$.
 
 This difference is now carried over to an
 inductive-recursive/inductive-inductive definition of $U : \Set$, $T :
@@ -609,12 +623,13 @@ by $\ArgAp(\gamma, \A, \B) = \ArgA(\zero, \gamma, \A, \B, \magic{X})$.
 The definition of $\ArgA$ follows the informal description of what the
 different codes represent above:
 
-%todo: formatting %todo mark changing arguments
+%todo: formatting
 \begin{align*} 
   \ArgA(\Xref, \nilA, \A, \B, \repA) &= \one \\
   \ArgA(\Xref, \nonindA(K, \gamma), \A, \B, \repA) &= (x : K) \times \ArgA(\Xref, \gamma(x), \A, \B, \repA) \\
   \ArgA(\Xref, \AindA(K, \gamma), \A, \B, \repA) &=  (j : K \to \A) \times \ArgA(\Xref + K, \gamma, \A, \B, [\repA, j]) \\
-  \ArgA(\Xref, \BindA(K, \hindex, \gamma), \A, \B, \repA) &=  ((x : K) \to \B((\repA \circ \hindex)(x))) \times \ArgA(\Xref, \gamma, \A, \B, \repA) \\
+  \ArgA(\Xref, \BindA(K, \hindex, \gamma), \A, \B, \repA) &= \\
+ ((x : K) \to& \B((\repA \circ \hindex)(x))) \times \ArgA(\Xref, \gamma, \A, \B, \repA)
 \end{align*}
 
 \begin{example}
@@ -726,7 +741,8 @@ by observing that $\ArgAp(\gammaA)$ is functorial:
     \ArgA(\nilA, f, g, p, \oneelt) &= \oneelt\\
     \ArgA(\nonindA(K, \gamma), f, g, p, \pair{k}{y}) &= \pair{k}{\ArgA(\gamma(k), f, g, p, y)}\\
     \ArgA(\AindA(K, \gamma), f, g, p, \pair{j}{y}) &= \pair{f \circ j}{\ArgA(\gamma, f, g, [p, \lambda x\,.\,\id], y)}\\
-    \ArgA(\BindA(K, \hindex, \gamma), f, g, p, \pair{j}{y}) &= \pair{\lambda k\,.\,p(\hindex(k), g(\repA(\hindex(k)), j(k)))}{\ArgA(\gamma, f, g, p, y)}
+    \ArgA(\BindA(K, \hindex, \gamma), f, g, p, \pair{j}{y}) &= \\
+    \pair{\lambda k\,.\,p(\hindex(k), g(\repA(&\hindex(k)), j(k)))}{\ArgA(\gamma, f, g, p, y)}
   \end{align*}
   
   Finally, we can define $\ArgAp(\gamma, f, g) : \ArgAp(\gamma, A, B) \to
@@ -781,6 +797,7 @@ and $\B$ respectively (i.e.\ we have $\repA : \Xref \to \A$, $\repIndex
 Formally, we can simultaneously define the following two functions:
 %
 \[ %\ldots = \gammaA, \introA, \repA, \repIndex, \repB
+\mathclap{%
 \infer{\deduce{\repBbar(\ldots) : (x : \Aterm(\gammaA, \Xref, \Yref)) \to \Bterm(\gammaA, \Xref, \Yref, x) \to \B(\repAbar(\ldots, x))}
               {\repAbar(\ldots) : \Aterm(\gammaA, \Xref, \Yref) \to \A}}
       {\gammaA : \SPAp & \quad
@@ -790,6 +807,7 @@ Formally, we can simultaneously define the following two functions:
        \deduce{\repB : (x : \Yref) \to \B(\repIndex(x))}
               {\deduce{\repIndex : \Yref \to \A}
                       {\repA : \Xref \to \A}}}
+}
 \]
 %
 The definition of $\repAbar$ is straightforward. The interesting case
@@ -1058,8 +1076,13 @@ Introduction rule for $B_{\gammaAB}$:
 Elimination rules can also be
 formulated~\cite{nordvallforsbergAltenkirchMorrisSetzer2011catsemindind}. Here,
 we just give the elimination rules for the data type of sorted lists
-(Example~\ref{ex:sorted-list}) as an example, and show how one can use them to
-define a function which inserts a number into a sorted list.
+(Example~\ref{ex:sorted-list}) as an example, and show how one can use
+them to define a function which inserts a number into a sorted
+list.\footnote{The inductive-inductive definition of the data type of
+  sorted lists falls outside the axiomatisation presented in this
+  article, as remarked at the end of Section~\ref{sec:examples}. We
+  still include this example, as it shows the use of elimination rules
+  in a real computer science example.}
 
 \begin{example}
   The elimination rules for sorted lists and the $\lessList$ predicate
@@ -1555,9 +1578,6 @@ according to their equations, e.g.\
 \sem{\ArgA}(\Xref, \sem{\BindA}(K, h, \gamma), X, Y, \repA) &\colonsimeq
   \sum_{\mathclap{j \in \Pi_{k \in K} B(\repA (h(k)))}}\sem{\ArgA}(\Xref, \gamma, X, Y, \repA).
 \end{align*}
-%
-% todo: rework to new axiomatisation
-%
 
 Finally, we have to interpret $A_{\gammaAB}$, $B_{\gammaAB}$,
 $\intro{A_{\gammaAB}}$ and $\intro{B_{\gammaAB}}$.  The high-level
@@ -1568,10 +1588,10 @@ to be the identity if $A$ is a fixed point of $\ArgAp(\gammaA, A, B)$
 (with $B$ fixed). In more detail, let
 \begin{gather*}
 \sem{A_{\gammaAB}} \colonsimeq A^{\cardz} \enspace\! , \quad\!\!
-\sem{B_{\gammaAB}}(a) \colonsimeq B^{\cardz}(a)\enspace\! , \quad\!\!
+\sem{B_{\gammaAB}}(a) \colonsimeq B^{\cardz}(a)\enspace\! , \quad\!\! \\
 \sem{\intro{A_{\gammaAB}}}(a) \colonsimeq a \enspace\! ,\quad\!\!
-\sem{\intro{B_{\gammaAB}}}(b) \colonsimeq b \enspace\! ,\\
-\end{gather*} \vskip -0.5cm \noindent 
+\sem{\intro{B_{\gammaAB}}}(b) \colonsimeq b \enspace\! ,
+\end{gather*}  \noindent 
 where $A^{\alpha}$ and $B^{\alpha}$ are
 simultaneously defined by recursion on $\alpha$ as
 \begin{align*}
