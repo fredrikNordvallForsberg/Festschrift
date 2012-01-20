@@ -21,12 +21,12 @@
 
 \usepackage{authblk}
 \author{Fredrik Nordvall Forsberg}
-\author{Anton Setzer}
+\author{Anton Setzer \thanks{Both authors are supported by EPSRC grant EP/G033374/1, Theory and applications of induction-recursion.} }
 \affil{Swansea University \\
 Singleton  Park \\
 Swansea SA2 8PP, UK}
 
-%\thanks{Supported by EPSRC grant EP/G033374/1, Theory and applications of induction-recursion.}}
+
 
 \input macros.tex
 
@@ -58,7 +58,7 @@ especially so in constructive mathematics.  Martin-L\"of's
 formulation~\cite{martinlof1984bibliopolis} of type theory, for
 instance, includes inductive definitions of among others Cartesian
 products, disjoint unions, the natural numbers, lists, well-orderings,
-the identity set, finite sets and a universe \`a la
+the identity set, finite sets, and a universe \`a la
 Tarski. %~\cite{palmgren1998twentyfiveyears}.
 
 These examples can be categorised as different kinds of inductive
@@ -90,9 +90,9 @@ $\finsucc{n}{\finsucc{n-1}{\finzero{n-2}}}$ up to
 $\finsucc{n}{\finsucc{n-1}{\cdots\finsucc{1}{\finzero{0}}}}$.
 %Each constructor constructs elements in $\Fin(k)$ for some $k : \Nat$,
 %and 
-The type of the inductive argument $m : \Fin(n)$ has index $n$,
-which is different from the index $n + 1$ of the type of the
-constructed element. Thus the whole family has to be defined
+The type of the inductive argument $m : \Fin(n)$ of the second rule
+has index $n$, which is different from the index $n + 1$ of the type
+of the constructed element. Thus the whole family has to be defined
 simultaneously.
 
 The universe \`a la Tarski is an example of an inductive-recursive
@@ -114,8 +114,8 @@ principle of \emph{induction-induction}. A set $A$ is inductively
 defined simultaneously with an $A$-indexed set $B$, which is also
 inductively defined, and the introduction rules for $A$ may also refer
 to $B$. Typical introduction rules might take the form
-\[ \infer{\text{intro}_A(a, b, \ldots) : A}{a : A &b : B(a) & \ldots} \quad
-\infer{\text{intro}_B(a_0, b, a_1, \ldots) : B(a_1)}{a_0 : A &
+\[ \infer{\intro{A}(a, b, \ldots) : A}{a : A &b : B(a) & \ldots} \quad
+\infer{\intro{B}(a_0, b, a_1, \ldots) : B(a_1)}{a_0 : A &
 &b : B(a_0) & a_1 : A & \ldots} \]
 
 This is not a simple mutual inductive definition of two sets, as $B$
@@ -343,7 +343,7 @@ certain length (with elements from a set $A$):
 \infer{\singleVec{a} : \Vecind(1)}{a : A} \qquad \infer{\consVec{a}{\ell} :
   \Vecind(n + 1)}{a : A & \quad \ell : \Vecind(n)}
 \]
-Notice how there is no constructor which constructs elements in
+Notice that there is no constructor which constructs elements in
 $\Vecind(0)$.
 
 \item[Recursive definition] In the recursive definition, we define the
@@ -405,16 +405,17 @@ $\langle a , b \rangle$, where $a : A$ and $b : B[x \coloneqq a]$.
 We also have $\beta$- and $\eta$-rules for both dependent function types
 and products.
 
-We add an empty type $\zero : \Set$, with elimination ${!_A : \zero
-  \to A}$ for every $A : \Set$. We also add a unit type $\one : \Set$,
+We add an empty type $\zero : \Set$, with elimination ${\magic{A} : \zero
+  \to A}$ for every $A : \Set$ (we will write $\magicOmit{}$ for $\magic{A}$ if $A$ can
+be inferred from the context). We also add a unit type $\one : \Set$,
 with unique element $\oneelt : \one$ and an $\eta$-rule stating that
 if $x : \one$, then $x = \oneelt : \one$. Moreover, we include a two
 element set $\two : \Set$, with elements $\twott : \two$, $\twoff :
 \two$ and elimination constant $\IF~\cdot~\THEN~\cdot~\ELSE~\cdot :$
 $(a : \two) \to A(\twott) \to A(\twoff) \to A(a)$ where $i : \two
-\Rightarrow A(i) : \TYPE$. It satisfies the obvious computation
-rules, i.e.\ $\IF~\twott~\THEN~a~\ELSE~b = a$ and
-$\IF~\twoff~\THEN~a~\ELSE~b = b$.
+\Rightarrow A(i) : \TYPE$. It satisfies the obvious computation rules,
+i.e.\ $\IF~\twott~\THEN~a~\ELSE~b = a$ and $\IF~\twoff~\THEN~a~\ELSE~b
+= b$.
 %Finally, we require the type $\Nat$ of natural numbers.
 
 With $\IF~\cdot~\THEN~\cdot~\ELSE~\cdot$ and dependent products, we can now
@@ -487,7 +488,7 @@ A$ such that $\introB(x) : B(a)$.
 
 Not all expressions $\Phi_{\mathrm{A}}$ and $\Phi_{\mathrm{B}}$ give
 rise to acceptable inductive-inductive definitions. It is well known,
-for example, that the theory becomes inconsistent if $A$ or $B$ occur
+for example, that the theory easily becomes inconsistent if $A$ or $B$ occur
 in negative positions in $\Phi_{\mathrm{A}}$ or $\Phi_{\mathrm{B}}$
 respectively. Thus, we restrict our attention to a class of strictly
 positive functors.
@@ -495,7 +496,7 @@ positive functors.
 These are based on the following analysis of what kind of premises can
 occur in a definition. A premise is either \emph{inductive} or
 \emph{non-inductive}. A non-inductive premise consists of a previously
-constructed set $K$, which later premises can depend on. An inductive
+constructed set $K$, on which later premises can depend. An inductive
 premise is inductive in $A$ or $B$. If it is inductive in $A$, it is
 of the form $K \to A$ for some previously constructed set $K$%
 %(this is also called a \emph{generalized} inductive premise, with
@@ -613,7 +614,7 @@ following formation rule:
 \]
 %
 Notice that if $\gamma : \SPAp$, i.e.\ if $\Xref = \zero$, then we can
-choose $\repA = {} \magic{X} : \zero \to \A$ (indeed, extensionally,
+choose $\repA = {} \magic{\A} : \zero \to \A$ (indeed, extensionally,
 this is the only choice), so that we can define
 \[
 \ArgAp : \SPAp \to (\A : \Set) \to (\B : \A \to \Set) \to \Set
@@ -641,7 +642,7 @@ different codes represent above:
 \ArgAp(\gamma_{\consCtxtbare}, \Ctxt, \Ty) = (\Gamma : \one \to \Ctxt)
 \times (\one \to \Ty(\Gamma(\oneelt))) \times \one
 \]
-which, thanks to the $\eta$-rules for $\one$, is isomorphic to the
+which, thanks to the $\eta$-rules for $\one$, $\times$ and $\to$, is isomorphic to the
 domain of $\consCtxtbare$. 
 \blackqed
 \end{example}
@@ -670,9 +671,9 @@ of the represented element, and $\repB$ the actual element.
 We want to represent elements in $\ArgAp(\gammaA, \A, \B)$. We claim that
 the elements in $\ArgAp(\gammaA, \Xref + \Yref, [\lambda x\,.\,\zero,
 \lambda x\,.\,\one])$ are suitable for this purpose. To see this,
-first observe that we can define a functions
+first observe that we can define functions
 \[
-f : \Xref + \Yref \to \A
+f : \Xref + \Yref \to \A \enspace ,
 \]
 %
 %and
@@ -683,7 +684,7 @@ g : (x : \Xref + \Yref) \to
       \to \B(f(x))
 \]
 %
-by $f = [\repA, \repIndex]$ and $g = [\lambda x\,.\,\magic{\B \circ
+by $f = [\repA, \repIndex]$ and $g = [\lambda x\,.\,\magicOmit{\B \circ
   \repA}, \lambda x \oneelt\,.\, \repB(x)]$. Then, we can lift these
 functions to a function
 %
@@ -748,7 +749,7 @@ by observing that $\ArgAp(\gammaA)$ is functorial:
   Finally, we can define $\ArgAp(\gamma, f, g) : \ArgAp(\gamma, A, B) \to
   \ArgAp(\gamma, A', B')$ by
   \[
-  \ArgAp(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magic{B'(f(\repA(x))) \to B'(\repA'(x))}) \enspace .
+  \ArgAp(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magicOmit{B'(f(\repA(x))) \to B'(\repA'(x))}) \enspace .
   \]
 %  % 
 %  (Pointwise) preservation of identities and composition is easily
@@ -823,9 +824,9 @@ functoriality of $\ArgAp$ and the mutually defined $\repBbar$:
 The simultaneously defined $\repBbar$ is very simple:
 %
 \begin{align*}
-  \repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termAref(x), y) &= \magic{\B \circ \repAbar(\ldots)}(y) \\
+  \repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termAref(x), y) &= \magicOmit{\B \circ \repAbar(\ldots)}(y) \\
 \repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termBref(x), \oneelt) &= \repB(y) \\
-\repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x), y) &= \magic{\B \circ \repAbar(\ldots)}(y) \\ \\
+\repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x), y) &= \magicOmit{\B \circ \repAbar(\ldots)}(y) \\ \\
 \end{align*}
 
 \begin{example}
@@ -959,7 +960,7 @@ The definition of $\ArgB$ should now not come as a surprise. First, we have a fo
 Once again, the definition is simpler for codes in $\SPBp(\gammaA)$:
 \[
 \ArgBp(\gammaA, \A, \B, \introA, \gamma) \coloneqq
-   \ArgB(\zero, \zero, \gammaA, \A, \B, \introA, \magic{\A}, \magic{\A}, \magic{\B \circ \magic{\A}}, \gamma)
+   \ArgB(\zero, \zero, \gammaA, \A, \B, \introA, \magicOmit{\A}, \magicOmit{\A}, \magicOmit{\B \circ \magicOmit{\A}}, \gamma)
 \]
 %
 We define:
@@ -996,7 +997,7 @@ from $b$ is in $\B(a)$.
 As we usually do, we define $\IndexBp : \ArgBp(\gammaA, \A, \B,
 \introA, \gammaB) \to \A$ by
 $\IndexBp(\gammaA, \A, \B, \introA, \gammaB) \coloneqq
-   \IndexB(\zero, \zero, \gammaA, \A, \B, \introA, \magic{\A}, \magic{\A}, \magic{\B \circ \magic{\A}}, \gammaB)$.
+   \IndexB(\zero, \zero, \gammaA, \A, \B, \introA, \magicOmit{\A}, \magicOmit{\A}, \magicOmit{\B \circ \magicOmit{\A}}, \gammaB)$.
 
 For the equations, we will suppress all inferable arguments:
 %
@@ -1299,7 +1300,7 @@ $\gamma_1$, then $\intro{0 + 1}$ is described by the code
   \to B(x)$, which is described by the code $\gamma_{\text{dummy}}
   \coloneqq \AindB(\one,
   \nilB(\termAref(\inr(\oneelt))))$\footnote{Another choice is
-    $\gamma_{\text{dummy}} = \nonindB(\zero, !_{\SPBp(\gammaA)})$, which makes $B(x)$
+    $\gamma_{\text{dummy}} = \nonindB(\zero, \magic{\SPBp(\gammaA)})$, which makes $B(x)$
     an empty type.}.
 
   For every $A : \Set$, $B : A \to \Set$, let
@@ -1474,12 +1475,12 @@ We will be working informally in ZFC extended with the existence of two
 strongly inaccessible cardinals $\cardz < \cardi$,
 and will be using standard set theoretic constructions, e.g.
 \begin{align*}
-\langle a, b\rangle &\coloneqq \{ \{ a \}, \{ a, b \}\}, \\
-\lambda x \in a.b(x) &\coloneqq \{\langle x, b(x)\rangle\,|\,x \in a \} \\
-\Pi_{x \in a}b(x) &\coloneqq \{ f : a \to \bigcup_{x \in a}b(x)\ |\ \forall x \in a.f(x) \in b(x)\}, \\
+\langle a, b\rangle &\coloneqq \{ \{ a \}, \{ a, b \}\} \enspace , \\
+\lambda x \in a.b(x) &\coloneqq \{\langle x, b(x)\rangle\,|\,x \in a \} \enspace ,\\
+\Pi_{x \in a}b(x) &\coloneqq \{ f : a \to \bigcup_{x \in a}b(x)\ |\ \forall x \in a.f(x) \in b(x)\} \enspace , \\
 \Sigma_{x \in a}b(x) &\coloneqq \{ \langle c , d\rangle\ |\ c \in a \land d
-\in b(c) \}, \\
-0 &\coloneqq \emptyset, 1 \coloneqq \{0\}, 2 \coloneqq \{0, 1\}, \\
+\in b(c) \} \enspace , \\
+0 &\coloneqq \emptyset, 1 \coloneqq \{0\}, 2 \coloneqq \{0, 1\} \enspace , \\
 %\Nat &\coloneqq \text{smallest set containing $0$ and closed under successor} \\
 a_0 + \ldots + a_n &\coloneqq \Sigma_{i \in \{0, \ldots, n\}}a_i
 \end{align*}
@@ -1525,7 +1526,7 @@ The interpretation of the logical framework is as in
 \sem{b}_\rho & \text{if $\sem{x}_\rho = 1$} \\
 \text{undefined} & \text{otherwise} \\
 \end{cases} \\
-\sem{!_A}_\rho \colonsimeq \emptyset \text{ (the unique inclusion $\emptyset \to \sem{A}_\rho$ )}
+\sem{\magic{A}}_\rho \colonsimeq \emptyset \text{ (the unique inclusion $\emptyset \to \sem{A}_\rho$ )}
 \end{gather*}
 
 To interpret terms containing $\SPA$, $\SPB$, $\ArgA$, $\ArgB$, $\IndexB$, 
@@ -1548,7 +1549,7 @@ $\sem{\SPA}(\Xref)$ is defined as the least set such that
 \begin{align*}
 \sem{\SPA}(\Xref) &= 1 + \sum_{K \in \sem{\Set}}(K \to \sem{\SPA}(\Xref))
   + \sum_{K \in \sem{\Set}}\sem{\SPA}(\Xref + K) \\
- & {} + \sum_{K \in \sem{\Set}}\sum_{h : K \to \Xref}\sem{\SPA}(\Xref).
+ & {} + \sum_{K \in \sem{\Set}}\sum_{h : K \to \Xref}\sem{\SPA}(\Xref) \enspace .
 \end{align*}
 %
 The constructors are then interpreted as
