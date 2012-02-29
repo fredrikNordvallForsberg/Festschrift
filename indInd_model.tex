@@ -6,6 +6,9 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 
+\usepackage{graphicx}
+\usepackage{varwidth}
+
 \usepackage{MnSymbol}
 \usepackage{stmaryrd}
 
@@ -16,7 +19,9 @@
 
 \usepackage{hyperref}
 
-%\title{A set-theoretic model of induction-induction}
+%Catch overfull boxes
+\overfullrule=10cm
+
 \title{A finite axiomatisation of inductive-inductive definitions}
 
 \usepackage{authblk}
@@ -37,7 +42,7 @@ Swansea SA2 8PP, UK}
 \begin{abstract}
   \noindent 
   Induction-induction is a principle for mutually defining data types
-  $A : \Set$, $B : A \to \Set$. Both $A$ and $B$ are defined
+  $A : \Set$ and $B : A \to \Set$. Both $A$ and $B$ are defined
   inductively, and the constructors for $A$ can refer to $B$ and vice
   versa. In addition, the constructor for $B$ can refer to \emph{the
     constructor} for $A$. Induction-induction occurs in a natural way
@@ -46,26 +51,38 @@ Swansea SA2 8PP, UK}
   surreal numbers. We then give a new finite axiomatisation of the
   principle of induction-induction, and prove its consistency by
   constructing a model.
-%Finally we analyse the relationship between induction-induction and indexed 
-%inductive definitions.
 \end{abstract}
 
-\section{Introduction} %todo: rewrite introduction
+\section{Introduction}
 \label{sec:introduction}
 
-Induction is an important principle of definition and reasoning,
-especially so in constructive mathematics.  Martin-L\"of's
-formulation~\cite{martinlof1984bibliopolis} of type theory, for
-instance, includes inductive definitions of among others Cartesian
-products, disjoint unions, the natural numbers, lists, well-orderings,
-the identity set, finite sets, and a universe \`a la
-Tarski. %~\cite{palmgren1998twentyfiveyears}.
+When using Martin-L\"of type theory~\cite{martinlof1984bibliopolis}
+for programming and theorem proving, one soon notices the need for
+more complex data types which are syntactically closer to their intended
+meaning. Examples include indexing data types with extra information
+in order to express properties of their elements, or constructing a
+universe in order to quantify over a large collection.
 
-These examples can be categorised as different kinds of inductive
-definitions. The first few (up to well-orderings) are just ordinary inductive
+The programming language and proof assistant
+Agda~\cite{norell2007thesis} supports many such data types, however
+without a complete theoretical foundation. The proof assistant
+Coq~\cite{coq}, on the other hand, does not at present support some of
+the more advanced data types that Agda does. With the current article,
+we wish to address both these issues for a form of data type which we
+call \emph{inductive-inductive definitions}, for reasons that will
+become clear below. Inductive-inductive definitions have been used by
+several researchers in different areas -- see
+Section~\ref{sec:examples} for some examples.
+
+Let us now look at some examples of inductive definitions, such as the
+natural numbers, lists, well-orderings, the identity set, finite sets,
+and a universe \`a la Tarski. These examples can be categorised as
+different kinds of inductive definitions.
+
+The first few (up to well-orderings) are just ordinary inductive
 definitions, where a single set is defined inductively. A typical
-example is the type $W(A, B)$ of well-orderings, parameterised by $A : \Set$, $B
-: A \to \Set$. The introduction rule is:
+example is the type $W(A, B)$ of well-orderings, parameterised by $A :
+\Set$, $B : A \to \Set$. The introduction rule is:
 \[
 \infer{\Wsup(a, f) : W(A, B)}{a : A & \quad f : B(a) \to W(A, B)}
 \]
@@ -76,10 +93,11 @@ non-inductive argument.
 
 The identity type and the finite sets are examples
 %not of ordinary inductive definitions, but 
-of inductive families~\cite{dybjer1994indfam}, where a family $X : I
-\to \Set$ for some fixed index set $I$ is defined inductively
-simultaneously. For the family $\Fin : \Nat \to \Set$ of finite sets,
-the index set is $\Nat$, and we have introduction rules
+of inductive families, where a family $X : I \to \Set$ for some fixed
+index set $I$ is defined inductively
+simultaneously~\cite{dybjer1994indfam}. For the family $\Fin : \Nat
+\to \Set$ of finite sets, the index set is $\Nat$, and we have
+introduction rules
 \[
 \infer{\finzero{n} : \Fin(n + 1)}{n : \Nat} \qquad
 \infer{\finsucc{n}{m} : \Fin(n + 1)}{n : \Nat & \quad m : \Fin(n)}
@@ -96,10 +114,11 @@ of the constructed element. Thus the whole family has to be defined
 simultaneously.
 
 The universe \`a la Tarski is an example of an inductive-recursive
-definition~\cite{dybjer2000IR}, where a set $U$ is defined inductively
-together with a recursive function $T : U \to \Set$.  The constructors
-for $U$ may depend negatively on $T$ applied to elements of $U$, as is
-the case if $U$ for example is closed under dependent function spaces:
+definition, where a set $U$ is defined inductively together with a
+recursive function $T : U \to \Set$~\cite{dybjer2000IR}.  The
+constructors for $U$ may depend negatively on $T$ applied to elements
+of $U$, as is the case if $U$, for example, is closed under dependent
+function spaces:
 \[
 \infer{\pi(a, b) : U}{a : U & \quad b : T(a) \to U}
 \]
@@ -118,30 +137,67 @@ to $B$. Typical introduction rules might take the form
 \infer{\intro{B}(a_0, b, a_1, \ldots) : B(a_1)}{a_0 : A &
 &b : B(a_0) & a_1 : A & \ldots} \]
 
-This is not a simple mutual inductive definition of two sets, as $B$
-is indexed by $A$. It is not an ordinary inductive family, as $A$ may
-refer to $B$. Finally, it is not an instance of induction-recursion,
-as $B$ is constructed inductively, not recursively.
+Notice that this is not a simple mutual inductive definition of two
+sets, as $B$ is indexed by $A$. It is not an ordinary inductive
+family, as $A$ may refer to $B$. Finally, it is not an instance of
+induction-recursion, as $B$ is constructed inductively, not
+recursively (see Section \ref{sec:indind-vs-IR} for the difference).
 
-In this article, we give a new finite axiomatisation of a type theory
-with inductive-inductive definitions. It differs from our earlier
+Coq does at present not support inductive-inductive
+definitions, whereas Agda does, without a theoretical foundation.
+Working towards a justification of Agda's inductive-inductive
+definitions, and an inclusion of such definitions in Coq, we give a
+new finite axiomatisation of a type theory with inductive-inductive
+definitions. It differs from our earlier
 axiomatisation~\cite{nordvallforsbergSetzer2010indind} in that it is
-finite, and is hopefully easier to understand. The price we have to pay
-for this simplicity is that the natural full function space
-set-theoretical model construction becomes slightly more involved.
+finite, and is hopefully easier to understand.  The current article is
+also somewhat different in scope from our CALCO
+paper~\cite{nordvallforsbergAltenkirchMorrisSetzer2011catsemindind},
+which focuses on a categorical semantics and shows that the
+elimination rules (not treated here) are equivalent to the initiality
+of certain algebras.
+%This is a nice theoretical result, but not a basis for an
+%implementation as the current article could be.
+
+%The price we have to
+%pay for this simplicity is that the natural full function space
+%set-theoretical model construction becomes slightly more involved.
 
 %Schemas and universes of descriptions.
 
 %External schemas for general inductive sets and inductive families
-%have been given by Backhouse et.\ al.\ \cite{backhouse1989diytt} %backhouse1988meaning
-%and Dybjer \cite{dybjer1994indfam} respectively.
+%have been given by  respectively.
 
-%this has been internalised by Dybjer and Setzer
-%\cite{dybjersetzer1999finax,dybjersetzer2003inalg,dybjersetzer2006IIR}.
+%this has been internalised by 
 
 %Inductive-recursive
 %definitions have also been used for generic programming in dependent
 %type theory \cite{benke2003universes}.
+
+\paragraph{Related work}
+\label{sec:related-work}
+
+Backhouse et.\ al.~\cite{backhouse1989diytt,backhouse1988meaning} and
+Dybjer \cite{dybjer1994indfam,dybjer2000IR} gave external schemas for
+ordinary inductive sets, inductive families and inductive definitions,
+which later Dybjer and
+Setzer~\cite{dybjersetzer1999finax,dybjersetzer2003inalg,dybjersetzer2006IIR}
+internalised. This is where we take most of our inspiration from.
+Recently, Ghani and Hancock~\cite{GhaniHancock2012algIR} have shed new
+light on this construction.
+
+The idea of a universe of data types is also present in Epigram
+2~\cite{mcbride2010levitation}, and has previously been used by
+Altenkirch, Ghani, Morris and McBride to study strictly positive
+types~\cite{morrisAltenkirchMcBride2006regularTreeTypes} and strictly
+positive families~\cite{morrisAltenkirchGhani2009SPFjournal} (see also
+Morris' thesis~\cite{morris2007thesis}). Here data types are given a
+more semantic account via the theory of
+containers~\cite{abbottAltenkirchGhani2005containers} and indexed
+containers~\cite{altenkirchMorris2009indexedCont}.
+
+% Benke, Dybjer and Jansson~\cite{benke2003universes} use Dybjer and
+% Setzer style universes of data types for generic programming.
 
 
 
@@ -343,11 +399,11 @@ certain length (with elements from a set $A$):
 \infer{\singleVec{a} : \Vecind(1)}{a : A} \qquad \infer{\consVec{a}{\ell} :
   \Vecind(n + 1)}{a : A & \quad \ell : \Vecind(n)}
 \]
-Notice that there is no constructor which constructs elements in
-$\Vecind(0)$.
+Notice that there is no constructor which constructs elements in the
+set $\Vecind(0)$.
 
-\item[Recursive definition] In the recursive definition, we define the
-  set $\Vecrec(n)$ for every natural number:
+\item[Recursive definition] If the recursive definition of the data
+  type, we define the set $\Vecrec(n)$ for every natural number:
   \begin{align*}
     \Vecrec(0) &= \zero \\
     \Vecrec(1) &= A \\
@@ -416,7 +472,6 @@ $(a : \two) \to A(\twott) \to A(\twoff) \to A(a)$ where $i : \two
 \Rightarrow A(i) : \TYPE$. It satisfies the obvious computation rules,
 i.e.\ $\IF~\twott~\THEN~a~\ELSE~b = a$ and $\IF~\twoff~\THEN~a~\ELSE~b
 = b$.
-%Finally, we require the type $\Nat$ of natural numbers.
 
 With $\IF~\cdot~\THEN~\cdot~\ELSE~\cdot$ and dependent products, we can now
 % as in \cite[A.2]{dybjersetzer2006IIR}
@@ -456,17 +511,18 @@ axiomatisation~\cite{nordvallforsbergSetzer2010indind}, and is
 hopefully easier to understand. However, the definable sets should
 be the same for both axiomatisations.
 
-%TODO: rewrite
-
-We take inspiration from Dybjer and Setzer's axiomatisation of
-inductive-recursive definitions~\cite{dybjersetzer1999finax}. The main
-idea is to construct a universe consisting of codes for
-inductive-inductive definitions, together with a decoding function,
-which maps a code $\varphi$ to the domain of the constructor for the
-inductively defined set represented by $\varphi$.  Just as the second
-component $B : A \to \Set$ depends on the first set $A$, the universe $\SPBp : \SPAp \to \TYPE$
-of codes for the second component will depend on the universe $\SPAp$ of codes
-for the first set.
+The main idea, following Dybjer and Setzer's axiomatisation of
+inductive-recursive definitions~\cite{dybjersetzer1999finax}, is to
+construct a universe consisting of codes for inductive-inductive
+definitions, together with a decoding function, which maps a code
+$\varphi$ to the domain of the constructor for the inductively defined
+set represented by $\varphi$.  We will actually use two universes; one
+to describe the constructors for the index set $A$, and one to
+describe the constructors of the second component $B : A \to \Set$.
+Just as the constructors for $B : A \to \Set$ can depend on the
+constructors for the first set $A$, the universe $\SPBp : \SPAp \to
+\TYPE$ of codes for the second component will depend on the universe
+$\SPAp$ of codes for the first.
 
 \subsection{Dissecting an inductive-inductive definition}
 \label{sec:dissect-ind}
@@ -602,7 +658,7 @@ family $\B : \A \to \Set$ as arguments to use as $A$ and $B$ in the
 inductive arguments. These will later be instantiated by the sets
 defined inductive-inductively. We also require a function $\repA :
 \Xref \to \A$ which we think of as mapping a ``referable'' element to
-the element it represents in $\A$. All in all, $\ArgA$ has the
+the element it represents in $\A$. Thus, $\ArgA$ has the
 following formation rule:
 %
 \[
@@ -622,16 +678,30 @@ this is the only choice), so that we can define
 by $\ArgAp(\gamma, \A, \B) = \ArgA(\zero, \gamma, \A, \B, \magic{X})$.
 
 The definition of $\ArgA$ follows the informal description of what the
-different codes represent above:
-
-%todo: formatting
-\begin{align*} 
-  \ArgA(\Xref, \nilA, \A, \B, \repA) &= \one \\
-  \ArgA(\Xref, \nonindA(K, \gamma), \A, \B, \repA) &= (x : K) \times \ArgA(\Xref, \gamma(x), \A, \B, \repA) \\
-  \ArgA(\Xref, \AindA(K, \gamma), \A, \B, \repA) &=  (j : K \to \A) \times \ArgA(\Xref + K, \gamma, \A, \B, [\repA, j]) \\
-  \ArgA(\Xref, \BindA(K, \hindex, \gamma), \A, \B, \repA) &= \\
- ((x : K) \to& \B((\repA \circ \hindex)(x))) \times \ArgA(\Xref, \gamma, \A, \B, \repA)
+different codes represent above\footnote{For readability, we have
+  replaced arguments which are simply passed on with ``$\omitt$'' in
+  the recursive call, and likewise on the left hand side if the
+  argument is not used otherwise.}:
+%
+%\resizebox{\textwidth}{!}{%
+%\begin{minipage}{\textwidth}
+\begin{align*}%
+%  \ArgA(\Xref, \nilA, \A, \B, \repA) &= \one \\
+  \ArgA(\omitt, \nilA, \omitt, \omitt, \omitt) &= \one \\
+%  \ArgA(\Xref, \nonindA(K, \gamma), \A, \B, \repA) &= (x : K) \times \ArgA(\Xref, \gamma(x), \A, \B, \repA) \\
+  \ArgA(\omitt, \nonindA(K, \gamma), \omitt, \omitt, \omitt) &= (x : K) \times \ArgA(\omitt, \gamma(x), \omitt, \omitt, \omitt) \\
+%  \ArgA(\Xref, \AindA(K, \gamma), \A, \B, \repA) &=  \\
+%\multispan{2}{\hfill $(j : K \to \A) \times \ArgA(\Xref + K, \gamma, \A, \B, [\repA, j])$} \\
+  \ArgA(\Xref, \AindA(K, \gamma), \A, \omitt, \repA) &=  \\
+\multispan{2}{\hfill $(j : K \to \A) \times \ArgA(\Xref + K, \gamma, \omitt, \omitt, [\repA, j])$} \\
+%  \ArgA(\Xref, \BindA(K, \hindex, \gamma), \A, \B, \repA) &= \\
+%\multispan{2}{\hfill $((x : K) \to \B((\repA \circ \hindex)(x))) \times \ArgA(\Xref, \gamma, \A, \B, \repA)$}
+  \ArgA(\omitt, \BindA(K, \hindex, \gamma), \omitt, \B, \repA) &= \\
+\multispan{2}{\hfill $((x : K) \to \B((\repA \circ \hindex)(x))) \times \ArgA(\omitt, \gamma, \omitt, \omitt, \omitt)$}
 \end{align*}
+%\end{minipage}
+%}
+
 
 \begin{example}
   Recall the code $\gamma_{\consCtxtbare} = \AindA(\one, \BindA(\one,
@@ -798,7 +868,9 @@ and $\B$ respectively (i.e.\ we have $\repA : \Xref \to \A$, $\repIndex
 Formally, we can simultaneously define the following two functions:
 %
 \[ %\ldots = \gammaA, \introA, \repA, \repIndex, \repB
-\mathclap{%
+%\mathclap{%
+\resizebox{\textwidth}{!}{%
+$
 \infer{\deduce{\repBbar(\ldots) : (x : \Aterm(\gammaA, \Xref, \Yref)) \to \Bterm(\gammaA, \Xref, \Yref, x) \to \B(\repAbar(\ldots, x))}
               {\repAbar(\ldots) : \Aterm(\gammaA, \Xref, \Yref) \to \A}}
       {\gammaA : \SPAp & \quad
@@ -808,6 +880,8 @@ Formally, we can simultaneously define the following two functions:
        \deduce{\repB : (x : \Yref) \to \B(\repIndex(x))}
               {\deduce{\repIndex : \Yref \to \A}
                       {\repA : \Xref \to \A}}}
+%}
+$
 }
 \]
 %
@@ -817,16 +891,16 @@ functoriality of $\ArgAp$ and the mutually defined $\repBbar$:
 \begin{align*}
   \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, \termAref(x)) &= \repA(x) \\
   \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, \termBref(x)) &= \repIndex(x) \\
-  \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x)) 
-    &= \introA(\ArgAp(\gammaA, \repAbar(\ldots), \repBbar(\ldots), x))
+  \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x)) &= \\
+\multispan{2}{\hfill $\introA(\ArgAp(\gammaA, \repAbar(\ldots), \repBbar(\ldots), x))$}
 \end{align*}
 %
 The simultaneously defined $\repBbar$ is very simple:
 %
 \begin{align*}
-  \repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termAref(x), y) &= \magicOmit{\B \circ \repAbar(\ldots)}(y) \\
+  \repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termAref(x), y) &=\ \magicOmit{\B \circ \repAbar(\ldots)}(y) \\
 \repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termBref(x), \oneelt) &= \repB(y) \\
-\repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x), y) &= \magicOmit{\B \circ \repAbar(\ldots)}(y) \\ \\
+\repBbar(\gammaA, \introA, \repA, \repIndex, \repB, \termArg(x), y) &=\ \magicOmit{\B \circ \repAbar(\ldots)}(y) \\ \\
 \end{align*}
 
 \begin{example}
@@ -939,42 +1013,61 @@ $\Aterm(\Aref, \Bref, \gammaA)$.
   $\widehat{\text{in}\pair{\Gamma}{\sigma}} = \termArg(\langle
   (\lambda \oneelt.\termBref(\inr(\oneelt))), \langle \lambda
   \oneelt.\oneelt, \oneelt\rangle\rangle)$ is the element representing
-  $\consCtxt{\Gamma}{\sigma}$.  \blackqed
+  $\consCtxt{\Gamma}{\sigma}$. 
+
+\hfill \blackqed
 \end{example}
 
 The definition of $\ArgB$ should now not come as a surprise. First, we have a formation rule:
 %
 \[
-\mathclap{%
+\resizebox{\textwidth}{!}{%
+$
+%\mathclap{%
 \infer{\ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma) : \Set}
-                                        {\deduce{\Xref, \Yref : \Set}{\gammaA : \SPAp}
-                                         & \quad \deduce{\introA : \ArgA(\gammaA, \A, \B) \to \A}
-                                                        {\deduce{\B : \A \to \Set}{\A : \Set}}
-                                         & \quad \deduce{\repB: (x : \Yref) \to \B(\repIndex(x))}
-                                                        {\deduce{\repIndex : \Yref \to \A}
-                                                                {\repA : \Xref \to \A}}
-                                         & \quad \gamma : \SPB(\Xref, \Yref, \gammaA)}
+             {\deduce{\gamma : \SPB(\Xref, \Yref, \gammaA)}
+                     {\deduce{\Xref, \Yref : \Set}{\gammaA : \SPAp}}
+      & \quad \deduce{\introA : \ArgA(\gammaA, \A, \B) \to \A}
+                     {\deduce{\B : \A \to \Set}{\A : \Set}}
+              & \quad \deduce{\repB: (x : \Yref) \to \B(\repIndex(x))}
+                             {\deduce{\repIndex : \Yref \to \A}
+                                     {\repA : \Xref \to \A}}}
+%}
+$
 }
 \]
 %
-Once again, the definition is simpler for codes in $\SPBp(\gammaA)$:
+The definition can be simplified for codes in $\SPBp(\gammaA)$:
 \[
 \ArgBp(\gammaA, \A, \B, \introA, \gamma) \coloneqq
    \ArgB(\zero, \zero, \gammaA, \A, \B, \introA, \magicOmit{\A}, \magicOmit{\A}, \magicOmit{\B \circ \magicOmit{\A}}, \gamma)
 \]
 %
-We define:
+We define\footnote{Once again, we have for readability
+  replaced arguments which are simply passed on with ``$\omitt$'' in
+  the recursive call, and likewise on the left hand side if the
+  argument is not used otherwise.}:
 %todo: formatting
+%
 \begin{align*} 
-&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nilB(a)) = \one \\
-&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nonindB(K, \gamma)) \\  
-&\quad= (x : K) \times \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma(x)) \\
-&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \AindB(K, \gamma)) \\
-&\quad=  (j : K \to \A) \times \ArgB(\Xref + K, \Yref, \gammaA, \A, \B, \introA,  [\repA, j], \repIndex, \repB, \gamma) \\
-&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
+%&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nilB(a)) = \one \\
+&  \ArgB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \nilB(a)) = \one \\
+%&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nonindB(K, \gamma)) \\  
+%&\quad= (x : K) \times \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma(x)) \\
+&  \ArgB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \nonindB(K, \gamma)) 
+= (x : K) \times \ArgB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \gamma(x)) \\
+%&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \AindB(K, \gamma)) \\
+%&\quad=  (j : K \to \A) \times \ArgB(\Xref + K, \Yref, \gammaA, \A, \B, \introA,  [\repA, j], \repIndex, \repB, \gamma) \\
+&  \ArgB(\Xref, \omitt, \omitt, \A, \omitt, \omitt, \repA, \omitt, \omitt, \AindB(K, \gamma)) \\
+&\quad=  (j : K \to \A) \times \ArgB(\Xref + K, \omitt, \omitt, \omitt, \omitt, \omitt,  [\repA, j], \omitt, \omitt, \gamma) \\
+&  \ArgB(\omitt, \Yref, \gammaA, \omitt, \B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
 &\quad= (j : (x : K) \to \B((\repAbar(\gammaA, \introA, \repA, \repIndex, \repB) \circ \hindex)(x))) \times {} \\ 
-& \qquad\quad     \ArgB(\Xref, \Yref + K, \gammaA, \A, \B, \introA, \repA, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma)
+& \qquad\qquad\qquad   \ArgB(\omitt, \Yref + K, \omitt, \omitt, \omitt, \omitt, \omitt, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma)
+%&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
+%&\quad= (j : (x : K) \to \B((\repAbar(\gammaA, \introA, \repA, \repIndex, \repB) \circ \hindex)(x))) \times {} \\ 
+%& \qquad     \ArgB(\Xref, \Yref + K, \gammaA, \A, \B, \introA, \repA, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma)
 \end{align*}
+
 
 Finally, we need the function $\IndexBp(\ldots) : \ArgB(\gammaA, \gammaB, \A, \B,
 \introA) \to \A$ which to each $b : \ArgB(\gammaA, \gammaB, \A, \B,
@@ -982,30 +1075,48 @@ Finally, we need the function $\IndexBp(\ldots) : \ArgB(\gammaA, \gammaB, \A, \B
 from $b$ is in $\B(a)$.
 %
 \[
-\mathclap{%
+\resizebox{\textwidth}{!}{%
+$
 \infer{\IndexB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma) : \ArgB(\ldots) \to \A}
-                                        {\deduce{\Xref, \Yref : \Set}{\gammaA : \SPAp}
-                                         & \quad \deduce{\introA : \ArgA(\gammaA, \A, \B) \to \A}
-                                                        {\deduce{\B : \A \to \Set}{\A : \Set}}
-                                         & \quad \deduce{\repB: (x : \Yref) \to \B(\repIndex(x))}
-                                                        {\deduce{\repIndex : \Yref \to \A}
-                                                                {\repA : \Xref \to \A}}
-                                         & \quad \gamma : \SPB(\Xref, \Yref, \gammaA)}
+             {\deduce{\gamma : \SPB(\Xref, \Yref, \gammaA)}
+                     {\deduce{\Xref, \Yref : \Set}{\gammaA : \SPAp}}
+      & \quad \deduce{\introA : \ArgA(\gammaA, \A, \B) \to \A}
+                     {\deduce{\B : \A \to \Set}{\A : \Set}}
+              & \quad \deduce{\repB: (x : \Yref) \to \B(\repIndex(x))}
+                             {\deduce{\repIndex : \Yref \to \A}
+                                     {\repA : \Xref \to \A}}}
+$
 }
 \]
-%
-As we usually do, we define $\IndexBp : \ArgBp(\gammaA, \A, \B,
-\introA, \gammaB) \to \A$ by
-$\IndexBp(\gammaA, \A, \B, \introA, \gammaB) \coloneqq
-   \IndexB(\zero, \zero, \gammaA, \A, \B, \introA, \magicOmit{\A}, \magicOmit{\A}, \magicOmit{\B \circ \magicOmit{\A}}, \gammaB)$.
 
-For the equations, we will suppress all inferable arguments:
+For codes in $\SPBp(\gammaA)$, we define $\IndexBp : \ArgBp(\gammaA,
+\A, \B, \introA, \gammaB) \to \A$ by $\IndexBp(\gammaA, \A, \B,
+\introA, \gammaB) \coloneqq \IndexB(\zero, \zero, \gammaA, \A, \B,
+\introA, \magicOmit{\A}, \magicOmit{\A}, \magicOmit{\B \circ
+  \magicOmit{\A}}, \gammaB)$.
+
+The equations by neccessity follows the same pattern as the equations
+for $\ArgB$. For the base case $\gammaB = \nilB(a)$, we use
+$\repA(\ldots, a)$, and for the other cases, we just do a recursive
+call\footnote{Simply passed on and otherwise not used arguments have
+  been replaced with ``$\omitt$'' for readability.}
+%
+%\begin{align*} 
+%\IndexB(\ldots, \nilB(a), \oneelt) &= \repAbar(\ldots, a) \\
+%\IndexB(\ldots, \nonindB(K, \gamma), \pair{k}{y}) &= \IndexB(\ldots, \gamma(k), y) \\  
+%\IndexB(\ldots, \AindB(K, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y) \\
+%\IndexB(\ldots, \BindB(K, \hindex, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y)
+%\end{align*}
 %
 \begin{align*} 
-\IndexB(\ldots, \nilB(a), \oneelt) &= \repAbar(\ldots, a) \\
-\IndexB(\ldots, \nonindB(K, \gamma), \pair{k}{y}) &= \IndexB(\ldots, \gamma(k), y) \\  
-\IndexB(\ldots, \AindB(K, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y) \\
-\IndexB(\ldots, \BindB(K, \hindex, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y)
+&  \IndexB(\omitt, \omitt, \gammaA, \omitt, \omitt, \introA, \repA, \repIndex, \repB, \nilB(a), \oneelt) \\
+&\quad= \repAbar(\gammaA, \introA, \repA, \repIndex, \repB, a) \\
+&  \IndexB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \nonindB(K, \gamma), \pair{k}{y}) \\
+&\quad= \IndexB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \gamma(k), y) \\
+&  \IndexB(\Xref, \omitt, \omitt, \A, \omitt, \omitt, \repA, \omitt, \omitt, \AindB(K, \gamma), \pair{j}{y}) \\
+&\quad=  \IndexB(\Xref + K, \omitt, \omitt, \omitt, \omitt, \omitt,  [\repA, j], \omitt, \omitt, \gamma, y) \\
+&  \IndexB(\omitt, \Yref, \gammaA, \omitt, \B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma), \pair{j}{y}) \\
+& \quad=   \IndexB(\omitt, \Yref + K, \omitt, \omitt, \omitt, \omitt, \omitt, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma, y)
 \end{align*}
 
 \begin{example} 
@@ -1154,10 +1265,11 @@ the result should be $[m, n, \ldots]$, otherwise we recursively insert
 $m$ into the tail of the list.
 
 In detail, we choose $P(\ell) = \Nat \to \SortedList$ and, in our
-first attempt, $Q(n, \ell, p, \stepindarg{\ell}) = \one$, since we are
-only interested in getting a function $\elim_{\SortedList}(\ldots) :
-\SortedList \to \Nat \to \SortedList$. We need to give functions
-$\stepind{\nilList} : (m : \Nat) \to \SortedList$ and $\stepind{\consListbare}(n, \ell, p) :
+first attempt, we choose $Q(n, \ell, p, \stepindarg{\ell}) = \one$,
+since we are only interested in getting a function
+$\elim_{\SortedList}(\ldots) : \SortedList \to \Nat \to
+\SortedList$. We need to give functions $\stepind{\nilList} : (m :
+\Nat) \to \SortedList$ and $\stepind{\consListbare}(n, \ell, p) :
 %(n : \Nat) \to (\ell : \SortedList) \to (p : n \lessList \ell) \to
 (\stepindarg{\ell} : \Nat \to \SortedList) \to Q(n, \ell, p,
 \stepindarg{\ell}) \to (m : \Nat) \to \SortedList$ to use when
@@ -1171,14 +1283,17 @@ The function $\stepind{\nilList}$ is easy to define: it should be
 \]
 For $\stepind{\consListbare}$, the decidability of $\leq$ (combined
 with the fact that $\leq$ is total) allows us to distinguish between
-the cases when $m \leq n$ and $n \leq m$. We try:
-\[
-\stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \oneelt, m) =
+the cases when $m \leq n$ and $n \leq m$, and we are entitled to a
+proof $q : m \leq n$ or $q : n \leq m$ of this fact. We try:
+%
+\begin{multline*}
+\stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \oneelt, m) \\ = 
 \begin{cases}
   \consList{m}{\consList{n}{\ell}{p}}{\consLess{m}{n}{\ell}{p}{q}{\lessListtrans{q}{p}}} & \text{where $q : m \leq n$} \\
   \consList{n}{\stepindarg{\ell}(m)}{\SHED} & \text{where $q : n \leq m$} 
 \end{cases}
-\]
+\end{multline*}
+%
 Here, $\lessListtransbare : m \leq n \to n \lessList \ell \to m
 \lessList \ell$ witnesses a kind of transitivity of $\leq$ and
 $\lessList$. It can be straightforwardly defined with the elimination
@@ -1198,13 +1313,13 @@ Q(n, \ell, p,\stepindarg{\ell})
 The argument $\oneelt : \one$ to $\stepind{\consListbare}$ in our
 first attempt has now been replaced with the argument $\stepindarg{p}
 : (m : \Nat) \to n \leq m \to n \lessList \stepindarg{l}(m)$, and we can define
-\[
-\stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \stepindarg{p}, m) =
+\begin{multline*}
+\stepind{\consListbare}(n, \ell, p, \stepindarg{\ell}, \stepindarg{p}, m) \\=
 \begin{cases}
   \consList{m}{\consList{n}{\ell}{p}}{\consLess{m}{n}{\ell}{p}{q}{\lessListtrans{q}{p}}} & \text{where $q : m \leq n$} \\
   \consList{n}{\stepindarg{\ell}(m)}{\stepindarg{p}(m, q)} & \text{where $q : n \leq m$} 
 \end{cases}
-\]
+\end{multline*}
 %
 Now we must also define $\stepind{\nilLess{}} : (n : \Nat) \to Q(n,
 \nilList, \nilLess{n}, \stepind{\nilList})$ and
@@ -1333,13 +1448,14 @@ $\gamma_1$, then $\intro{0 + 1}$ is described by the code
     \gamma_{\finsuccBare} &\coloneqq \nonindB(\Nat, \lambda n\,.\,\BindB(\one, (\lambda \oneelt . \termArg(\pair{n}{\oneelt})), \nilB(\termArg(\pair{n + 1}{\oneelt})))) \enspace .
   \end{align*} 
 
-  Then $\intro{A_{\gamma_A, \gamma_{\Fin}}} : \Nat \times \one \to
+  Then the constructor $\intro{A_{\gamma_A, \gamma_{\Fin}}} : \Nat \times \one \to
   A_{\gamma_A, \gamma_{\Fin}}$ is one part of an isomorphism $\Nat
   \cong \Nat \times \one \cong A_{\gamma_A, \gamma_{\Fin}}$, and if we
-  define $\Fin : \Nat \to \Set$ by $\Fin(n) = B_{\gamma_A,
-    \gamma_{\Fin}}(\intro{A_{\gamma_A,
-    \gamma_{\Fin}}}(\pair{n}{\oneelt}))$, then we can define
-  constructors
+  define $\Fin : \Nat \to \Set$ by 
+  \[
+  \Fin(n) = B_{\gamma_A, \gamma_{\Fin}}(\intro{A_{\gamma_A,  \gamma_{\Fin}}}(\pair{n}{\oneelt})) \enspace ,
+  \] 
+  then we can define constructors
   \begin{align*}
     \infer{\finzero{n} : \Fin(n + 1)}{n : \Nat} \qquad
 \infer{\finsucc{n}{m} : \Fin(n + 1)}{n : \Nat & \quad m : \Fin(n)}
@@ -1396,7 +1512,7 @@ and we can define the usual constructors by
 \vskip 0.2cm
 \begin{tabular}{l@{\qquad\qquad}l}
   $\emptyCtxt : \Ctxt$ & $\baseTybare : (\Gamma : \Ctxt) \to \Ty(\Gamma)$ \\
-  $\emptyCtxt = \intro{A_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \oneelt\rangle)\enspace ,$ & $\baseTy{\Gamma} = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \langle (\lambda \oneelt.\Gamma), \oneelt\rangle\rangle)\enspace ,$\\
+  $\emptyCtxt = \intro{A_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \oneelt\rangle)\enspace ,$ & $\baseTy{\Gamma} = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \langle (\lambda \oneelt.\Gamma), \oneelt\rangle\rangle)\enspace ,$\!\!\!\\
 \end{tabular}
 \vskip 0.2cm
 \begin{tabular}{l}
@@ -1490,7 +1606,7 @@ introduce sets $A^{\alpha}$ indexed by ordinals $\alpha$, let \[A^{< \alpha}
 \coloneqq \displaystyle\bigcup_{\beta < \alpha}A^{\beta}.\]
 
 For every expression $A$ of our type theory, we will give an interpretation
-$\sem{A}_\rho$, regardless if $A : \TYPE$ or $A : B$ or not. Interpretations
+$\sem{A}_\rho$, regardless of whether $A : \TYPE$ or $A : B$ or not. Interpretations
 might however be undefined, written $\sem{A}_\rho\uparrow$. If $\sem{A}_\rho$
 is defined, we write $\sem{A}_\rho\downarrow$. We write $A \simeq B$ for
 partial equality, i.e.\ $A \simeq B$ if and only if $A\downarrow
@@ -1574,8 +1690,8 @@ according to their equations, e.g.\
   \sem{\ArgA}(\Xref, \sem{\nilA}, X, Y, \repA) &\colonsimeq 1 \\
 \sem{\ArgA}(\Xref, \sem{\nonindA}(K, \gamma), X, Y, \repA) &\colonsimeq
   \sum_{k \in K} \sem{\ArgA}(\Xref, \gamma(k), X, Y, \repA) \\
-\sem{\ArgA}(\Xref, \sem{\AindA}(K, \gamma), X, Y, \repA) &\colonsimeq
-  \sum_{j : K \to A}\sem{\ArgA}(\Xref + K, \gamma, X, Y, [\repA, j]) \\
+\sem{\ArgA}(\Xref, \sem{\AindA}(K, \gamma), X, Y, \repA) &\colonsimeq\!\!\!\!\!
+  \sum_{j : K \to A}\!\!\!\sem{\ArgA}(\Xref + K, \gamma, X, Y, [\repA, j])\!\!\!\!\!\!\!\! \\
 \sem{\ArgA}(\Xref, \sem{\BindA}(K, h, \gamma), X, Y, \repA) &\colonsimeq
   \sum_{\mathclap{j \in \Pi_{k \in K} B(\repA (h(k)))}}\sem{\ArgA}(\Xref, \gamma, X, Y, \repA).
 \end{align*}
@@ -1715,7 +1831,7 @@ $\sem{\Set}$:
   For all $\gammaA \in \sem{\SPAp}$ and $\gammaB \in \sem{\SPBp}(\gammaA)$:
   \begin{enumerate}[(i)]
   \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$, then $\sem{\ArgAp}(\gammaA, X, Y) \in \sem{\Set}$.
-  \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$, then $\sem{\ArgBp}(\gammaA, X, Y, \intro{X}, \gammaB) \in \sem{\Set}$.
+  \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$,  $\sem{\ArgBp}(\gammaA, X, Y, \intro{X}, \gammaB) \in \sem{\Set}$.
   \end{enumerate}
   \end{lemma}
 
