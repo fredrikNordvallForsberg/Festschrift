@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{schwicht}
 
 \usepackage{proof}
 \usepackage{mathtools}
@@ -19,22 +19,18 @@
 
 \usepackage{hyperref}
 
+%\overfullrule=10pt
+
 \title{A finite axiomatisation of inductive-inductive definitions}
+\author{Fredrik Nordvall Forsberg and Anton Setzer}
 
-\usepackage{authblk}
-\author{Fredrik Nordvall Forsberg}
-\author{Anton Setzer \thanks{Both authors are supported by EPSRC grant EP/G033374/1, Theory and applications of induction-recursion.} }
-\affil{Swansea University \\
-Singleton  Park \\
-Swansea SA2 8PP, UK}
-
-
+%\thanks{Both authors are supported by EPSRC grant EP/G033374/1, Theory and applications of induction-recursion.}
 
 \input macros.tex
 
 \begin{document}
 
-\maketitle
+\altmaketitle
 
 \begin{abstract}
   \noindent 
@@ -328,7 +324,7 @@ definition, and how the first definition already refers to the second.
 As an inductive definition, the negative occurrence of $\leq$ in the
 definition of the class of surreal numbers is problematic. We can get
 around this by simultaneously defining the class $\Sur : \Set$
-together with two relations ${ \Surleq {} : \Sur \to \Sur \to \Set}$ and
+together with two relations $ \Surleq {} : \Sur \to \Sur \to \Set$ and
 ${ \Surnleq {} : \Sur \to \Sur \to \Set}$ as follows:
 
 \begin{itemize}
@@ -762,7 +758,7 @@ functions to a function
 %
 by observing that $\ArgAp(\gammaA)$ is functorial:
 
-\begin{lemma} %todo: reword. Do we want to avoid cat. theory?
+\begin{lemma}
   For each $\gamma : \SPAp$, $\ArgAp(\gamma)$ extends to a functor from
   families of sets to sets, i.e.\ given $f : \A \to \A'$ and $g : (x :
   \A) \to \B(x) \to \B'(f(x))$, one can define $\ArgAp(\gamma, f, g) :
@@ -789,13 +785,7 @@ by observing that $\ArgAp(\gammaA)$ is functorial:
   \[
   p : (x : \Xref) \to \B'(f(\repA(x))) \to \B'(\repA'(x)) \enspace .
   \]
-% let $\A$,
-%  $\B$, $\repA : \Xref \to \A$, $\A'$, $\B'$, $\repA' : \Xref \to \A'$ and
-%  $f : \A \to \A'$, $g : (x : \A) \to \B(x) \to \B'(f(x))$ be given. In
-%  addition, assume that $f(\repA(x)) = \repA'(x)$ for all $x :
-%  \Xref$. It is enough for our purposes to state this in a
-%  ``specialised Leibniz form''; we require a term
-  % 
+  %
   Thus we define
   % 
   \[
@@ -816,11 +806,8 @@ by observing that $\ArgAp(\gammaA)$ is functorial:
   Finally, we can define $\ArgAp(\gamma, f, g) : \ArgAp(\gamma, A, B) \to
   \ArgAp(\gamma, A', B')$ by
   \[
-  \ArgAp(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magicOmit{B'(f(\repA(x))) \to B'(\repA'(x))}) \enspace .
+  \ArgAp(\gamma, f, g) \coloneqq \ArgA(\gamma,f, g, \magicOmit{B'(f(\repA(x))) \to B'(\repA'(x))}) \enspace . \qedhere
   \]
-%  % 
-%  (Pointwise) preservation of identities and composition is easily
-%  checked, again by induction over $\gamma$.
 \end{proof}
 
 Recall that we want to use the lemma to represent elements in
@@ -864,8 +851,7 @@ and $\B$ respectively (i.e.\ we have $\repA : \Xref \to \A$, $\repIndex
 : \Yref \to \A$ and $\repB : (x : \Yref) \to \B(\repIndex(x))$).
 Formally, we can simultaneously define the following two functions:
 %
-\[ %\ldots = \gammaA, \introA, \repA, \repIndex, \repB
-%\mathclap{%
+\[ 
 \resizebox{\textwidth}{!}{%
 $
 \infer{\deduce{\repBbar(\ldots) : (x : \Aterm(\gammaA, \Xref, \Yref)) \to \Bterm(\gammaA, \Xref, \Yref, x) \to \B(\repAbar(\ldots, x))}
@@ -877,7 +863,6 @@ $
        \deduce{\repB : (x : \Yref) \to \B(\repIndex(x))}
               {\deduce{\repIndex : \Yref \to \A}
                       {\repA : \Xref \to \A}}}
-%}
 $
 }
 \]
@@ -931,7 +916,6 @@ The simultaneously defined $\repBbar$ is very simple:
     = \consCtxt{(\repIndex(\hat{b}))}{(\repB(\hat{b}))} 
     = \consCtxt{a}{b} \enspace .
   \]
-% (λ _ → arg  (ff , ((λ _ → bref (inr _)) , ((λ _ → _) , _))))
 \blackqed
 \end{itemize}
 \end{example}
@@ -975,12 +959,12 @@ The code $\nonindB(K, \gamma)$ represents a non-inductive argument $x: K$, with 
 %
 The code $\AindB(K, \gamma)$ represents an inductive argument with
 type $K \to A$, with the rest of the arguments given by
-$\gamma$. %Notice that $\gamma : \SPA(\Aref + K)$, so that the
-%remaining arguments can refer to more elements in $A$ (namely those
-%introduced by the inductive argument).
+$\gamma$.
 %
 \[
+\resizebox{\textwidth}{!}{
 \infer{\BindB(K, \hindex, \gamma) : \SPB(\Aref, \Bref, \gammaA)}{K : \Set & \quad \hindex : K \to \Aterm(\Aref, \Bref, \gammaA) & \quad \gamma : \SPB(\Aref, \Bref + K, \gammaA)}
+}
 \]
 %
 At last, the code $\BindB(K, \hindex, \gamma)$ represents an inductive
@@ -1044,14 +1028,13 @@ We define\footnote{Once again, we have for readability
   replaced arguments which are simply passed on with ``$\omitt$'' in
   the recursive call, and likewise on the left hand side if the
   argument is not used otherwise.}:
-%todo: formatting
 %
 \begin{align*} 
 %&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nilB(a)) = \one \\
 &  \ArgB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \nilB(a)) = \one \\
 %&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \nonindB(K, \gamma)) \\  
 %&\quad= (x : K) \times \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \gamma(x)) \\
-&  \ArgB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \nonindB(K, \gamma)) 
+&  \ArgB (\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \nonindB(K, \gamma)) 
 = (x : K) \times \ArgB(\omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \omitt, \gamma(x)) \\
 %&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \AindB(K, \gamma)) \\
 %&\quad=  (j : K \to \A) \times \ArgB(\Xref + K, \Yref, \gammaA, \A, \B, \introA,  [\repA, j], \repIndex, \repB, \gamma) \\
@@ -1059,7 +1042,7 @@ We define\footnote{Once again, we have for readability
 &\quad=  (j : K \to \A) \times \ArgB(\Xref + K, \omitt, \omitt, \omitt, \omitt, \omitt,  [\repA, j], \omitt, \omitt, \gamma) \\
 &  \ArgB(\omitt, \Yref, \gammaA, \omitt, \B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
 &\quad= (j : (x : K) \to \B((\repAbar(\gammaA, \introA, \repA, \repIndex, \repB) \circ \hindex)(x))) \times {} \\ 
-& \qquad\qquad\qquad   \ArgB(\omitt, \Yref + K, \omitt, \omitt, \omitt, \omitt, \omitt, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma)
+& \qquad\qquad\ \    \ArgB(\omitt, \Yref + K, \omitt, \omitt, \omitt, \omitt, \omitt, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma)
 %&  \ArgB(\Xref, \Yref, \gammaA, \A, \B, \introA, \repA, \repIndex, \repB, \BindB(K, \hindex, \gamma)) \\
 %&\quad= (j : (x : K) \to \B((\repAbar(\gammaA, \introA, \repA, \repIndex, \repB) \circ \hindex)(x))) \times {} \\ 
 %& \qquad     \ArgB(\Xref, \Yref + K, \gammaA, \A, \B, \introA, \repA, [\repIndex, \repAbar(\ldots) \circ \hindex], [\repB, j], \gamma)
@@ -1097,13 +1080,6 @@ for $\ArgB$. For the base case $\gammaB = \nilB(a)$, we use
 $\repA(\ldots, a)$, and for the other cases, we just do a recursive
 call\footnote{Simply passed on and otherwise not used arguments have
   been replaced with ``$\omitt$'' for readability.}
-%
-%\begin{align*} 
-%\IndexB(\ldots, \nilB(a), \oneelt) &= \repAbar(\ldots, a) \\
-%\IndexB(\ldots, \nonindB(K, \gamma), \pair{k}{y}) &= \IndexB(\ldots, \gamma(k), y) \\  
-%\IndexB(\ldots, \AindB(K, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y) \\
-%\IndexB(\ldots, \BindB(K, \hindex, \gamma), \pair{j}{y})  &= \IndexB(\ldots, \gamma, y)
-%\end{align*}
 %
 \begin{align*} 
 &  \IndexB(\omitt, \omitt, \gammaA, \omitt, \omitt, \introA, \repA, \repIndex, \repB, \nilB(a), \oneelt) \\
@@ -1145,10 +1121,6 @@ We have
 and $\IndexBp(\gamma_{\consCtxtbare}, \Ctxt, \Ty, \consCtxtbare,
 \gamma_{\Pi}, \langle \Gamma, \sigma, \tau, \oneelt\rangle) =
 \Gamma(\oneelt)$.
-
-
-%(and also $\widehat{\Gamma} : \Aterm({\zero + \one}, {\zero + \one + \one}, \gamma_{\Ctxt})$)
-
 \blackqed
 \end{example}
 
@@ -1346,32 +1318,6 @@ With all pieces in place, we can now define $\Listinsert : \SortedList
 \stepind{\nilList}, \stepind{\consListbare}, \stepind{\nilLess{}},
 \stepind{\consLessbare})$.
 \blackqed
-
-% P : SList -> Set
-% P ys = (n : ℕ) -> SList
-
-% Q : (y : ℕ) -> (ys : SList) -> y ≤L ys -> P ys -> Set
-% Q y ys p insert[_,ys] = (x : ℕ) -> y ≤ x ->  y ≤L insert[_,ys] x
-
-% step[] : P []
-% step[] m = m :: [] 〈 triv
-
-%step:: : (n : ℕ) -> (ys : SList) -> (p : n ≤L ys) -> (pp : P ys) -> Q n ys p pp 
-%             -> P (n :: ys 〈 p)
-%step:: n ys p insert[_,ys] lemma[_,ys,p] m with m ≤? n 
-%... | yes q = m :: n :: ys 〈 p 〈 cons q (≤L-trans ys q p)
-%... | no ¬q = n :: (insert[_,ys] m) 〈 lemma[_,ys,p] m (¬x<y→y<x ¬q)
-
-% steptriv : (n : ℕ) -> Q n [] triv step[]
-% steptriv y x y<x = cons y<x triv
-
-% stepcons : (m : ℕ) -> {n : ℕ} -> {ys : SList} -> {p : n ≤L ys} -> 
-%            (q : m ≤ n) -> (p' : m ≤L ys) ->
-%            (pp : P ys) -> (qq : Q n ys p pp) -> (qqq : Q m ys p' pp)
-%              -> Q m (n :: ys 〈 p) (cons {m} {n} {ys} {p} q p') (step:: n ys p pp qq)
-% stepcons m {n} {ys} {p} q m<ys insert[_,ys] lemma[_,ys,p] lemma[_,ys,m<ys] x r with x ≤? n
-% ... | yes q = cons r (cons q m<ys)
-% ... | no ¬q = cons q (lemma[_,ys,m<ys] x r)
 \end{example}
 
 \subsection{The examples revisited}
@@ -1425,7 +1371,7 @@ $\gamma_1$, then $\intro{0 + 1}$ is described by the code
   \intro{W(A, B)} : \big((x : A) \times (B(x) \to W(A, B)) \times \one\big) \to W(A, B) \enspace .
   \]
 
-\item[Finite sets] Indexed inductive definitions can also be
+\item[Finite sets] Also indexed inductive definitions can be
   interpreted as inductive-inductive definitions, namely those where
   the index set just is an isomorphic copy of a previously constructed
   set (i.e.\ with constructor $\introA : I \to A$ for some $I : \Set$).
@@ -1507,9 +1453,9 @@ We have $\Ctxt = A_{\gamma_{\Ctxt}, \gamma_{\Ty}}$ and $\Ty =
 B_{\gamma_{\Ctxt}, \gamma_{\Ty}}$
 and we can define the usual constructors by
 \vskip 0.2cm
-\begin{tabular}{l@{\qquad\qquad}l}
+\begin{tabular}{l@{\qquad}l}
   $\emptyCtxt : \Ctxt$ & $\baseTybare : (\Gamma : \Ctxt) \to \Ty(\Gamma)$ \\
-  $\emptyCtxt = \intro{A_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \oneelt\rangle)\enspace ,$ & $\baseTy{\Gamma} = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \langle (\lambda \oneelt.\Gamma), \oneelt\rangle\rangle)\enspace ,$\!\!\!\\
+  $\emptyCtxt = \intro{A_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \oneelt\rangle)\enspace ,$ & $\baseTy{\Gamma} = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twott, \langle (\lambda \oneelt.\Gamma), \oneelt\rangle\rangle)\enspace ,$\\
 \end{tabular}
 \vskip 0.2cm
 \begin{tabular}{l}
@@ -1523,35 +1469,6 @@ $\Pi : (\Gamma : \Ctxt) \to (\sigma : \Ty(\Gamma)) \to \Ty(\consCtxt{\Gamma}{\si
 $\Pi(\Gamma, \sigma, \tau) = \intro{B_{\gamma_{\Ctxt}, \gamma_{\Ty}}}(\langle \twoff, \langle (\lambda
     \oneelt.\Gamma), \langle (\lambda \oneelt.\sigma),\langle (\lambda \oneelt. \tau) , \oneelt\rangle\rangle \rangle\rangle)$\enspace .
 \end{tabular}
-
-% γCtxt : SPA ⊥
-% γCtxt = nilA ++ A-ind ⊤ (B-ind ⊤ (λ _ → inr _) nilA)
-
-% γTy : SPB ⊥ ⊥ γCtxt
-% γTy = A-ind ⊤ (nilB  (aref (inr _))) +++
-%       A-ind ⊤ (B-ind ⊤  (λ _ → aref (inr _)) (B-ind ⊤ (λ _ → arg  (ff , ((λ _ → bref (inr _)) , ((λ _ → _) , _)))) (nilB  (aref (inr _)))))
-
-
-% Ctxt : Set
-% Ctxt = A γCtxt γTy
-
-% Ty : Ctxt -> Set
-% Ty = B γCtxt γTy
-
-
-% ε : Ctxt
-% ε = introA (tt , _)
-
-% cons : (Γ : Ctxt) -> Ty Γ -> Ctxt
-% cons Γ σ = introA ((ff , (λ _ → Γ) , (λ _ → σ) , _))
-
-% ι : {Γ : Ctxt} -> Ty Γ
-% ι {Γ} = introB ((tt , (λ _ → Γ) , _))
-
-% Π : (Γ : Ctxt) -> (A : Ty Γ) -> (B : Ty (cons Γ A)) -> Ty Γ
-% Π Γ A B = introB (ff , ((λ _ → Γ ) , ((λ _ → A) , ((λ _ → B) , _))))
-
-%\item[Sorted lists] 
 \end{description}
 
 \section{A set-theoretic model}
@@ -1564,19 +1481,15 @@ since the formation and introduction rules are not instances of
 ordinary indexed inductive definitions.  (However, we do believe that
 the theory of inductive-inductive definitions \emph{can} be reduced to
 the theory of indexed inductive definitions with a bit of more
-work, and plan to do this in the future.) %and plan to publish an article about this in the future.
-%see Section~\ref{sec:indexed-induction}.)
+work, and plan to do this in the future.)
 To make sure that our theory is consistent, it is thus necessary to
 construct a model.
-
 
 We will develop a model in ZFC set theory, extended by two
 inaccessible cardinals in order to interpret $\Set$ and $\TYPE$.  Our
 model will be a simpler version of the models developed by Dybjer and
 Setzer~\cite{dybjersetzer1999finax,dybjersetzer2006IIR} for
-induction-recursion. %Hence the proof theoretical
-%strength required is, as expected significantly lower but still too
-%strong. 
+induction-recursion.
 See Aczel \cite{aczel1999typesandsets} for a more detailed treatment
 of interpreting type theory in set theory.
 
@@ -1587,6 +1500,7 @@ of interpreting type theory in set theory.
 We will be working informally in ZFC extended with the existence of two
 strongly inaccessible cardinals $\cardz < \cardi$,
 and will be using standard set theoretic constructions, e.g.
+{\allowdisplaybreaks %give latex a chance to break the page
 \begin{align*}
 \langle a, b\rangle &\coloneqq \{ \{ a \}, \{ a, b \}\} \enspace , \\
 \lambda x \in a.b(x) &\coloneqq \{\langle x, b(x)\rangle\,|\,x \in a \} \enspace ,\\
@@ -1594,13 +1508,14 @@ and will be using standard set theoretic constructions, e.g.
 \Sigma_{x \in a}b(x) &\coloneqq \{ \langle c , d\rangle\ |\ c \in a \land d
 \in b(c) \} \enspace , \\
 0 &\coloneqq \emptyset, 1 \coloneqq \{0\}, 2 \coloneqq \{0, 1\} \enspace , \\
-%\Nat &\coloneqq \text{smallest set containing $0$ and closed under successor} \\
 a_0 + \ldots + a_n &\coloneqq \Sigma_{i \in \{0, \ldots, n\}}a_i
 \end{align*}
+%
 and the cumulative hierarchy $V_{\alpha} \coloneqq
 \displaystyle\bigcup_{\beta < \alpha} \mathcal{P}(V_{\beta})$. Whenever we
 introduce sets $A^{\alpha}$ indexed by ordinals $\alpha$, let \[A^{< \alpha}
 \coloneqq \displaystyle\bigcup_{\beta < \alpha}A^{\beta}.\]
+}
 
 For every expression $A$ of our type theory, we will give an interpretation
 $\sem{A}_\rho$, regardless of whether $A : \TYPE$ or $A : B$ or not. Interpretations
@@ -1642,9 +1557,11 @@ The interpretation of the logical framework is as in
 \sem{\magic{A}}_\rho \colonsimeq \emptyset \text{ (the unique inclusion $\emptyset \to \sem{A}_\rho$ )}
 \end{gather*}
 
-To interpret terms containing $\SPA$, $\SPB$, $\ArgA$, $\ArgB$, $\IndexB$, 
-$\nilA$, $\nonindA$, $\AindA$, $\BindA$, we first define $\sem{\SPA}$,
-$\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpret
+To interpret terms containing $\SPA$, $\SPB$, $\ArgA$, $\ArgB$,
+$\IndexB$, and the codes $\nilA$, $\nonindA$, $\AindA$ and
+$\BindA$, we first define $\sem{\SPA}$, $\sem{\SPB}$, $\sem{\ArgA}$,
+$\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpret
+{\allowdisplaybreaks
 \begin{align*}
 \sem{\SPA(\Xref)}_\rho &\coloneqq \sem{\SPA}(\sem{\Xref}_\rho) \\
 \vdots \\
@@ -1657,6 +1574,7 @@ $\sem{\SPB}$, $\sem{\ArgA}$, $\sem{\nilA}$, $\sem{\nonindA}$, \ldots and interpr
 \end{align*}
 In all future definitions, if we are currently defining $\sem{F}_{\rho}$ where $F : D
 \to E$, say, let $\sem{F}_{\rho}(d)\uparrow$ if $d \notin \sem{D}_{\rho}$.
+}
 
 $\sem{\SPA}(\Xref)$ is defined as the least set such that
 \begin{align*}
@@ -1667,12 +1585,6 @@ $\sem{\SPA}(\Xref)$ is defined as the least set such that
 %
 The constructors are then interpreted as
 %
-%  By the inaccessibility of $\cardi$, there is a
-% regular cardinal ${\kappa < \cardi}$ such that for all $K \in \sem{\Set}$, we
-% have that the cardinality of $K$, $\Xref$, $\Xref + K$ and $(K \to \Xref)$ is less than
-% $\kappa$. If we now iterate an appropriate operator $\kappa$ times, we get our
-% solution, which must be an element of $\sem{\TYPE} = V_{\cardi}$ by the
-% inaccessibility of $\cardi$.
 \begin{align*}
  \sem{\nilA} \colonsimeq \langle 0, 0\rangle \quad
  \sem{\BindA}(K, h, \gamma) \colonsimeq \langle 3 , \langle K, \langle h, \gamma \rangle\rangle\rangle
@@ -1746,22 +1658,6 @@ that the operator has a fixed point after $\cardz$ iterations, which
 must be an element of $\sem{\TYPE} = V_{\cardi}$ by the
 inaccessibility of $\cardi$.
 
-% \begin{theorem}[Soundness] \mbox{}
-% \label{thm:soundness}
-%   \begin{enumerate}[(i)]
-%   \item If ${} \tstile \Gamma \text{context}$, then
-%     $\sem{\Gamma}\downarrow$. 
-%   \item If $\Gamma \tstile A : E$, then $\sem{\Gamma}\downarrow$, and
-%     for all $\rho \in \sem{\Gamma}$, ${\sem{A}_\rho \in \sem{E}_\rho}$, and also
-%     $\sem{E}_\rho \in \sem{\TYPE}$ if $E \not\equiv \TYPE$.
-%   \item If $\Gamma \tstile A = B : E$, then $\sem{\Gamma}\downarrow$, and
-%     for all $\rho \in \sem{\Gamma}$, $\sem{A}_\rho = \sem{B}_\rho$,
-%     $\sem{A}_\rho \in \sem{E}_\rho$ and also $\sem{E}_\rho \in \sem{\TYPE}$ if
-%     $E \not\equiv \TYPE$. 
-%   \item $\nvdash a : \zero$. \qed
-%   \end{enumerate}
-% \end{theorem}
-
 To see that $\sem{A_{\gamma_A, \gamma_B}} \in \sem{\Set}$ and
 $\sem{B_{\gamma_A, \gamma_B}} : \sem{A_{\gamma_A, \gamma_B}} \to
 \sem{\Set}$, one first verifies that $\sem{\ArgAp}$, $\sem{\ArgBp}$,
@@ -1785,39 +1681,6 @@ $\sem{\IndexBp}$ are monotone in the following sense:
   \end{enumerate}
 \end{lemma}
 
-% We are interested in the monotonicity of $\sem{\ArgAp}$,
-% $\sem{\ArgBp}$, $\sem{\IndexBp}$ because of the following adaption of
-% the standard result~\cite{aczel1977indDef} for monotone
-% operators. 
-% %TODO: introduce type of F, G?
-% Let us say that $F$, $G$ are $\kappa$-based if
-% \begin{align*}
-% x \in F(X, Y) \quad & \text{ implies } \quad x \in F(X', Y') \\
-% y \in G(X, Y, \intro{}, x) \quad & \text{ implies } \quad y \in G(X', Y', \intro{}', x)
-% \end{align*}
-% for some $X' \subseteq X$, $Y'(x) \subseteq Y(x)$ for all $x \in X'$
-% and $\intro{}' : F(X', Y') \to X'$ with $\abs{X'} < \kappa$ and $\sup_{x
-%   \in X'}\abs{Y'(x)} < \kappa$.
-
-% If all index sets $K$ which starts an inductive argument occuring in
-% $\sem{\ArgAp}(\gammaA)$, $\sem{\ArgBp}(\gamma_A, \text{--}, \text{--}, \text{--},
-% \gammaB)$ have cardinality $< \kappa$, then
-% $\sem{\ArgAp}(\gammaA)$, $\sem{\ArgBp}(\gamma_A, \text{--},\text{--},\text{--},
-% \gammaB)$ is $\kappa$-based.
-
-% \begin{proposition}
-%   \label{thm:mono-fixpoint}
-%   Let $F$, $G$ be a $\kappa$-based monotone operators where $\kappa$
-%   is regular. Then $F^\kappa = F^{< \kappa}$ and $G^\kappa = G^{< \kappa}$.
-% \end{proposition}
-% \IncludedProof{%
-%   \begin{proof}
-%     It is enough to prove $F^\kappa \subseteq F^{< \kappa}$ and $G^\kappa(x)
-%     \subseteq G^{< \kappa}(x)$ for all $x$. So let $x \in F^\kappa$
-
-%   \end{proof}
-% }{}
-
 We can then adapt the standard results~\cite{aczel1977indDef} about
 monotone operators. First, we note that one application of
 $\sem{\ArgAp}$ and $\sem{\ArgBp}$ is not enough to take us outside of
@@ -1828,7 +1691,7 @@ $\sem{\Set}$:
   For all $\gammaA \in \sem{\SPAp}$ and $\gammaB \in \sem{\SPBp}(\gammaA)$:
   \begin{enumerate}[(i)]
   \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$, then $\sem{\ArgAp}(\gammaA, X, Y) \in \sem{\Set}$.
-  \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$,  $\sem{\ArgBp}(\gammaA, X, Y, \intro{X}, \gammaB) \in \sem{\Set}$.
+  \item If $X \in \sem{\Set}$ and $Y(x) \in \sem{\Set}$ for each $x \in X$, $\sem{\ArgBp}(\gammaA, X, Y, \intro{X}, \gammaB) \in \sem{\Set}$. \qed
   \end{enumerate}
   \end{lemma}
 
@@ -1850,52 +1713,10 @@ $\sem{\Set}$:
     \in A^{\alpha}$. \qed 
   \end{enumerate}
 \end{lemma}
-% \begin{proof}
-%   \begin{enumerate}[(i)]
-%   \item Induction over $\alpha$.
-
-% \notIncludedProof{ 
-%   \begin{itemize}
-%   \item If $\alpha = 0$, then $A^{\alpha} =  \text{least fixed point of }
-%        \lambda X\,.\, \sem{\ArgAp}(\gamma_A, X, \lambda x\,.\,\emptyset)$.
-%        Let $\kappa$ be a regular cardinal of cardinality greater than
-%        that of all index sets which starts an inductive argument. By the
-%        inaccessibility of $\cardz$, $\kappa < \cardz$. Now by the standard argument, 
-%        the fixed point is reached after $\kappa$ iterations, and by the inaccessibility
-%        of $\cardz$, we must have $A^0 \in V_{\cardz}$.
-
-%        Let $a \in A^{0}$. Then
-%        \begin{multline*}
-%        B^0(a) = \{b\ |\ b \in \sem{\ArgBp}(\gamma_A, A^{0},
-%        \lambda x\,.\,\emptyset, \id, \gamma_B) \\
-%          \land \sem{\IndexBp}(\gamma_A,
-%          A^{0}, \lambda x\,.\,\emptyset, \id, \gamma_B, b) = a \}
-%        \end{multline*}
-%        which is in $V_{\cardz}$ by the inaccessibility of $\cardz$.
-%      \item If $\alpha = \beta + 1$. As argued above, one iteration is
-%        not going to make us reach $V_{\cardz}$.
-%   \item If $\alpha = \lambda$ limit. Since $\lambda < \cardz$ and cf($\cardz$) = $\cardz$, $\lim_{\beta \to \lambda} A^\beta < \cardz$.
-%   \end{itemize}
-% }
-%   \item Induction over $\alpha$ and $\beta$, using Lemma~\ref{thm:Arg-monotone}. %todo
-%   \item Let $\kappa$ be a regular cardinal of cardinality greater than
-%     that of all index sets which start an inductive argument. 
-%     %TODO: Why does \kappa exist?#
-%     Apply Proposition \ref{thm:mono-fixpoint}.
-%  \qedhere
-%   \end{enumerate}
-% \end{proof}
 
 Now we are done, since %by Lemma~\ref{thm:A-in-Set}
 $\sem{A_{\gamma_A, \gamma_B}} = A^{\cardz} = A^{\kappa} \in
 \sem{\Set}$, and similarly for $\sem{B_{\gamma_A, \gamma_B}}$.
-
-%\begin{theorem}
-%  $\sem{A_{\gamma_A, \gamma_B}} \in \sem{\Set}$ and $\sem{B_{\gamma_A,
-%      \gamma_B}} : \sem{A_{\gamma_A, \gamma_B}} \to \sem{\Set}$.
-%\end{theorem}
-
-
 
 \bibliographystyle{alpha}
 \bibliography{schwichtenberg}
