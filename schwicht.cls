@@ -1,15 +1,15 @@
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \ProvidesClass{schwicht}
-              [2012/03/02 v0.7 Schwichtenberg Festschrift]
+              [2012/03/02 v0.82 Schwichtenberg Festschrift]
 \newcommand\@ptsize{}
 \newif\if@restonecol
 \newif\if@titlepage
 \@titlepagefalse
-\if@compatibility\else
+
 \setlength\paperheight {210mm}%
 \setlength\paperwidth  {148mm}
-\fi
 \renewcommand\@ptsize{0}
+
 \if@compatibility\else
 \DeclareOption{oneside}{\@twosidefalse \@mparswitchfalse}
 \fi
@@ -25,26 +25,14 @@
 \DeclareOption{onecolumn}{\@twocolumnfalse}
 \fi
 \DeclareOption{twocolumn}{\@twocolumntrue}
-\DeclareOption{openbib}{%
-  \AtEndOfPackage{%
-   \renewcommand\@openbib@code{%
-      \advance\leftmargin\bibindent
-      \itemindent -\bibindent
-      \listparindent \itemindent
-      \parsep \z@
-      }%
-   \renewcommand\newblock{\par}}%
-}
 \ExecuteOptions{twoside,onecolumn,final}
 \ProcessOptions
 \input{size1\@ptsize.clo}
 
 %\RequirePackage[left=1.1cm,right=2.1cm, top=2cm, bottom=2.12cm]{geometry}  
 \RequirePackage[left=1.6cm,right=1.6cm, top=2cm, bottom=2.12cm]{geometry}  
-
-%Ontos
 \RequirePackage{times}
-\RequirePackage{fancyhdr}
+
 \setlength\lineskip{1\p@}
 \setlength\normallineskip{1\p@}
 \renewcommand\baselinestretch{}
@@ -64,48 +52,14 @@
 \renewcommand\dblfloatpagefraction{.5}
 
 \def\@dedication{}
-\newcommand{\dedication}[1]{
-  \def\@dedication{\vskip 1.5em \noindent #1}
-}
-
-\def\ps@headings{%
-    \let\@oddfoot\@empty\let\@evenfoot\@empty
-    \def\@evenhead{\thepage\hfil\slshape\leftmark}%
-    \def\@oddhead{{\slshape\rightmark}\hfil\thepage}%
-    \let\@mkboth\markboth
-  \def\sectionmark##1{%
-    \markboth {\MakeUppercase{%
-      \ifnum \c@secnumdepth >\z@
-        \thesection\quad
-      \fi
-      ##1}}{}}%
-  \def\subsectionmark##1{%
-    \markright {%
-      \ifnum \c@secnumdepth >\@ne
-        \thesubsection\quad
-      \fi
-      ##1}}}
- 
-\def\ps@myheadings{%
-    \let\@oddfoot\@empty\let\@evenfoot\@empty
-    \def\@evenhead{\thepage\hfil\slshape\leftmark}%
-    \def\@oddhead{{\slshape\rightmark}\hfil\thepage}%
-    \let\@mkboth\@gobbletwo
-    \let\sectionmark\@gobble
-    \let\subsectionmark\@gobble
-    }
-
-
-
+\newcommand{\dedication}[1]{\def\@dedication{\vskip 1.5em \noindent #1}}
+\def\@runningauthor{}
+\newcommand{\runningauthor}[1]{\def\@runningauthor{#1}}
+\def\@runningtitle{}
+\newcommand{\runningtitle}[1]{\def\@runningtitle{#1}}
 
 \newcommand\altmaketitle
 {
-\renewcommand{\headrulewidth}{0pt}
-\pagestyle{fancy}
-\fancyhead{}
-\fancyfoot{}
-\fancyhead[LE]{\sc\small \thepage \quad \quad \@author}
-\fancyhead[RO]{\sc\small \@title \quad \quad \thepage}
 \par
   \begingroup
     \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
@@ -113,39 +67,30 @@
     \long\def\@makefntext##1{\parindent 1em\noindent
             \hb@xt@1.8em{%
                 \hss\@textsuperscript{\normalfont\@thefnmark}}##1}%
-    \if@twocolumn
-      \ifnum \col@number=\@ne
-        \@altmaketitle
-
-      \else
-        \twocolumn[\@altmaketitle
-]%
-      \fi
-    \else
       \newpage
       \global\@topnum\z@   % Prevents figures from going at top of page.
       \@altmaketitle
-
-    \fi
     \thispagestyle{plain}\@thanks
   \endgroup
   \setcounter{footnote}{0}%
   \global\let\thanks\relax
-  \global\let\altmaketitle
-\relax
-  \global\let\@altmaketitle
-\relax
+  \global\let\altmaketitle\relax
+  \global\let\@altmaketitle\relax
   \global\let\@thanks\@empty
   \global\let\@date\@empty
   \global\let\date\relax
   \global\let\and\relax
+  \def\@evenhead{\sc\small \thepage \quad \quad \@runningauthor \hfill}
+  \def\@oddhead{\hfill \sc\small \@runningtitle \quad \quad \thepage}
+  \def\@evenfoot{}
+  \def\@oddfoot{}
 }
 \def\@altmaketitle
 {%
   \newpage
   \null
   \vskip 1em%
-  \let \footnote \thanks
+  \let\footnote\thanks
     {\sffamily \noindent \LARGE \@title \par}%
     \vskip 1.5em%
     {\large \sffamily \noindent \@author
@@ -163,46 +108,13 @@
 \newcounter {subsubsection}[subsection]
 \newcounter {paragraph}[subsubsection]
 \newcounter {subparagraph}[paragraph]
-\renewcommand \thepart {\@Roman\c@part}
-\renewcommand \thesection {\@arabic\c@section}
+\renewcommand\thepart {\@Roman\c@part}
+\renewcommand\thesection {\@arabic\c@section}
 \renewcommand\thesubsection   {\thesection.\@arabic\c@subsection}
 \renewcommand\thesubsubsection{\thesubsection.\@arabic\c@subsubsection}
 \renewcommand\theparagraph    {\thesubsubsection.\@arabic\c@paragraph}
 \renewcommand\thesubparagraph {\theparagraph.\@arabic\c@subparagraph}
-\newcommand\part{%
-   \if@noskipsec \leavevmode \fi
-   \par
-   \addvspace{4ex}%
-   \@afterindentfalse
-   \secdef\@part\@spart}
 
-\def\@part[#1]#2{%
-    \ifnum \c@secnumdepth >\m@ne
-      \refstepcounter{part}%
-      \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
-    \else
-      \addcontentsline{toc}{part}{#1}%
-    \fi
-    {\parindent \z@ \raggedright
-     \interlinepenalty \@M
-     \normalfont
-     \ifnum \c@secnumdepth >\m@ne
-       \Large\bfseries \partname\nobreakspace\thepart
-       \par\nobreak
-     \fi
-     \huge \bfseries #2%
-     \markboth{}{}\par}%
-    \nobreak
-    \vskip 3ex
-    \@afterheading}
-\def\@spart#1{%
-    {\parindent \z@ \raggedright
-     \interlinepenalty \@M
-     \normalfont
-     \huge \bfseries #1\par}%
-     \nobreak
-     \vskip 3ex
-     \@afterheading}
 \newcommand\section{\@startsection {section}{1}{\z@}%
                                    {-3.5ex \@plus -1ex \@minus -.2ex}%
                                    {2.3ex \@plus.2ex}%
@@ -280,36 +192,7 @@
                {\list{}{\rightmargin\leftmargin}%
                 \item\relax}
                {\endlist}
-\if@compatibility
-\newenvironment{titlepage}
-    {%
-      \if@twocolumn
-        \@restonecoltrue\onecolumn
-      \else
-        \@restonecolfalse\newpage
-      \fi
-      \thispagestyle{empty}%
-      \setcounter{page}\z@
-    }%
-    {\if@restonecol\twocolumn \else \newpage \fi
-    }
-\else
-\newenvironment{titlepage}
-    {%
-      \if@twocolumn
-        \@restonecoltrue\onecolumn
-      \else
-        \@restonecolfalse\newpage
-      \fi
-      \thispagestyle{empty}%
-      \setcounter{page}\@ne
-    }%
-    {\if@restonecol\twocolumn \else \newpage \fi
-     \if@twoside\else
-        \setcounter{page}\@ne
-     \fi
-    }
-\fi
+
 \newcommand\appendix{\par
   \setcounter{section}{0}%
   \setcounter{subsection}{0}%
@@ -498,17 +381,8 @@
 \setlength\columnseprule{0\p@}
 \pagestyle{plain}
 \pagenumbering{arabic}
-\if@twoside
-\else
-  \raggedbottom
-\fi
-\if@twocolumn
-  \twocolumn
-  \sloppy
-  \flushbottom
-\else
-  \onecolumn
-\fi
+\raggedbottom
+\onecolumn
 \endinput
 %%
-%% End of file `article.cls'.
+%% End of file `schwicht.cls'.
